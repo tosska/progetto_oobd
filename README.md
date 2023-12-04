@@ -1,7 +1,7 @@
 # 🔖 Progetto-OO/BD-2021-2022  <img src="icon.png" align="right"/> 
 #### ↬ "Object-Oriention": **_Progettazione e sviluppo di un applicativo in Java dotato di GUI per una pagina Wiki_** 
 
-#### ↬ "Basi Di Dati": **_Progettazione e sviluppo di una Base di Dati Relazionale per la gestione del ciclo di vita di una pagina Wiki** 
+#### ↬ "Basi Di Dati": **_Progettazione e sviluppo di una Base di Dati Relazionale per la gestione del ciclo di vita di una pagina Wiki_** 
 
 ## 📑 *Organizzazione e Scelte Progettuali*
 
