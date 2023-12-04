@@ -15,12 +15,12 @@
 ## ©️ *Contribuenti*
 👨‍💼  Lorenzo Trignano : N86004496
 
-🙎‍♂️  Francesco Simone : N86
+🙎‍♂️  Francesco Simone : N86004627
 
 ### 📬 *Contatti*
 @ l.trignano@studenti.unina.it
 
-@ f.simone@studenti.unina.it
+@ franc.simone@studenti.unina.it
 
 ## 🏬 *Info*
 - Università degli Studi di Napoli: "Federico II" 
