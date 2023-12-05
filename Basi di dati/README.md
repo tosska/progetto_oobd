@@ -45,11 +45,7 @@ In questo README è presente una breve descrizione dei vari files riguardanti la
 📝 Le Insert per la popolazione del DB
 
 ### 🧩 Indicizzazione per il file *SQL*
-- [Dalla riga * alla riga * viene mostrata la creazione dei *domini*;](aggiungi collegamento)
-- [Dalla riga * alla riga * viene mostrata la creazione delle *tabelle*;](aggiungi collegamento)
-- [Dalla riga * alla riga * vengono mostrati i *trigger*, le *procedure* e  i *vincoli* implementati;](aggiungi collegamento)
-- [Dalla riga * alla riga * viene mostrata la *popolazione* del database;](aggiungi collegamento)
-- [Dalla riga * alla riga * viene creato uno User specifico per il Docente;](aggiungi collegamento)
+..
 
 ## 🗺 Istruzioni per l'accesso al Database 
 ```
