@@ -22,7 +22,7 @@ In questo README è presente una breve descrizione dei vari files riguardanti la
 - File .png del Sequence Diagram di un primo metodo
 - File .png del Sequence Diagram di un secondo metodo
 
-## ⚒ *Directory: E-LearningGUI*
+## ⚒ *Directory: WikiGUI*
 ↓ Codice sorgente suddiviso in packages:
 
 🗀  Controller
