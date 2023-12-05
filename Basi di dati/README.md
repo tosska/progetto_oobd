@@ -45,11 +45,11 @@ In questo README è presente una breve descrizione dei vari files riguardanti la
 📝 Le Insert per la popolazione del DB
 
 ### 🧩 Indicizzazione per il file *SQL*
-- [Dalla riga 8 alla riga 23 viene mostrata la creazione dei *domini*;](https://github.com/antoniolanuto2001/Progetto-OOBD-2021-2022/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L8)
-- [Dalla riga 34 alla riga 296 viene mostrata la creazione delle *tabelle*;](https://github.com/antoniolanuto2001/Progetto-OOBD-2021-2022/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L34)
-- [Dalla riga 300 alla riga 465 vengono mostrati i *trigger*, le *procedure* e  i *vincoli* implementati;](https://github.com/antoniolanuto2001/Progetto-OOBD-2021-2022/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L300)
-- [Dalla riga 470 alla riga 879 viene mostrata la *popolazione* del database;](https://github.com/antoniolanuto2001/Progetto-OOBD-2021-2022/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L470)
-- [Dalla riga 888 alla riga 889 viene creato uno User specifico per il Docente;](https://github.com/antoniolanuto2001/Progetto-OOBD-2021-2022/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L888)
+- [Dalla riga * alla riga * viene mostrata la creazione dei *domini*;](aggiungi collegamento)
+- [Dalla riga * alla riga * viene mostrata la creazione delle *tabelle*;](aggiungi collegamento)
+- [Dalla riga * alla riga * vengono mostrati i *trigger*, le *procedure* e  i *vincoli* implementati;](aggiungi collegamento)
+- [Dalla riga * alla riga * viene mostrata la *popolazione* del database;](aggiungi collegamento)
+- [Dalla riga * alla riga * viene creato uno User specifico per il Docente;](aggiungi collegamento)
 
 ## 🗺 Istruzioni per l'accesso al Database 
 ```
