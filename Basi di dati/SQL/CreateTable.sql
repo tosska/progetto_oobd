@@ -5,10 +5,17 @@
         !Creazione Domini!
     ---------------------------
 */
---Vincolo Di Dominio : Password Domain
+-- Vincolo Di Dominio : Password 
 CREATE DOMAIN PASSWORD_DOMINIO AS VARCHAR(40)
 	CHECK (VALUE ~ '^.*(?=.*[@!#$^*%&])(?=.*[0-9])(?=.*[a-zA-Z]).*$'
 		AND VALUE LIKE '________%');
+
+-- Vincolo Di Dominio: Username
+CREATE DOMAIN USERNAME_DOMINIO
+
+-- Vincolo Di Dominio: Email
+CREATE DOMAIN EMAIL_DOMINIO
+
         
 
 
@@ -31,7 +38,7 @@ CREATE TABLE UTENTE
     Autore BOOLEAN,
 
     PRIMARY KEY(Username)
-}
+};
 
 /*
     ---------------------------
@@ -48,7 +55,8 @@ CREATE TABLE PAGINA
 
     PRIMARY KEY(ID_Pagina),
     FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username)
-}
+    ON DELETE SET DEFAULT  -- ?
+};
 
 /*
     ---------------------------
@@ -65,7 +73,9 @@ CREATE TABLE FRASE
 
     PRIMARY KEY(Ordine, ID_Pagina),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
-}
+    ON DELETE CASCADE
+    ON UPDATE CASCADE   -- ?
+};
 
 /*
     ---------------------------
@@ -79,10 +89,15 @@ CREATE TABLE COLLEGAMENTO
     ID_Collegamento SERIAL,
 
     PRIMARY KEY(OrdineFrase, ID_Pagina, ID_Collegamento),
-    FOREIGN KEY(OrdineFrase) REFERENCES FRASE(Ordine),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
+    FOREIGN KEY(OrdineFrase) REFERENCES FRASE(Ordine)
+    ON DELETE CASCADE,
+    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,    -- ?
     FOREIGN KEY(ID_Collegamento) REFERENCES PAGINA(ID_Pagina)
-}
+    ON DELETE CASCADE
+    ON UPDATE CASCADE   -- ?
+};
 
 /*
     ---------------------------
@@ -100,9 +115,11 @@ CREATE TABLE INSERIMENTO_AUTORE
     UsernameAutore VARCHAR(20),
 
     PRIMARY KEY(ID_Inserimento),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
-    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)
-}
+    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,    -- ?
+    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)   -- ?
+};
 
 /*
     ---------------------------
@@ -121,8 +138,10 @@ CREATE TABLE MODIFICA_AUTORE
     UsernameAutore VARCHAR(20),
 
     PRIMARY KEY(ID_Modifica),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
-    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)
+    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,    -- ?
+    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)   -- ?
 }
 
 /*
@@ -141,8 +160,10 @@ CREATE TABLE CANCELLAZIONE_AUTORE
     UsernameAutore VARCHAR(20),
 
     PRIMARY KEY(ID_Cancellazione),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
-    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)
+    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,  -- ?
+    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)   -- ?
 }
 
 /*
@@ -165,9 +186,11 @@ CREATE TABLE PROPOSTA_INSERIMENTO
     OraApprovazione TIME,
 
     PRIMARY KEY(ID_Proposta),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
-    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username),
-    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username)
+    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,    -- ?
+    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username),    -- ?
+    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username)     -- ?
 }
 
 /*
@@ -192,8 +215,10 @@ CREATE TABLE PROPOSTA_MODIFICA
 
     PRIMARY KEY(ID_Proposta),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
-    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username),
-    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,    -- ?
+    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username),    -- ?
+    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username)     -- ?
 
 }
 
@@ -217,9 +242,11 @@ CREATE TABLE PROPOSTA_CANCELLAZIONE
     OraApprovazione TIME,
 
     PRIMARY KEY(ID_Proposta),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
-    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username),
-    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username)
+    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,  -- ?
+    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username),  -- ?
+    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username)   -- ?
 } 
 
 
@@ -312,7 +339,7 @@ INSERT INTO PROPOSTA_CANCELLAZIONE VALUES
 
 
 CREATE USER silvio_barra PASSWORD 'ProgettoOOBD@'; -- Creazione Nuovo Utente 
-GRANT ALL ON ALL TABLES IN SCHEMA public TO Silvio_Barra; --Assegnazione Privileggi
+GRANT ALL ON ALL TABLES IN SCHEMA public TO Silvio_Barra; -- Assegnazione Privileggi
 
 /* ----------------------------------- */
 
