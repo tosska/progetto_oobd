@@ -49,12 +49,11 @@ CREATE TABLE PAGINA
 {
     ID_Pagina SERIAL,
     Titolo VARCHAR(50),
-    DataCreazione DATE,
-    OraCreazione TIME,
-    UsernameAutore VARCHAR(20),
+    DataCreazione TIMESTAMP,
+    UserAutore VARCHAR(20),
 
     PRIMARY KEY(ID_Pagina),
-    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username)
+    FOREIGN KEY(UserAutore) REFERENCES UTENTE(Username)
     ON DELETE SET DEFAULT  -- ?
 };
 
@@ -67,8 +66,8 @@ CREATE TABLE FRASE
 {
     Ordine SERIAL,
     ID_Pagina SERIAL,
-    Testo VARCHAR(100),
-    Riga INT,
+    Contenuto VARCHAR(100) NOT NULL,
+    Riga INT NOT NULL,
     Collegamento BOOLEAN,
 
     PRIMARY KEY(Ordine, ID_Pagina),
@@ -86,168 +85,135 @@ CREATE TABLE COLLEGAMENTO
 {
     OrdineFrase SERIAL,
     ID_Pagina SERIAL,
-    ID_Collegamento SERIAL,
+    ID_PaginaCollegata SERIAL,
 
-    PRIMARY KEY(OrdineFrase, ID_Pagina, ID_Collegamento),
-    FOREIGN KEY(OrdineFrase) REFERENCES FRASE(Ordine)
+    PRIMARY KEY(OrdineFrase, ID_Pagina, ID_PaginaCollegata),
+    FOREIGN KEY(OrdineFrase, ID_Pagina) REFERENCES FRASE(Ordine, ID_Pagina)
     ON DELETE CASCADE,
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,    -- ?
-    FOREIGN KEY(ID_Collegamento) REFERENCES PAGINA(ID_Pagina)
+    FOREIGN KEY(ID_PaginaCollegata) REFERENCES PAGINA(ID_Pagina)
     ON DELETE CASCADE
     ON UPDATE CASCADE   -- ?
 };
 
 /*
     ---------------------------
-        !Table-INSERIMENTO_AUTORE!
+        !Table-INSERIMENTO!
     ---------------------------
 */
-CREATE TABLE INSERIMENTO_AUTORE
+
+CREATE TABLE INSERIMENTO
 {
     ID_Inserimento SERIAL,
-    Riga INT,
-    DataInserimento DATE,
-    OraInserimento TIME,
-    FraseInserita VARCHAR(100),
-    ID_Pagina SERIAL,
-    UsernameAutore VARCHAR(20),
+    Riga INT NOT NULL,
+    FraseInserita VARCHAR(100) NOT NULL,
+    Data TIMESTAMP,
+    Proposta BOOLEAN NOT NULL,
+    ID_Pagina SERIAL NOT NULL,
+    Utente VARCHAR(20) NOT NULL,
 
     PRIMARY KEY(ID_Inserimento),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,    -- ?
-    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)   -- ?
+    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
+    FOREIGN KEY(Utente) REFERENCES UTENTE(Username)
 };
 
 /*
     ---------------------------
-        !Table-MODIFICA_AUTORE!
+        !Table-MODIFICA!
     ---------------------------
 */
-CREATE TABLE MODIFICA_AUTORE
+
+CREATE TABLE MODIFICA
 {
     ID_Modifica SERIAL,
-    Riga INT,
-    DataModifica DATE, 
-    OraModifica TIME,
-    FraseOriginale VARCHAR(100),
-    FraseModificata VARCHAR(100),
-    ID_Pagina SERIAL,
-    UsernameAutore VARCHAR(20),
+    Riga INT NOT NULL,
+    FraseOriginale VARCHAR(100) NOT NULL,
+    FraseModificata VARCHAR(100) NOT NULL,
+    Data TIMESTAMP,
+    Proposta BOOLEAN NOT NULL,
+    ID_Pagina SERIAL NOT NULL,
+    Utente VARCHAR(20) NOT NULL,
 
     PRIMARY KEY(ID_Modifica),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,    -- ?
-    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)   -- ?
-}
+    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
+    FOREIGN KEY(Utente) REFERENCES UTENTE(Username)
+};
+
 
 /*
     ---------------------------
-        !Table-CANCELLAZIONE_AUTORE!
+        !Table-CANCELLAZIONE!
     ---------------------------
 */
-CREATE TABLE CANCELLAZIONE_AUTORE
+
+CREATE TABLE CANCELLAZIONE
 {
     ID_Cancellazione SERIAL,
-    Riga INT,
-    DataCancellazione DATE,
-    OraCancellazione TIME,
-    FraseEliminata VARCHAR(100),
-    ID_Pagina SERIAL,
-    UsernameAutore VARCHAR(20),
+    Riga INT NOT NULL,
+    FraseEliminata VARCHAR(100) NOT NULL,
+    Data TIMESTAMP,
+    Proposta BOOLEAN NOT NULL,
+    ID_Pagina SERIAL NOT NULL,
+    Utente VARCHAR(20) NOT NULL,
 
     PRIMARY KEY(ID_Cancellazione),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,  -- ?
-    FOREIGN KEY(UsernameAutore) REFERENCES AUTORE(Username)   -- ?
-}
-
-/*
-    ---------------------------
-        !Table-PROPOSTA_INSERIMENTO!
-    ---------------------------
-*/
-CREATE TABLE PROPOSTA_INSERIMENTO
-{
-    ID_Proposta SERIAL,
-    Riga INT,
-    DataProposta DATE,
-    OraProposta TIME,
-    FraseInserita VARCHAR(100),
-    ID_Pagina SERIAL,
-    UsernameUtente VARCHAR(20),
-    UsernameAutore VARCHAR(20),
-    Approvato BOOLEAN,
-    DataApprovazione DATE,
-    OraApprovazione TIME,
-
-    PRIMARY KEY(ID_Proposta),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,    -- ?
-    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username),    -- ?
-    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username)     -- ?
-}
-
-/*
-    ---------------------------
-        !Table-PROPOSTA_MODIFICA!
-    ---------------------------
-*/
-CREATE TABLE PROPOSTA_MODIFICA
-{
-    ID_Proposta SERIAL,
-    Riga INT,
-    DataProposta DATE,
-    OraProposta TIME,
-    FraseOriginale VARCHAR(100),
-    FraseModificata VARCHAR(100),
-    ID_Pagina SERIAL,
-    UsernameUtente VARCHAR(20),
-    UsernameAutore VARCHAR(20),
-    Approvato BOOLEAN,
-    DataApprovazione DATE,
-    OraApprovazione TIME,
-
-    PRIMARY KEY(ID_Proposta),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina),
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,    -- ?
-    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username),    -- ?
-    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username)     -- ?
-
-}
+    FOREIGN KEY(Utente) REFERENCES UTENTE(Username)
+};
 
 /*
     ---------------------------
-        !Table-PROPOSTA_CANCELLAZIONE!
+        !Table-APPROVAZIONE_INSERIMENTO!
     ---------------------------
 */
-CREATE TABLE PROPOSTA_CANCELLAZIONE
-{
-    ID_Proposta SERIAL,
-    Riga INT,
-    DataProposta DATE,
-    OraProposta TIME,
-    FraseEliminata VARCHAR(100),
-    ID_Pagina SERIAL,
-    UsernameUtente VARCHAR(20),
-    UsernameAutore VARCHAR(20),
-    Approvato BOOLEAN,
-    DataApprovazione DATE,
-    OraApprovazione TIME,
 
-    PRIMARY KEY(ID_Proposta),
-    FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,  -- ?
-    FOREIGN KEY(UsernameAutore) REFERENCES UTENTE(Username),  -- ?
-    FOREIGN KEY(UsernameUtente) REFERENCES UTENTE(Username)   -- ?
-} 
+CREATE TABLE APPROVAZIONE_INSERIMENTO
+{
+    ID_Inserimento SERIAL,
+    Autore VARCHAR(20),
+    Data TIMESTAMP,
+    Risposta BOOLEAN,
+
+    PRIMARY KEY(ID_Inserimento, Autore),
+    FOREIGN KEY(ID_Inserimento) REFERENCES INSERIMENTO(ID_Inserimento),
+    FOREIGN KEY(Autore) REFERENCES UTENTE(Username),
+};
+
+/*
+    ---------------------------
+        !Table-APPROVAZIONE_MODIFICA!
+    ---------------------------
+*/
+
+CREATE TABLE APPROVAZIONE_MODIFICA
+{
+    ID_Modifica SERIAL,
+    Autore VARCHAR(20),
+    Data TIMESTAMP,
+    Risposta BOOLEAN,
+
+    PRIMARY KEY(ID_Modifica, Autore),
+    FOREIGN KEY(ID_Modifica) REFERENCES MODIFICA(ID_Modifica),
+    FOREIGN KEY(Autore) REFERENCES UTENTE(Username),
+};
+
+
+/*
+    ---------------------------
+        !Table-APPROVAZIONE_CANCELLAZIONE!
+    ---------------------------
+*/
+
+CREATE TABLE APPROVAZIONE_CANCELLAZIONE
+{
+    ID_Cancellazione SERIAL,
+    Autore VARCHAR(20),
+    Data TIMESTAMP,
+    Risposta BOOLEAN,
+
+    PRIMARY KEY(ID_Cancellazione, Autore),
+    FOREIGN KEY(ID_Cancellazione) REFERENCES CANCELLAZIONE(ID_Cancellazione),
+    FOREIGN KEY(Autore) REFERENCES UTENTE(Username),
+};
 
 
 
@@ -286,50 +252,50 @@ INSERT INTO COLLEGAMENTO VALUES
 
 /*
   ---------------------------------
-    !INSERT->TABLE->INSERIMENTO_AUTORE!
+    !INSERT->TABLE->INSERIMENTO!
   ---------------------------------
 */
-INSERT INTO INSERIMENTO_AUTORE VALUES
+INSERT INTO INSERIMENTO VALUES
 
 
 /*
   ---------------------------------
-    !INSERT->TABLE->MODIFICA_AUTORE!
+    !INSERT->TABLE->MODIFICA !
   ---------------------------------
 */
-INSERT INTO MODIFICA_AUTORE VALUES
+INSERT INTO MODIFICA VALUES
 
 
 /*
   ---------------------------------
-    !INSERT->TABLE->CANCELLAZIONE_AUTORE!
+    !INSERT->TABLE->CANCELLAZIONE !
   ---------------------------------
 */
-INSERT INTO CANCELLAZIONE_AUTORE VALUES
+INSERT INTO CANCELLAZIONE VALUES
 
 
 /*
   ---------------------------------
-    !INSERT->TABLE->PROPOSTA_INSERIMENTO!
+    !INSERT->TABLE->APPROVAZIONE_INSERIMENTO!
   ---------------------------------
 */
-INSERT INTO PROPOSTA_INSERIMENTO VALUES
+INSERT INTO APPROVAZIONE_INSERIMENTO VALUES
 
 
 /*
   ---------------------------------
-    !INSERT->TABLE->PROPOSTA_MODIFICA!
+    !INSERT->TABLE->APPROVAZIONE_MODIFICA!
   ---------------------------------
 */
-INSERT INTO PROPOSTA_MODIFICA VALUES
+INSERT INTO APPROVAZIONE_MODIFICA VALUES
 
 
 /*
   ---------------------------------
-    !INSERT->TABLE->PROPOSTA_CANCELLAZIONE!
+    !INSERT->TABLE->APPROVAZIONE_CANCELLAZIONE!
   ---------------------------------
 */
-INSERT INTO PROPOSTA_CANCELLAZIONE VALUES
+INSERT INTO APPROVAZIONE_CANCELLAZIONE VALUES
 
 
 
@@ -339,7 +305,7 @@ INSERT INTO PROPOSTA_CANCELLAZIONE VALUES
 
 
 CREATE USER silvio_barra PASSWORD 'ProgettoOOBD@'; -- Creazione Nuovo Utente 
-GRANT ALL ON ALL TABLES IN SCHEMA public TO Silvio_Barra; -- Assegnazione Privileggi
+GRANT ALL ON ALL TABLES IN SCHEMA public TO Silvio_Barra; -- Assegnazione Privilegi
 
 /* ----------------------------------- */
 
