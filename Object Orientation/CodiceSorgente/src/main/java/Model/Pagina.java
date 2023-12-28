@@ -3,7 +3,7 @@ package Model;
 public class Pagina {
     private String titolo;
     private String dataCreazione;
-    public Utente autore;
+    private Utente autore;
 
     public Pagina(String title, String data, Utente author) {
         setTitolo(title);
