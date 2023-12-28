@@ -1,9 +1,12 @@
 package Model;
 
+import java.util.ArrayList;
+
 public class Utente {
     private String username;
     private String email;
     private String password;
+    private ArrayList<Operazione> operazioniEffettuate;
 
     public Utente (String user, String mail, String pass) {
         setUsername(user);
