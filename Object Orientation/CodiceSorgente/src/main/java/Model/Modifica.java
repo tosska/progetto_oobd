@@ -4,8 +4,8 @@ public class Modifica extends Operazione {
     private Frase fraseOriginale;
     private Frase fraseModificata;
 
-    public Modifica(Boolean proposta, int riga, String data, Utente utente, Frase fraseOriginale, Frase fraseModificata) {
-        super(proposta, riga, data, utente);
+    public Modifica(Boolean proposta, int riga, String data, Utente utente, Frase fraseOriginale, Frase fraseModificata, Storico storico) {
+        super(proposta, riga, data, utente, storico);
         setFraseOriginale(fraseOriginale);
         setFraseModificata(fraseModificata);
     }

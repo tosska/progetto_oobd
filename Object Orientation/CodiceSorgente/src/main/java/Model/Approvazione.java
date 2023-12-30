@@ -4,9 +4,9 @@ public class Approvazione {
     private String data;
     private Boolean risposta;
     private Operazione operazione;
-    private Autore autore;
+    private Utente autore;
 
-    public Approvazione(String data, Boolean risposta, Operazione operazione, Autore autore) {
+    public Approvazione(String data, Boolean risposta, Operazione operazione, Utente autore) {
         setData(data);
         setRisposta(risposta);
         setOperazione(operazione);
@@ -19,7 +19,7 @@ public class Approvazione {
     public void setRisposta(Boolean risposta) { this.risposta = risposta; }
     public Operazione getOperazione() { return operazione; }
     public void setOperazione(Operazione operazione) { this.operazione = operazione; }
-    public Autore getAutore() { return autore; }
-    public void setAutore(Autore autore) { this.autore = autore; }
+    public Utente getAutore() { return autore; }
+    public void setAutore(Utente autore) { this.autore = autore; }
 
 }

@@ -7,6 +7,8 @@ public class Utente {
     private String email;
     private String password;
     private ArrayList<Operazione> operazioniEffettuate;
+    private ArrayList<Pagina> ListaPagineCreate;
+    private ArrayList<Approvazione> notifiche;
 
     public Utente (String user, String mail, String pass) {
         setUsername(user);
@@ -20,6 +22,9 @@ public class Utente {
     public void setEmail(String email) { this.email = email; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    public void creaPagina(String titolo, String data, Testo testo, Storico storico) {
+        ListaPagineCreate.add(new Pagina(titolo, data, this, testo, storico));
+    }
 
 
 }

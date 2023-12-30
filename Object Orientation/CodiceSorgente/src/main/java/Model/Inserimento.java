@@ -3,8 +3,8 @@ package Model;
 public class Inserimento extends Operazione {
     private Frase fraseInserita;
 
-    public Inserimento(Boolean proposta, int riga, String data, Utente utente, Frase fraseInserita) {
-        super(proposta, riga, data, utente);
+    public Inserimento(Boolean proposta, int riga, String data, Utente utente, Frase fraseInserita, Storico storico) {
+        super(proposta, riga, data, utente, storico);
         setFraseInserita(fraseInserita);
     }
 
