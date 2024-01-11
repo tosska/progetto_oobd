@@ -13,6 +13,7 @@ public class CreationPage {
     private JTextArea textArea;
 
     private JPanel panel;
+    private JTextArea textArea1;
     public JFrame frame;
 
     public JFrame frameChiamante;
