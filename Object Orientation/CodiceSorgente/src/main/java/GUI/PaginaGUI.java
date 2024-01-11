@@ -1,8 +1,10 @@
 package GUI;
 
+import Controller.Controller;
+
 import javax.swing.*;
 
-public class Pagina {
+public class PaginaGUI {
     private JPanel panel;
     private JLabel titleField;
     private JTextArea textArea1;
@@ -14,7 +16,10 @@ public class Pagina {
     private JPanel panelInfo;
     public JFrame frame;
 
-    public Pagina(JFrame frameChiamante) {
+    public Controller controller;
+
+    public PaginaGUI(JFrame frameChiamante, Controller controller) {
+        this.controller = controller;
         frame = new JFrame("PaginaGUI");
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

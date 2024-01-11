@@ -1,5 +1,7 @@
 package GUI;
 
+import Controller.Controller;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,11 +13,13 @@ public class StartScreen {
     private JPanel panel2;
     private static JFrame frame;
 
+    public Controller controller = new Controller();
+
     public StartScreen() {
         register.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Register registerGUI = new Register(frame);
+                Register registerGUI = new Register(frame, controller);
                 registerGUI.frame.setVisible(true);
                 frame.setVisible(false);
             }
@@ -24,7 +28,7 @@ public class StartScreen {
         login.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Login loginGUI = new Login(frame);
+                Login loginGUI = new Login(frame, controller);
                 loginGUI.frame.setVisible(true);
                 frame.setVisible(false);
             }

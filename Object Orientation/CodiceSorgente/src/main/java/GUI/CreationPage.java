@@ -6,29 +6,32 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Login {
+public class CreationPage {
+    private JButton creaPaginaButton;
+    private JButton indietroButton;
+    private JTextField titleField;
+    private JTextArea textArea;
+
     private JPanel panel;
-    private JTextField usernameField;
-    private JPasswordField passwordField;
-    private JButton loginButton;
-    private JLabel usernamLabel;
-    private JLabel passwordLabel;
     public JFrame frame;
+
+    public JFrame frameChiamante;
+
     public Controller controller;
 
-    public Login(JFrame frameChiamante, Controller controller) {
+    public CreationPage(JFrame frameChiamante, Controller controller) {
         this.controller = controller;
-        frame= new JFrame("LoginGUI");
+        frame= new JFrame("CreationPage");
         frame.setContentPane(panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-        loginButton.addActionListener(new ActionListener() {
+
+        creaPaginaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Home homeGUI = new Home(frame, controller);
-                homeGUI.frame.setVisible(true);
-                frame.setVisible(false);
+                controller.creazionePagina(titleField.getText(), textArea.getText());
+                System.out.println("pagina creata");
             }
         });
     }

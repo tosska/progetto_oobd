@@ -22,9 +22,11 @@ public class Utente {
     public void setEmail(String email) { this.email = email; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-    public void creaPagina(String titolo, String data, Testo testo, Storico storico) {
-        ListaPagineCreate.add(new Pagina(titolo, data, this, testo, storico));
-    }
+
+    //da capire se cancellare o modificare
+    /*public void creaPagina(String titolo, String data, Testo testo, Storico storico) {
+        ListaPagineCreate.add(new Pagina(titolo, data, this));
+    }*/
 
 
 }

@@ -19,4 +19,9 @@ public class Frase {
     public void setOrdine(int ordine) { this.ordine = ordine; }
     public int getRiga() { return riga; }
     public void setRiga(int riga) { this.riga = riga; }
+
+    public void stampa()  //da cancellare
+    {
+        System.out.println(contenuto + riga);
+    }
 }
