@@ -31,14 +31,14 @@ CREATE DOMAIN EMAIL_DOMINIO
     ---------------------------
 */
 CREATE TABLE UTENTE
-{
-    Username VARCHAR(20),
-    Email VARCHAR(50),
-    Password PASSWORD_DOMINIO,
-    Autore BOOLEAN,
+(
+    Username VARCHAR(20) NOT NULL,
+    Email VARCHAR(50) NOT NULL,
+    Password VARCHAR(30) NOT NULL,
+    Autore BOOLEAN DEFAULT FALSE,
 
     PRIMARY KEY(Username)
-};
+);
 
 /*
     ---------------------------
