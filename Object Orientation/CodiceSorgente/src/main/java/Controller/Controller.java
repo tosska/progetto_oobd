@@ -26,7 +26,7 @@ public class Controller {
 
     public void aggiungiUtente(String username, String email, String password)
     {
-        ListaUtenti.add(new Utente(username, email, password)); // in memoria
+        // ListaUtenti.add(new Utente(username, email, password)); // in memoria
         ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
         l.addUtenteDB(username, email, password);   // scrive sul DB
     }
