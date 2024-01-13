@@ -1,5 +1,7 @@
 package Controller;
 
+import DAO.ListaUtentiDAO;
+import ImplementazionePostgresDAO.ListaUtentiImplementazionePostgresDAO;
 import Model.Pagina;
 import Model.Utente;
 
@@ -24,11 +26,14 @@ public class Controller {
 
     public void aggiungiUtente(String username, String email, String password)
     {
-        ListaUtenti.add(new Utente(username, email, password));
+        // ListaUtenti.add(new Utente(username, email, password)); // in memoria
+        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        l.addUtenteDB(username, email, password);   // scrive sul DB
     }
 
     public boolean verificaUsername(String username)
     {
+        /*
         for (Utente u : ListaUtenti)
         {
             if (u.getUsername().equals(username))
@@ -38,10 +43,16 @@ public class Controller {
         }
 
         return false;
+         */
+
+        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        boolean result = l.verificaUsernameDB(username);
+        return result;
     }
 
     public boolean verificaPassword(String username, String password)
     {
+        /*
         for (Utente u : ListaUtenti)
         {
             if (u.getUsername().equals(username))
@@ -55,6 +66,10 @@ public class Controller {
         }
 
         return false;
+         */
+        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        boolean result = l.verificaPasswordDB(username, password);
+        return result;
     }
 
 
