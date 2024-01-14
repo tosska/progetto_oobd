@@ -74,7 +74,7 @@ public class LoginPage implements ActionListener {
                     messageLabel.setForeground(Color.green);
                     messageLabel.setText("Login succesful");
                     frame.dispose();    // la schermata di login non ci serve più (va bene?)
-                    WelcomePage welcomePage = new WelcomePage(userID);
+                    WelcomePage welcomePage = new WelcomePage(userID, controllerPrincipale);
                 }
                 else {
                     messageLabel.setForeground(Color.red);

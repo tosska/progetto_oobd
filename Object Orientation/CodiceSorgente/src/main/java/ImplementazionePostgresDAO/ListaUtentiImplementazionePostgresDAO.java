@@ -2,6 +2,7 @@ package ImplementazionePostgresDAO;
 
 import DAO.ListaUtentiDAO;
 import Database.ConnessioneDatabase;
+import Model.Utente;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -68,5 +69,28 @@ public class ListaUtentiImplementazionePostgresDAO implements ListaUtentiDAO {
             System.out.println("Errore: " + e.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public Utente cercaAutoreDB(String username) {
+        try {
+            PreparedStatement queryControllo = connection.prepareStatement("SELECT * from utente where username = '" + username + "'");
+            ResultSet rs = queryControllo.executeQuery();
+
+            if(rs.next())
+            {
+                String email = rs.getString("email");
+                String password = rs.getString("password");
+                Utente autore = new Utente(username, email, password);
+                return autore;
+            }
+
+            connection.close();
+
+        } catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+        }
+        return null;
     }
 }

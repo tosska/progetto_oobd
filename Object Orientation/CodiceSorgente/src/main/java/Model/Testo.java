@@ -16,6 +16,7 @@ public class Testo {
     }
 
     public Pagina getPaginaRiferita() { return paginaRiferita; }
+    public ArrayList<Frase> getListaFrasi() { return listaFrasi; }
     public void setPaginaRiferita(Pagina paginaRiferita) { this.paginaRiferita = paginaRiferita; }
 
     public void inserisciTesto(String testo)
@@ -68,4 +69,5 @@ public class Testo {
         for(Frase f : listaFrasi)
             f.stampa();
     }
+
 }

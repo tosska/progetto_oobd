@@ -6,6 +6,7 @@ public class Utente {
     private String username;
     private String email;
     private String password;
+    private Boolean autore; // indica se si tratta di un autore o no
     private ArrayList<Operazione> operazioniEffettuate;
     private ArrayList<Pagina> ListaPagineCreate;
     private ArrayList<Approvazione> notifiche;

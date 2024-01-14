@@ -1,27 +1,30 @@
 package Model;
 
+import java.sql.Timestamp;
+
 public class Pagina {
     private String titolo;
-    private String dataCreazione;
+    private Timestamp dataCreazione;
     private Utente autore;
     private Testo testoRiferito;
     private Storico storico;
 
-    public Pagina(String titolo, String dataCreazione, Utente autore, String testo) {
+    public Pagina(String titolo, Utente autore, String testo) {
         setTitolo(titolo);
-        setDataCreazione(dataCreazione);
+        setDataCreazione();
         setAutore(autore);
         testoRiferito = new Testo(this);
-        storico = new Storico(this);
+        // storico = new Storico(this);
         inserisciTesto(testo);
+        System.out.println(autore.getUsername());
     }
 
     public String getTitolo() { return titolo; }
     public void setTitolo(String titolo) { this.titolo = titolo; }
 
-    public String getDataCreazione() { return dataCreazione; }
-    public void setDataCreazione(String dataCreazione) { this.dataCreazione = dataCreazione; }
-    public Utente getAutore() { return autore; }
+    public Timestamp getDataCreazione() { return dataCreazione; }
+    public void setDataCreazione() { this.dataCreazione = new Timestamp(System.currentTimeMillis()); }
+    public String getAutore() { return autore.getUsername(); }
     public void setAutore(Utente autore) { this.autore = autore; }
 
     public Testo getTestoRiferito() { return testoRiferito; }

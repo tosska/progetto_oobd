@@ -1,6 +1,8 @@
 package Controller;
 
+import DAO.ListaPagineDAO;
 import DAO.ListaUtentiDAO;
+import ImplementazionePostgresDAO.ListaPagineImplementazionePostgresDAO;
 import ImplementazionePostgresDAO.ListaUtentiImplementazionePostgresDAO;
 import Model.Pagina;
 import Model.Utente;
@@ -18,33 +20,32 @@ public class Controller {
         ListaUtenti = new ArrayList<Utente>();
     }
 
-    public void creazionePagina(String titolo, String testo)
+    public void creazionePagina(String titolo, String testo, String usernameAutore)
     {
-        utilizzatore = new Utente("dd", "aa", "ddsa");
-        Pagina p = new Pagina(titolo, "data", utilizzatore, testo);
+        // utilizzatore = new Utente("dd", "aa", "ddsa");
+        // Pagina p = new Pagina(titolo, "data", utilizzatore, testo);
+
+
+        ListaUtentiDAO listaUtentiDAO = new ListaUtentiImplementazionePostgresDAO();
+        Utente autore = listaUtentiDAO.cercaAutoreDB(usernameAutore);
+        Pagina p = new Pagina(titolo, autore, testo);
+
+        ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
+        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore());
+
+        int idPagina = listaPagineDAO.recuperaIdPagina();
+
+        listaPagineDAO.addFraseDB(idPagina, p.getTestoRiferito().getListaFrasi());
     }
 
     public void aggiungiUtente(String username, String email, String password)
     {
-        // ListaUtenti.add(new Utente(username, email, password)); // in memoria
         ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
         l.addUtenteDB(username, email, password);   // scrive sul DB
     }
 
     public boolean verificaUsername(String username)
     {
-        /*
-        for (Utente u : ListaUtenti)
-        {
-            if (u.getUsername().equals(username))
-            {
-                return true;
-            }
-        }
-
-        return false;
-         */
-
         ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
         boolean result = l.verificaUsernameDB(username);
         return result;
@@ -52,21 +53,6 @@ public class Controller {
 
     public boolean verificaPassword(String username, String password)
     {
-        /*
-        for (Utente u : ListaUtenti)
-        {
-            if (u.getUsername().equals(username))
-            {
-                if (u.getPassword().equals(password))
-                {
-                    return true;
-                }
-            }
-
-        }
-
-        return false;
-         */
         ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
         boolean result = l.verificaPasswordDB(username, password);
         return result;
