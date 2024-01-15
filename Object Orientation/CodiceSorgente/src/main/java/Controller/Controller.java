@@ -13,22 +13,25 @@ public class Controller {
 
     public ArrayList<Utente> ListaUtenti;
     public Utente utilizzatore;
-    public ArrayList<Pagina> pagine = new ArrayList<>();
+    public ArrayList<Pagina> pagineCreate;
 
     public Controller()
     {
         ListaUtenti = new ArrayList<Utente>();
     }
 
-    public void creazionePagina(String titolo, String testo, String usernameAutore)
+    public void caricaPagineCreate()
+    {
+        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        pagineCreate = l.getPagineCreateDB(utilizzatore);
+        stampaPagineCreate();
+    }
+    public void creazionePagina(String titolo, String testo)
     {
         // utilizzatore = new Utente("dd", "aa", "ddsa");
         // Pagina p = new Pagina(titolo, "data", utilizzatore, testo);
 
-
-        ListaUtentiDAO listaUtentiDAO = new ListaUtentiImplementazionePostgresDAO();
-        Utente autore = listaUtentiDAO.cercaAutoreDB(usernameAutore);
-        Pagina p = new Pagina(titolo, autore, testo);
+        Pagina p = new Pagina(titolo, utilizzatore, testo);
 
         ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
         listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore());
@@ -56,6 +59,24 @@ public class Controller {
         ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
         boolean result = l.verificaPasswordDB(username, password);
         return result;
+    }
+
+    public void impostaUtilizzatore(String username)
+    {
+        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        utilizzatore = l.getUtenteDB(username);
+    }
+
+    public void stampaPagineCreate() //debug
+    {
+        for(Pagina p : pagineCreate)
+            System.out.println(p.getTitolo());
+    }
+
+    public Pagina cercaPagina(String titolo)
+    {
+        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        return l.cercaPaginaDB(titolo);
     }
 
 

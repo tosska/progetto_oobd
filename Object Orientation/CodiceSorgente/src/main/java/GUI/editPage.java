@@ -7,7 +7,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CreateNewPage{
+public class editPage {
+
     private JFrame frame = new JFrame();
     private Controller controllerPrincipale;
     private JTextArea textArea;
@@ -16,11 +17,11 @@ public class CreateNewPage{
     private JTextField titleField;
     private JButton backButton;
     private JButton submitButton;
-    CreateNewPage(Controller controller, JFrame frameChiamante) {
+    editPage(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
         String userID = controllerPrincipale.utilizzatore.getUsername();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Create new page");
+        frame.setTitle("Edit page");
         frame.setSize(500, 500);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
@@ -74,5 +75,4 @@ public class CreateNewPage{
         frame.add(submitButton);
         frame.setVisible(true);
     }
-
 }

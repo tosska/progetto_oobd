@@ -1,5 +1,6 @@
 package Model;
 
+import javax.swing.text.Utilities;
 import java.util.ArrayList;
 
 public class Testo {
@@ -33,7 +34,7 @@ public class Testo {
             System.out.println(frase.length());
 
             System.out.println("frase:" + frase);
-            inserisciFrase(frase, riga);
+            inserisciFrasePura(frase, riga);
 
             //troviamo la riga in cui è posizionata la frase
             if(inizioFrase < testo.length() && testo.indexOf('\n', inizioFrase, inizioFrase+2) != -1
@@ -43,10 +44,26 @@ public class Testo {
         stampaFrasi();
     }
 
-    private void inserisciFrase(String frase, int riga)
+    public void inserisciFrase(Frase f)
     {
-        numFrasi++;
-        Frase f = new Frase(numFrasi, cancellaSpazi_NewLine(frase), riga, this);
+        listaFrasi.add(f);
+        //come faccio a gestire numFrasi
+    }
+    private void inserisciFrasePura(String frase, int riga)
+    {
+        Frase f;
+
+        frase = cancellaSpazi_NewLine(frase);
+
+        if(frase.charAt(0)== '#' && frase.charAt(frase.length()+1)=='#')
+        {
+            frase = frase.substring(frase.indexOf("#")+1, frase.lastIndexOf('#'));
+            f = new Collegamento(numFrasi, frase, riga, this, null); //da cambiare
+        }
+        else
+            f = new Frase(numFrasi, frase, riga, this);
+
+        numFrasi++;//frase ha ordine di tipo serial nel database, quindi numFrasi al momento è inutile
         listaFrasi.add(f);
     }
 

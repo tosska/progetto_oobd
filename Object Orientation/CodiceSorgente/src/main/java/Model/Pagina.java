@@ -19,6 +19,17 @@ public class Pagina {
         System.out.println(autore.getUsername());
     }
 
+    public Pagina(String titolo, Testo testo, Timestamp dataCreazione, Utente autore ) {
+        setTitolo(titolo);
+        setTestoRiferito(testo);
+        this.dataCreazione = dataCreazione;
+        setAutore(autore);
+        testoRiferito = testo;
+        // storico = new Storico(this);
+
+        System.out.println(autore.getUsername());
+    }
+
     public String getTitolo() { return titolo; }
     public void setTitolo(String titolo) { this.titolo = titolo; }
 
