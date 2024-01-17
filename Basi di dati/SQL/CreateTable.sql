@@ -51,12 +51,14 @@ CREATE TABLE UTENTE
 CREATE TABLE PAGINA 
 (
     ID_Pagina SERIAL,
-    Titolo VARCHAR(50),
+    Titolo VARCHAR(50) NOT NULL,
+    Tema VARCHAR(50) NOT NULL, 
     DataCreazione TIMESTAMP,
     UserAutore VARCHAR(20) DEFAULT 'non trovato', --NOT NULL?
 
     PRIMARY KEY(ID_Pagina),
     FOREIGN KEY(UserAutore) REFERENCES UTENTE(Username) ON DELETE SET DEFAULT
+    UNIQUE(Titolo, Tema)
 );
 
 /*

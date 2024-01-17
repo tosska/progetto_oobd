@@ -1,17 +1,23 @@
 package Model;
 
 public class Modifica extends Operazione {
-    private Frase fraseOriginale;
-    private Frase fraseModificata;
+    private String fraseOriginale;
+    private String fraseModificata;
 
-    public Modifica(Boolean proposta, int riga, String data, Utente utente, Frase fraseOriginale, Frase fraseModificata, Storico storico) {
-        super(proposta, riga, data, utente, storico);
+    public Modifica(Boolean proposta, int riga, String data, Utente utente, String fraseOriginale, String fraseModificata, Storico storico, Pagina pagina) {
+        super(proposta, riga, data, utente, storico, pagina);
         setFraseOriginale(fraseOriginale);
         setFraseModificata(fraseModificata);
     }
 
-    public Frase getFraseOriginale() { return fraseOriginale; }
-    public void setFraseOriginale(Frase fraseOriginale) { this.fraseOriginale = fraseOriginale; }
-    public Frase getFraseModificata() { return fraseModificata; }
-    public void setFraseModificata(Frase fraseModificata) { this.fraseModificata = fraseModificata; }
+    public String getFraseOriginale() { return fraseOriginale; }
+    public void setFraseOriginale(String fraseOriginale) { this.fraseOriginale = fraseOriginale; }
+    public String getFraseModificata() { return fraseModificata; }
+    public void setFraseModificata(String fraseModificata) { this.fraseModificata = fraseModificata; }
+
+    @Override
+    public void stampa() //debug
+    {
+        System.out.println("Modifica: " + getProposta() + " " + getRiga() +" "+ getData() + " " + getUtente().getUsername() +" " + fraseOriginale + " "+fraseModificata);
+    }
 }

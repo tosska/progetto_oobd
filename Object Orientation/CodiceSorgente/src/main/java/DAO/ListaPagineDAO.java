@@ -1,9 +1,6 @@
 package DAO;
 
-import Model.Frase;
-import Model.Pagina;
-import Model.Testo;
-import Model.Utente;
+import Model.*;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -15,6 +12,8 @@ public interface ListaPagineDAO {
 
     public Pagina cercaPaginaDB(String titolo);
 
-    public Testo getTestoDB(int idPagina,  Pagina p);
+    public Storico getStoricoDB(Pagina p);
+
+    public Testo getTestoDB(Pagina p);
     public ArrayList<Pagina> getPagineCreateDB(Utente utilizzatore);
 }

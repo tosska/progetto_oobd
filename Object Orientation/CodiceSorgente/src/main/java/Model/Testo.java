@@ -20,7 +20,7 @@ public class Testo {
     public ArrayList<Frase> getListaFrasi() { return listaFrasi; }
     public void setPaginaRiferita(Pagina paginaRiferita) { this.paginaRiferita = paginaRiferita; }
 
-    public void inserisciTesto(String testo)
+    public void setTestoString(String testo)
     {
         int inizioFrase=0;
         String frase;
@@ -37,17 +37,36 @@ public class Testo {
             inserisciFrasePura(frase, riga);
 
             //troviamo la riga in cui è posizionata la frase
-            if(inizioFrase < testo.length() && testo.indexOf('\n', inizioFrase, inizioFrase+2) != -1
-                    || frase.indexOf('\n', 1, frase.length()) != -1)
-                riga++;
+            try {
+                if (inizioFrase < testo.length() && testo.indexOf('\n', inizioFrase, inizioFrase + 2) != -1
+                        || frase.indexOf('\n', 1, frase.length()) != -1)
+                    riga++;
+            }
+            catch (Exception e) {
+                System.out.println("carattere di new line non trovato");
+            }
+
         }
         stampaFrasi();
     }
 
+    public String getTestoString()
+    {
+        String testo="";
+
+        for(Frase f: listaFrasi)
+        {
+            testo = testo + f.getContenuto();
+        }
+
+        return testo;
+    }
+
     public void inserisciFrase(Frase f)
     {
+        f.setOrdine(numFrasi);
         listaFrasi.add(f);
-        //come faccio a gestire numFrasi
+        numFrasi++;
     }
     private void inserisciFrasePura(String frase, int riga)
     {
@@ -63,8 +82,8 @@ public class Testo {
         else
             f = new Frase(numFrasi, frase, riga, this);
 
-        numFrasi++;//frase ha ordine di tipo serial nel database, quindi numFrasi al momento è inutile
         listaFrasi.add(f);
+        numFrasi++;
     }
 
     private String cancellaSpazi_NewLine(String frase) //da valutare se è utile o cambiare approccio di lettura del testo

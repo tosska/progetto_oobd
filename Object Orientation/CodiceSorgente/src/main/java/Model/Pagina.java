@@ -3,23 +3,28 @@ package Model;
 import java.sql.Timestamp;
 
 public class Pagina {
+
+    private int id;
     private String titolo;
+    private String tema; //da implementare sia da codice che da UML
     private Timestamp dataCreazione;
     private Utente autore;
     private Testo testoRiferito;
     private Storico storico;
 
-    public Pagina(String titolo, Utente autore, String testo) {
+    public Pagina(String titolo, Utente autore, String testo) { //creazione di un oggetto Pagina mandando testo di tipo String
+                                                                // costruttore da chiamare quando viene creata una pagina;
         setTitolo(titolo);
         setDataCreazione();
         setAutore(autore);
         testoRiferito = new Testo(this);
-        // storico = new Storico(this);
-        inserisciTesto(testo);
-        System.out.println(autore.getUsername());
+        storico = new Storico(this);
+        setTestoString(testo);
     }
 
-    public Pagina(String titolo, Testo testo, Timestamp dataCreazione, Utente autore ) {
+    public Pagina(int id, String titolo, Testo testo, Timestamp dataCreazione, Utente autore ) { //creazione di un oggetto Pagina mandando testo di tipo Testo
+                                                                                                // costruttore da chiamare quando viene recuperata una pagina dal DB
+        this.id = id;
         setTitolo(titolo);
         setTestoRiferito(testo);
         this.dataCreazione = dataCreazione;
@@ -43,9 +48,15 @@ public class Pagina {
     public Storico getStorico() { return storico; }
     public void setStorico(Storico storico) { this.storico = storico; }
 
-    public void inserisciTesto(String testo)
+    public int getId() {return id;}
+
+    public String getTestoString() //da cancellare?
     {
-        System.out.println("sono in pagina");
-        testoRiferito.inserisciTesto(testo);
+        return testoRiferito.getTestoString();
+    }
+
+    public void setTestoString(String testo)
+    {
+        testoRiferito.setTestoString(testo);
     }
 }

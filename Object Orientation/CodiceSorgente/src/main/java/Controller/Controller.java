@@ -4,8 +4,7 @@ import DAO.ListaPagineDAO;
 import DAO.ListaUtentiDAO;
 import ImplementazionePostgresDAO.ListaPagineImplementazionePostgresDAO;
 import ImplementazionePostgresDAO.ListaUtentiImplementazionePostgresDAO;
-import Model.Pagina;
-import Model.Utente;
+import Model.*;
 
 import java.util.ArrayList;
 
@@ -26,6 +25,70 @@ public class Controller {
         pagineCreate = l.getPagineCreateDB(utilizzatore);
         stampaPagineCreate();
     }
+
+    public void caricaStoricoDaPagina(Pagina pagina)
+    {
+        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        Storico s = l.getStoricoDB(pagina);
+        pagina.setStorico(s);
+    }
+
+    public void caricaModifichePagina(Pagina paginaOriginale, Testo testoModificato, Boolean proposta)
+    {
+        Testo testoOriginale = paginaOriginale.getTestoRiferito();
+        int sizeTestoOriginale = testoOriginale.getListaFrasi().size(); //2
+        int sizeTestoModificato = testoModificato.getListaFrasi().size();//1
+        int limite;
+        String frasePrecedente;
+
+        if(sizeTestoOriginale<=sizeTestoModificato)
+            limite = sizeTestoOriginale;
+        else
+            limite = sizeTestoModificato;
+
+        for(int i=0; i<limite; i++)
+        {
+            Frase frase1 = testoOriginale.getListaFrasi().get(i);
+            Frase frase2 = testoModificato.getListaFrasi().get(i);
+
+            if(!(frase1.getContenuto().equals(frase2.getContenuto()))) //se non sono uguali
+            {
+                Modifica modifica = new Modifica(proposta, frase1.getRiga(), "data", utilizzatore, frase1.getContenuto(), frase2.getContenuto(),
+                        paginaOriginale.getStorico(), paginaOriginale);
+
+                paginaOriginale.getStorico().addOperazione(modifica);
+            }
+        }
+
+        if(sizeTestoOriginale<sizeTestoModificato) //è avvenuta una o più aggiunte
+        {
+            for(int i=sizeTestoOriginale; i<sizeTestoModificato; i++)
+            {
+                Frase fraseAggiunta = testoModificato.getListaFrasi().get(i);
+
+                Inserimento inserimento = new Inserimento(proposta, fraseAggiunta.getRiga(), "data", utilizzatore, fraseAggiunta.getContenuto(),
+                        paginaOriginale.getStorico(), paginaOriginale);
+                paginaOriginale.getStorico().addOperazione(inserimento);
+            }
+        }
+        else if(sizeTestoOriginale>sizeTestoModificato) //è avvenuta una o più cancellazioni
+        {
+            for(int i=sizeTestoModificato; i<sizeTestoOriginale; i++)
+            {
+                Frase fraseEliminata = testoOriginale.getListaFrasi().get(i);
+
+                Cancellazione cancellazione = new Cancellazione(proposta, fraseEliminata.getRiga(), "data", utilizzatore, fraseEliminata.getContenuto(),
+                        paginaOriginale.getStorico(), paginaOriginale);
+                paginaOriginale.getStorico().addOperazione(cancellazione);
+            }
+        }
+
+        paginaOriginale.setTestoRiferito(testoModificato);
+        System.out.println("------------------------------------------------------------"); //debug
+        paginaOriginale.getStorico().stampaOperazioni();
+    }
+
+
     public void creazionePagina(String titolo, String testo)
     {
         // utilizzatore = new Utente("dd", "aa", "ddsa");
