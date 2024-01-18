@@ -2,7 +2,6 @@ package GUI;
 
 import Controller.Controller;
 import javax.swing.*;
-import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -86,7 +85,11 @@ public class LoginPage {
                 if (controllerPrincipale.verificaUsername(userID)) {
                     if (controllerPrincipale.verificaPassword(userID, password)) {
                         frame.dispose();    // la schermata di login non ci serve più (va bene?)
-                        WelcomePage welcomePage = new WelcomePage(userID, controllerPrincipale);
+
+                        controllerPrincipale.impostaUtilizzatore(userID);
+                        controllerPrincipale.caricaPagineCreate();
+
+                        WelcomePage welcomePage = new WelcomePage(controllerPrincipale);
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "Wrong password", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -134,7 +137,7 @@ public class LoginPage {
         copyrightLabel.setBounds(80, 420, 300, 20);
         copyrightLabel.setForeground(new Color(210, 210, 210));
 
-        ImageIcon logoImagine = new ImageIcon(this.getClass().getResource("/icon/logo4.png"));
+        ImageIcon logoImagine = new ImageIcon(this.getClass().getResource("/icon/logo.png"));
         logoLabel.setIcon(logoImagine);
         logoLabel.setBounds(0, 60, 350, 300);
 
