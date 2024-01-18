@@ -36,9 +36,13 @@ public class WelcomePage {
         });
 
 
+        ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
+        frame.setResizable(false);
+        frame.setIconImage(logo.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(420, 420);
+        frame.setSize(900, 500);
         frame.setLayout(null);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 }

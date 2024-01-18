@@ -1,5 +1,5 @@
-package GUI;
 import Controller.Controller;
+import GUI.LoginPage;
 
 public class Main {
     public static void main(String[] args) {
