@@ -89,7 +89,11 @@ public class LoginPage {
                         controllerPrincipale.impostaUtilizzatore(userID);
                         controllerPrincipale.caricaPagineCreate();
 
-                        WelcomePage welcomePage = new WelcomePage(controllerPrincipale);
+                        // elimino il contenuto dei text field così se l'utente decide di fare un logout questi saranno già vuoti
+                        usernameField.setText("");
+                        passwordField.setText("");
+
+                        WelcomePage welcomePage = new WelcomePage(controllerPrincipale, frame);
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "Wrong password", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -110,6 +114,11 @@ public class LoginPage {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
+
+                // elimino il contenuto dei text field così se l'utente decide di ritornare indietro questi saranno già vuoti
+                usernameField.setText("");
+                passwordField.setText("");
+
                 RegisterPage registerPage = new RegisterPage(controllerPrincipale, frame);
             }
 

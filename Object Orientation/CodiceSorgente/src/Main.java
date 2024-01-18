@@ -6,6 +6,5 @@ public class Main {
         Controller controllerPrincipale = new Controller();
 
         LoginPage loginPage = new LoginPage(controllerPrincipale);
-
     }
 }

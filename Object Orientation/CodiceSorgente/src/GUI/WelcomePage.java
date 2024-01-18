@@ -5,73 +5,151 @@ import Model.Pagina;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 // CLASSE PER DEBUG
 public class WelcomePage {
     private JFrame frame = new JFrame();
     private Controller controllerPrincipale;
-    private JLabel welcomeLabel = new JLabel("Hello!");
     private JButton createNewPageButton = new JButton("Crea nuova pagina");
 
-    private JLabel searchLabel = new JLabel("Search:");
-    private JTextField search = new JTextField();
 
-    private  JButton searchButton = new JButton("Search");
 
-    private JButton viewPageButton = new JButton("Visualizza ultima pagina creata"); //da cancellare
+    private JPanel menuPanel = new JPanel();
+    private JLabel logoLabel = new JLabel();
+    private JLabel logoutLabel = new JLabel("Log out");
+    private JLabel createLabel = new JLabel("Create a new page");
 
-    WelcomePage(Controller controller) {
+
+    private JPanel panelWhite = new JPanel();
+    private JLabel searchLabel = new JLabel();
+    private JTextField searchField = new JTextField("Search...");
+
+
+    private JPanel panelGrey = new JPanel();
+
+    WelcomePage(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
-        String userID = controllerPrincipale.utilizzatore.getUsername();
 
-        welcomeLabel.setBounds(0, 0, 200, 35);
-        welcomeLabel.setFont(new Font(null, Font.PLAIN, 25));
-        welcomeLabel.setText("Hello "+userID);
+        menuPanel.setBounds(0, 0, 200, 500);
+        menuPanel.setLayout(null);
+        menuPanel.setBackground(new Color(47,69,92));
 
-        createNewPageButton.setBounds(140, 170, 150, 25);
-        createNewPageButton.setFocusable(false);
+        ImageIcon logoImagine = new ImageIcon(this.getClass().getResource("/icon/logoHome.png"));
+        logoLabel.setIcon(logoImagine);
+        logoLabel.setBounds(40, 20, 150, 70);
 
-        viewPageButton.setBounds(140, 200, 150, 25);
-        viewPageButton.setFocusable(false);
-
-        searchLabel.setBounds(140, 80, 50, 25);
-        search.setBounds(80, 100, 180, 25);
-        searchButton.setBounds(270, 100, 80, 20);
-
-        frame.add(welcomeLabel);
-        frame.add(searchLabel);
-        frame.add(search);
-        frame.add(searchButton);
-        frame.add(createNewPageButton);
-        frame.add(viewPageButton);
-
-        createNewPageButton.addActionListener(new ActionListener() {
+        ImageIcon logoutImagine = new ImageIcon(this.getClass().getResource("/icon/logout.png"));
+        logoutLabel.setIcon(logoutImagine);
+        logoutLabel.setBounds(15, 350, 250, 70);
+        logoutLabel.setIconTextGap(15);
+        logoutLabel.setForeground(Color.white);
+        logoutLabel.addMouseListener(new MouseListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
+                frame.dispose();
+                frameChiamante.setVisible(true);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                logoutLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+
+        ImageIcon createImagine = new ImageIcon(this.getClass().getResource("/icon/create.png"));
+        createLabel.setIcon(createImagine);
+        createLabel.setBounds(15, 150, 250, 70);
+        createLabel.setIconTextGap(15);
+        createLabel.setForeground(Color.white);
+        createLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
                 CreateNewPage createNewPage = new CreateNewPage(controllerPrincipale, frame);
             }
-        });
 
-        viewPageButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.setVisible(false);
-                Pagina p = controllerPrincipale.pagineCreate.get(3); //da cancellare
-                PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                createLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
             }
         });
 
-        searchButton.addActionListener(new ActionListener() {
+
+
+
+        panelWhite.setBounds(200, 0, 700, 50);
+        panelWhite.setLayout(null);
+        panelWhite.setBackground(Color.white);
+
+        searchField.setBounds(30, 11, 300, 30);
+        ImageIcon searchImagine = new ImageIcon(this.getClass().getResource("/icon/search.png"));
+        searchLabel.setIcon(searchImagine);
+        searchLabel.setBounds(335, 10, 35, 35);
+
+
+
+        panelGrey.setBounds(200, 50, 700, 450);
+        panelGrey.setLayout(null);
+        panelGrey.setBackground(new Color(244, 244, 244));
+
+
+        // quando premo invio inizia la ricerca
+        searchField.addKeyListener(new KeyAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                Pagina p = controllerPrincipale.cercaPagina(search.getText());
-                PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
-                frame.setVisible(false);
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    Pagina p = controllerPrincipale.cercaPagina(searchField.getText());
+                    PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
+                    frame.setVisible(false);
+                }
             }
         });
+
+
+
+
+
+        frame.add(menuPanel);
+        frame.add(panelWhite);
+        frame.add(panelGrey);
+
+        menuPanel.add(logoLabel);
+        menuPanel.add(logoutLabel);
+        menuPanel.add(createLabel);
+
+        panelWhite.add(searchField);
+        panelWhite.add(searchLabel);
 
 
         ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));

@@ -87,7 +87,7 @@ public class RegisterPage {
 
 
         registerButton.setBounds(50, 300, 300, 35);
-        registerButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        registerButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         registerButton.setBackground(new Color(47,69,92));
         registerButton.setForeground(Color.white);
         registerButton.setFocusable(false);
