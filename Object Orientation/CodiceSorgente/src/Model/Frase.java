@@ -10,7 +10,7 @@ public class Frase {
         setOrdine(ordine);
         setContenuto(contenuto);
         setRiga(riga);
-        testo = this.testo;
+        this.testo = testo;
     }
 
     public String getContenuto() { return contenuto; }

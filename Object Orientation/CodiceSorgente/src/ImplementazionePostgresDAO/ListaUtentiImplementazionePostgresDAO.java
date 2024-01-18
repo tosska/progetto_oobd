@@ -72,7 +72,7 @@ public class ListaUtentiImplementazionePostgresDAO implements ListaUtentiDAO {
     }
 
     @Override
-    public Utente cercaAutoreDB(String username) {
+    public Utente getUtenteDB(String username) {
         try {
             PreparedStatement queryControllo = connection.prepareStatement("SELECT * from utente where username = '" + username + "'");
             ResultSet rs = queryControllo.executeQuery();
@@ -81,8 +81,8 @@ public class ListaUtentiImplementazionePostgresDAO implements ListaUtentiDAO {
             {
                 String email = rs.getString("email");
                 String password = rs.getString("password");
-                Utente autore = new Utente(username, email, password);
-                return autore;
+                Utente u = new Utente(username, email, password);
+                return u;
             }
 
             connection.close();

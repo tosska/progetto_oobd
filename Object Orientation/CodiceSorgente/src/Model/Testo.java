@@ -1,5 +1,6 @@
 package Model;
 
+import javax.swing.text.Utilities;
 import java.util.ArrayList;
 
 public class Testo {
@@ -19,7 +20,7 @@ public class Testo {
     public ArrayList<Frase> getListaFrasi() { return listaFrasi; }
     public void setPaginaRiferita(Pagina paginaRiferita) { this.paginaRiferita = paginaRiferita; }
 
-    public void inserisciTesto(String testo)
+    public void setTestoString(String testo)
     {
         int inizioFrase=0;
         String frase;
@@ -33,21 +34,56 @@ public class Testo {
             System.out.println(frase.length());
 
             System.out.println("frase:" + frase);
-            inserisciFrase(frase, riga);
+            inserisciFrasePura(frase, riga);
 
             //troviamo la riga in cui è posizionata la frase
-            if(inizioFrase < testo.length() && testo.indexOf('\n', inizioFrase, inizioFrase+2) != -1
-                    || frase.indexOf('\n', 1, frase.length()) != -1)
-                riga++;
+            try {
+                if (inizioFrase < testo.length() && testo.indexOf('\n', inizioFrase, inizioFrase + 2) != -1
+                        || frase.indexOf('\n', 1, frase.length()) != -1)
+                    riga++;
+            }
+            catch (Exception e) {
+                System.out.println("carattere di new line non trovato");
+            }
+
         }
         stampaFrasi();
     }
 
-    private void inserisciFrase(String frase, int riga)
+    public String getTestoString()
     {
-        numFrasi++;
-        Frase f = new Frase(numFrasi, cancellaSpazi_NewLine(frase), riga, this);
+        String testo="";
+
+        for(Frase f: listaFrasi)
+        {
+            testo = testo + f.getContenuto();
+        }
+
+        return testo;
+    }
+
+    public void inserisciFrase(Frase f)
+    {
+        f.setOrdine(numFrasi);
         listaFrasi.add(f);
+        numFrasi++;
+    }
+    private void inserisciFrasePura(String frase, int riga)
+    {
+        Frase f;
+
+        frase = cancellaSpazi_NewLine(frase);
+
+        if(frase.charAt(0)== '#' && frase.charAt(frase.length()+1)=='#')
+        {
+            frase = frase.substring(frase.indexOf("#")+1, frase.lastIndexOf('#'));
+            f = new Collegamento(numFrasi, frase, riga, this, null); //da cambiare
+        }
+        else
+            f = new Frase(numFrasi, frase, riga, this);
+
+        listaFrasi.add(f);
+        numFrasi++;
     }
 
     private String cancellaSpazi_NewLine(String frase) //da valutare se è utile o cambiare approccio di lettura del testo
