@@ -22,32 +22,54 @@ public class Testo {
 
     public void setTestoString(String testo)
     {
-        int inizioFrase=0;
-        String frase;
-        int fineFrase;
+        testo = testo + "\n"; // da valutare se la soluzione migliore
+        String[] splitLine = testo.split("\\n");
+        String textFormatted="";
         int riga=1;
-        System.out.println("sono in testo");
-        while( (fineFrase = testo.indexOf('.', inizioFrase, testo.length())) != -1)
+        int numFrasi=0;
+
+        for(String line : splitLine)
         {
-            frase = testo.substring(inizioFrase, fineFrase+1);
-            inizioFrase = inizioFrase + frase.length();
-            System.out.println(frase.length());
+            while(line.length() > 50)
+            {
+                textFormatted = textFormatted + line.substring(0, 51) + "\n";
+                line = line.substring(51, line.length());
+            }
 
-            System.out.println("frase:" + frase);
-            inserisciFrasePura(frase, riga);
+            textFormatted = textFormatted + line + "\n";
+        }
 
-            //troviamo la riga in cui è posizionata la frase
+        System.out.println("Sono il testo formattato: " + textFormatted);
+        
+        for(String f : textFormatted.split("\\."))
+        {
+            numFrasi++;
+
+            System.out.println("Sono: "  + f);
+            f = f.strip(); // cancello gli spazi ad inizio e fine frase
+            System.out.println("Sono la frase senza spazi" + f);
+
             try {
-                if (inizioFrase < testo.length() && testo.indexOf('\n', inizioFrase, inizioFrase + 2) != -1
-                        || frase.indexOf('\n', 1, frase.length()) != -1)
+                if (f.charAt(0) == '\n') //se ad inizio frase vi è un new line incremento il valore di riga
                     riga++;
             }
-            catch (Exception e) {
-                System.out.println("carattere di new line non trovato");
+            catch (Exception eg){
+                System.out.println(eg.getMessage());
             }
 
+            //creo la frase
+            Frase frase = new Frase(numFrasi, f.replace("\n", ""), riga, this);
+            listaFrasi.add(frase);
+
+            String temp = f.substring(1);
+            int occurences = getNumOccurences(temp, '\n'); //conto quante righe si estende la frase considerata
+            if(occurences > 0)
+                riga = riga + occurences;
+
         }
+
         stampaFrasi();
+
     }
 
     public String getTestoString()
@@ -56,7 +78,7 @@ public class Testo {
 
         for(Frase f: listaFrasi)
         {
-            testo = testo + f.getContenuto();
+            testo = testo + f.getRiga() + f.getContenuto();
         }
 
         return testo;
@@ -104,6 +126,19 @@ public class Testo {
     {
         for(Frase f : listaFrasi)
             f.stampa();
+    }
+
+    private int getNumOccurences(String line, char occurence)
+    {
+        int num=0;
+
+        for(int i=0; i<line.length(); i++)
+        {
+            if(line.charAt(i) == occurence)
+                num++;
+        }
+
+        return num;
     }
 
 }

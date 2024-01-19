@@ -91,15 +91,12 @@ public class Controller {
 
     public void creazionePagina(String titolo, String testo)
     {
-        // utilizzatore = new Utente("dd", "aa", "ddsa");
-        // Pagina p = new Pagina(titolo, "data", utilizzatore, testo);
-
-        Pagina p = new Pagina(titolo, utilizzatore, testo);
+        Pagina p = new Pagina(titolo, utilizzatore, testo); //creo la pagina
 
         ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
         listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore());
 
-        int idPagina = listaPagineDAO.recuperaIdPagina();
+        int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
         listaPagineDAO.addFraseDB(idPagina, p.getTestoRiferito().getListaFrasi());
     }
