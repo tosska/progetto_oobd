@@ -4,10 +4,7 @@ import DAO.ListaUtentiDAO;
 import Database.ConnessioneDatabase;
 import Model.Utente;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ListaUtentiImplementazionePostgresDAO implements ListaUtentiDAO {
     private Connection connection;
@@ -21,15 +18,83 @@ public class ListaUtentiImplementazionePostgresDAO implements ListaUtentiDAO {
     }
 
     @Override
-    public void addUtenteDB(String username, String email, String password) {
+    public void addUtenteDB(String username, String email, String password, Timestamp data) {
         try {
-            PreparedStatement addUtentePS = connection.prepareStatement("INSERT INTO \"utente\" " + "(\"username\", \"email\", \"password\")"
-                    + "VALUES ('"+username+"', '"+email+"', + '"+password+"');");
+            PreparedStatement addUtentePS = connection.prepareStatement("INSERT INTO \"utente\" " + "(\"username\", \"email\", \"password\", \"dataiscrizione\")"
+                    + "VALUES ('"+username+"', '"+email+"', '"+password+"', '"+data+"');");
             addUtentePS.executeUpdate();
             connection.close();
         } catch (Exception e) {
             System.out.println("Errore: " + e.getMessage());
         }
+    }
+
+    @Override
+    public boolean modificaEmailDB(String oldEmail, String newEmail) {
+        try {
+            PreparedStatement queryControllo = connection.prepareStatement("UPDATE utente SET email = '" + newEmail + "'"
+                    + " WHERE username = '" +oldEmail+ "'");
+            queryControllo.executeUpdate();
+
+            connection.close();
+
+        } catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean modificaUsernameDB(String oldUsername, String newUsername)
+    {
+        try {
+            PreparedStatement queryControllo = connection.prepareStatement("UPDATE utente SET username = '" + newUsername + "'"
+                    + " WHERE username = '" +oldUsername+ "'");
+            queryControllo.executeUpdate();
+
+            connection.close();
+
+        } catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean modificaPasswordDB(String oldPassword, String newPassword) {
+        try {
+            PreparedStatement queryControllo = connection.prepareStatement("UPDATE utente SET password = '" + newPassword + "'"
+                    + " WHERE password = '" +oldPassword+ "'");
+            queryControllo.executeUpdate();
+
+            connection.close();
+
+        } catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean eliminaAccountDB(String username) {
+        try {
+            PreparedStatement queryControllo = connection.prepareStatement("DELETE FROM utente WHERE username = '" + username + "'");
+            queryControllo.executeUpdate();
+
+            connection.close();
+
+        } catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -81,7 +146,8 @@ public class ListaUtentiImplementazionePostgresDAO implements ListaUtentiDAO {
             {
                 String email = rs.getString("email");
                 String password = rs.getString("password");
-                Utente u = new Utente(username, email, password);
+                Timestamp data = rs.getTimestamp("dataiscrizione");
+                Utente u = new Utente(username, email, password, data);
                 return u;
             }
 

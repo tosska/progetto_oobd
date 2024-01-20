@@ -6,6 +6,7 @@ import ImplementazionePostgresDAO.ListaPagineImplementazionePostgresDAO;
 import ImplementazionePostgresDAO.ListaUtentiImplementazionePostgresDAO;
 import Model.*;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class Controller {
@@ -101,10 +102,38 @@ public class Controller {
         listaPagineDAO.addFraseDB(idPagina, p.getTestoRiferito().getListaFrasi());
     }
 
-    public void aggiungiUtente(String username, String email, String password)
+    public void aggiungiUtente(String username, String email, String password, Timestamp data)
     {
         ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
-        l.addUtenteDB(username, email, password);   // scrive sul DB
+        l.addUtenteDB(username, email, password, data);   // scrive sul DB
+    }
+
+    public boolean modificaUsername(String oldUsername, String newUsername)
+    {
+        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        boolean result = l.modificaUsernameDB(oldUsername, newUsername);
+        return result;
+    }
+
+    public boolean modificaEmail(String oldEmail, String newEmail)
+    {
+        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        boolean result = l.modificaEmailDB(oldEmail, newEmail);
+        return result;
+    }
+
+    public boolean eliminaAccount(String username)
+    {
+        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        boolean result = l.eliminaAccountDB(username);
+        return result;
+    }
+
+    public boolean modificaPassword(String oldPassword, String newPassword)
+    {
+        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        boolean result = l.modificaPasswordDB(oldPassword, newPassword);
+        return result;
     }
 
     public boolean verificaUsername(String username)

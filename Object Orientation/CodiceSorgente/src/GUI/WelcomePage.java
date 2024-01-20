@@ -146,7 +146,7 @@ public class WelcomePage {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
-                AreaRiservata areaPersonale = new AreaRiservata(controllerPrincipale, frame);
+                AreaRiservata areaPersonale = new AreaRiservata(controllerPrincipale, frame, profileLabel);
             }
 
             @Override

@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.Timestamp;
 
 public class RegisterPage {
     private JFrame frame = new JFrame();
@@ -155,10 +156,12 @@ public class RegisterPage {
 
                 if (password.equals(confPassword))
                 {
-                    controllerPrincipale.aggiungiUtente(userID, email, password);
+                    Timestamp dataIscrizione = new Timestamp(System.currentTimeMillis());
+                    controllerPrincipale.aggiungiUtente(userID, email, password, dataIscrizione);
+                    controllerPrincipale.impostaUtilizzatore(userID);
 
                     frame.dispose();
-                    frameChiamante.setVisible(true);
+                    WelcomePage welcomePage = new WelcomePage(controllerPrincipale, frameChiamante);
                 }
                 else
                 {
