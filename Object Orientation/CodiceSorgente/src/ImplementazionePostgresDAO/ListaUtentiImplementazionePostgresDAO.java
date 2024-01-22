@@ -33,7 +33,7 @@ public class ListaUtentiImplementazionePostgresDAO implements ListaUtentiDAO {
     public boolean modificaEmailDB(String oldEmail, String newEmail) {
         try {
             PreparedStatement queryControllo = connection.prepareStatement("UPDATE utente SET email = '" + newEmail + "'"
-                    + " WHERE username = '" +oldEmail+ "'");
+                    + " WHERE email = '" +oldEmail+ "'");
             queryControllo.executeUpdate();
 
             connection.close();

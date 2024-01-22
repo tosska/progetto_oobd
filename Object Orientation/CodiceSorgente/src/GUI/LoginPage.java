@@ -21,7 +21,8 @@ public class LoginPage {
     private JPanel leftPanel = new JPanel();
     private JPanel rightPanel = new JPanel();
     private JLabel iconUserLabel = new JLabel();
-    private JLabel iconPasswordLabel = new JLabel();
+    private JLabel iconVisibleLabel = new JLabel();
+    private JLabel iconNotVisibleLabel = new JLabel();
     private JLabel loginLabel = new JLabel("LOGIN");
     private JLabel copyrightLabel = new JLabel("copyright © danilo wiki All rights reserved");
     private Controller controllerPrincipale;
@@ -64,9 +65,50 @@ public class LoginPage {
 
         passwordField.setBounds(60, 230, 230, 25);
 
-        ImageIcon passwordImagine = new ImageIcon(this.getClass().getResource("/icon/pass.png"));
-        iconPasswordLabel.setIcon(passwordImagine);
-        iconPasswordLabel.setBounds(305, 230, 25, 25);
+        ImageIcon visibleImagine = new ImageIcon(this.getClass().getResource("/icon/visible.png"));
+        iconVisibleLabel.setIcon(visibleImagine);
+        iconVisibleLabel.setBounds(305, 230, 25, 25);
+        iconVisibleLabel.setVisible(false);
+        iconVisibleLabel.setEnabled(false);
+
+        ImageIcon notVisibleImagine = new ImageIcon(this.getClass().getResource("/icon/notvisible.png"));
+        iconNotVisibleLabel.setIcon(notVisibleImagine);
+        iconNotVisibleLabel.setBounds(305, 230, 25, 25);
+        iconNotVisibleLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                passwordField.setEchoChar((char)0);
+                iconNotVisibleLabel.setVisible(false);
+                iconNotVisibleLabel.setEnabled(false);
+                iconVisibleLabel.setVisible(true);
+                iconVisibleLabel.setEnabled(true);
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                passwordField.setEchoChar((char)8226);
+                iconVisibleLabel.setVisible(false);
+                iconVisibleLabel.setEnabled(false);
+                iconNotVisibleLabel.setVisible(true);
+                iconNotVisibleLabel.setEnabled(true);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                iconNotVisibleLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 
 
 
@@ -160,7 +202,8 @@ public class LoginPage {
         rightPanel.add(passwordField);
         rightPanel.add(passwordLabel);
         rightPanel.add(iconUserLabel);
-        rightPanel.add(iconPasswordLabel);
+        rightPanel.add(iconNotVisibleLabel);
+        rightPanel.add(iconVisibleLabel);
         rightPanel.add(loginLabel);
 
         leftPanel.add(copyrightLabel);
