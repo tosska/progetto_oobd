@@ -4,7 +4,7 @@ VINCOLI DA IMPLEMENTARE:
   - non può esistere un operazione di cancellamento o di inserimento che abbia l'attributo "fraseModificata" not null.
   - non può esistere un operazione di modifica in cui l'attributo "fraseModificata" sia null. 
   - un autore di una pagina non può approvare proposte di operazioni su pagine non scritte da lui 
-
+  - non posso esistere operazione di proposta non presenti in approvazione
 
 
 TRIGGER DA IMPLEMENTARE:

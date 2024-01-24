@@ -32,6 +32,11 @@ public class Operazione { //fare interfaccia?
     public Pagina getPagina(){return pagina;}
     public void setPagina(Pagina pagina) {this.pagina = pagina;}
 
+    public void setApprovazione(Approvazione approvazione)
+    {
+        this.approvazione = approvazione;
+    }
+
     public void stampa()
     {
         //da capire se operazione farla classe o interfaccia
