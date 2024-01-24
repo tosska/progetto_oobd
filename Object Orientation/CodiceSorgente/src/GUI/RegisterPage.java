@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.Timestamp;
 
 public class RegisterPage {
     private JFrame frame = new JFrame();
@@ -21,7 +22,10 @@ public class RegisterPage {
     private JLabel emailLabel = new JLabel("Email:");
     private JLabel passwordLabel = new JLabel("Password:");
     private JLabel iconUserLabel = new JLabel();
-    private JLabel iconPasswordLabel = new JLabel();
+    private JLabel iconNotVisibleLabel = new JLabel();
+    private JLabel iconVisibleLabel = new JLabel();
+    private JLabel iconNotVisible2Label = new JLabel();
+    private JLabel iconVisible2Label = new JLabel();
     private JLabel iconEmailLabel = new JLabel();
     private JLabel registerLabel = new JLabel("SIGN UP");
     private JPanel panel = new JPanel();
@@ -73,9 +77,49 @@ public class RegisterPage {
 
         passwordField.setBounds(400, 150, 230, 25);
 
-        ImageIcon passwordImagine = new ImageIcon(this.getClass().getResource("/icon/pass.png"));
-        iconPasswordLabel.setIcon(passwordImagine);
-        iconPasswordLabel.setBounds(645, 150, 25, 25);
+        ImageIcon visibleImagine = new ImageIcon(this.getClass().getResource("/icon/visible.png"));
+        iconVisibleLabel.setIcon(visibleImagine);
+        iconVisibleLabel.setBounds(645, 150, 25, 25);
+        iconVisibleLabel.setVisible(false);
+        iconVisibleLabel.setEnabled(false);
+
+        ImageIcon notVisibleImagine = new ImageIcon(this.getClass().getResource("/icon/notvisible.png"));
+        iconNotVisibleLabel.setIcon(notVisibleImagine);
+        iconNotVisibleLabel.setBounds(645, 150, 25, 25);
+        iconNotVisibleLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                passwordField.setEchoChar((char)0);
+                iconNotVisibleLabel.setVisible(false);
+                iconNotVisibleLabel.setEnabled(false);
+                iconVisibleLabel.setVisible(true);
+                iconVisibleLabel.setEnabled(true);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                passwordField.setEchoChar((char)8226);
+                iconVisibleLabel.setVisible(false);
+                iconVisibleLabel.setEnabled(false);
+                iconNotVisibleLabel.setVisible(true);
+                iconNotVisibleLabel.setEnabled(true);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                iconNotVisibleLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 
 
 
@@ -84,6 +128,48 @@ public class RegisterPage {
         passwordConfLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
         passwordConfField.setBounds(400, 230, 230, 25);
+
+        iconVisible2Label.setIcon(visibleImagine);
+        iconVisible2Label.setBounds(645, 230, 25, 25);
+        iconVisible2Label.setVisible(false);
+        iconVisible2Label.setEnabled(false);
+
+        iconNotVisible2Label.setIcon(notVisibleImagine);
+        iconNotVisible2Label.setBounds(645, 230, 25, 25);
+        iconNotVisible2Label.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                passwordConfField.setEchoChar((char)0);
+                iconNotVisible2Label.setVisible(false);
+                iconNotVisible2Label.setEnabled(false);
+                iconVisible2Label.setVisible(true);
+                iconVisible2Label.setEnabled(true);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                passwordConfField.setEchoChar((char)8226);
+                iconVisible2Label.setVisible(false);
+                iconVisible2Label.setEnabled(false);
+                iconNotVisible2Label.setVisible(true);
+                iconNotVisible2Label.setEnabled(true);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                iconNotVisible2Label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 
 
         registerButton.setBounds(50, 300, 300, 35);
@@ -134,7 +220,10 @@ public class RegisterPage {
         panel.add(mailField);
         panel.add(emailLabel);
         panel.add(iconUserLabel);
-        panel.add(iconPasswordLabel);
+        panel.add(iconNotVisibleLabel);
+        panel.add(iconVisibleLabel);
+        panel.add(iconNotVisible2Label);
+        panel.add(iconVisible2Label);
         panel.add(registerLabel);
         panel.add(registerButton);
         panel.add(iconEmailLabel);
@@ -155,10 +244,12 @@ public class RegisterPage {
 
                 if (password.equals(confPassword))
                 {
-                    controllerPrincipale.aggiungiUtente(userID, email, password);
+                    Timestamp dataIscrizione = new Timestamp(System.currentTimeMillis());
+                    controllerPrincipale.aggiungiUtente(userID, email, password, dataIscrizione);
+                    controllerPrincipale.impostaUtilizzatore(userID);
 
                     frame.dispose();
-                    frameChiamante.setVisible(true);
+                    WelcomePage welcomePage = new WelcomePage(controllerPrincipale, frameChiamante);
                 }
                 else
                 {

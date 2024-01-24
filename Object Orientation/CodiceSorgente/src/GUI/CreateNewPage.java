@@ -20,12 +20,7 @@ public class CreateNewPage{
     private JButton submitButton;
     CreateNewPage(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
-        String userID = controllerPrincipale.utilizzatore.getUsername();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Create new page");
-        frame.setSize(500, 500);
-        frame.setLayout(null);
-        frame.setLocationRelativeTo(null);
+
 
         textArea = new JTextArea();
         textArea.setLineWrap(true);
@@ -54,6 +49,7 @@ public class CreateNewPage{
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
                 frameChiamante.setVisible(true);
+                frameChiamante.requestFocusInWindow();
             }
         });
 
@@ -74,6 +70,12 @@ public class CreateNewPage{
         frame.add(titleField);
         frame.add(backButton);
         frame.add(submitButton);
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setTitle("Create new page");
+        frame.setSize(500, 500);
+        frame.setLayout(null);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 

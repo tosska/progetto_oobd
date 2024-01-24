@@ -24,6 +24,7 @@ public class WelcomePage {
     private JPanel panelWhite = new JPanel();
     private JLabel searchLabel = new JLabel();
     private JTextField searchField = new JTextField("Search...");
+    private JLabel profileLabel = new JLabel();
 
 
     private JPanel panelGrey = new JPanel();
@@ -112,10 +113,62 @@ public class WelcomePage {
         panelWhite.setLayout(null);
         panelWhite.setBackground(Color.white);
 
-        searchField.setBounds(30, 11, 300, 30);
+        searchField.setBounds(30, 10, 300, 30);
         ImageIcon searchImagine = new ImageIcon(this.getClass().getResource("/icon/search.png"));
         searchLabel.setIcon(searchImagine);
-        searchLabel.setBounds(335, 10, 35, 35);
+        searchLabel.setBounds(335, 10, 30, 30);
+        searchField.setForeground(Color.GRAY);
+        searchField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField.getText().equals("Search...")) {
+                    searchField.setText("");
+                    searchField.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField.getText().isEmpty()) {
+                    searchField.setForeground(Color.GRAY);
+                    searchField.setText("Search...");
+                }
+            }
+        });
+
+        profileLabel.setText(controllerPrincipale.utilizzatore.getUsername());
+        profileLabel.setBounds(580, 10, 150, 30);
+        ImageIcon profileImagine = new ImageIcon(this.getClass().getResource("/icon/profile.png"));
+        profileLabel.setIcon(profileImagine);
+        profileLabel.setHorizontalTextPosition(JLabel.LEFT);
+        profileLabel.setIconTextGap(10);
+        profileLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.setVisible(false);
+                AreaRiservata areaPersonale = new AreaRiservata(controllerPrincipale, frame, profileLabel);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                profileLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 
 
 
@@ -150,6 +203,7 @@ public class WelcomePage {
 
         panelWhite.add(searchField);
         panelWhite.add(searchLabel);
+        panelWhite.add(profileLabel);
 
 
         ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
@@ -160,5 +214,6 @@ public class WelcomePage {
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        frame.requestFocusInWindow();
     }
 }
