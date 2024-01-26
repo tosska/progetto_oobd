@@ -20,7 +20,9 @@ public class PageGUI {
 
     private JFrame frameChiamante;
     private Controller controllerPrincipale;
-    private JTextPane textPane;
+    private JTextArea textArea;
+
+    private  JScrollPane scrollPane;
     private JLabel titleLabel;
     private JButton backButton;
 
@@ -65,10 +67,17 @@ public class PageGUI {
         frame.setLocationRelativeTo(null);
 
 
-        textPane = new JTextPane();
-        textPane.setBounds(10, 50, 460, 350);
-        textPane.setText(pagina.getTestoString());
-        textPane.setEditable(false);
+        textArea = new JTextArea();
+        textArea.setLineWrap(false);
+        textArea.setWrapStyleWord(false);
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Arial", Font.PLAIN, 20));
+        textArea.setText(pagina.getTestoString());
+
+        scrollPane = new JScrollPane(textArea);
+        // scrollPane.setPreferredSize(new Dimension(450, 450));
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBounds(10, 50, 460, 350);
 
         titleLabel = new JLabel(pagina.getTitolo());
         titleLabel.setBounds(10, 10, 200, 25);
@@ -79,15 +88,24 @@ public class PageGUI {
         editButton= new JButton(editTesto);
         editButton.setBounds(350, 410, larghezza, 25);
 
+        //frame.add(textArea);
+        frame.add(scrollPane);
         frame.add(titleLabel);
         frame.add(backButton);
-        frame.add(textPane);
         frame.add(editButton);
         frame.setVisible(true);
     }
 
     private void functionButton()
     {
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                frameChiamante.setVisible(true);
+            }
+        });
+
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -104,6 +122,7 @@ public class PageGUI {
         else
             return false;
     }
+
 
 
 }

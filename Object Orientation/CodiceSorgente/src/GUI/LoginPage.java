@@ -117,6 +117,10 @@ public class LoginPage {
         loginButton.setBackground(new Color(47,69,92));
         loginButton.setForeground(Color.white);
         loginButton.setFocusable(false);
+
+        usernameField.setText("dark");
+        passwordField.setText("123");
+
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

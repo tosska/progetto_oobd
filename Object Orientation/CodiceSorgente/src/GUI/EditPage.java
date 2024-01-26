@@ -71,7 +71,9 @@ public class EditPage {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         //textArea.setFont(new Font("Arial", Font.PLAIN, 20));
-        textArea.setText(editPg.getTestoString());
+        String testo = editPg.getTestoString().replace("-\n", "");
+        textArea.setText(testo);
+        textArea.setFont(new Font("Arial", Font.PLAIN, 20));
 
         scrollPane = new JScrollPane(textArea);
         // scrollPane.setPreferredSize(new Dimension(450, 450));

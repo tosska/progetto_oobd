@@ -22,6 +22,6 @@ public class Frase {
 
     public void stampa()  //da cancellare
     {
-        System.out.println(contenuto + riga);
+        System.out.println("Riga: " + riga + "->  " + contenuto);
     }
 }

@@ -36,57 +36,73 @@ public class Controller {
 
     public void caricaModifichePagina(Pagina paginaOriginale, Testo testoModificato, Boolean proposta)
     {
-        Testo testoOriginale = paginaOriginale.getTestoRiferito();
-        int sizeTestoOriginale = testoOriginale.getListaFrasi().size(); //2
-        int sizeTestoModificato = testoModificato.getListaFrasi().size();//1
-        int limite;
-        String frasePrecedente;
+        Testo testoOriginale  = paginaOriginale.getTestoRiferito();
+        Storico storico = paginaOriginale.getStorico();
 
-        if(sizeTestoOriginale<=sizeTestoModificato)
-            limite = sizeTestoOriginale;
-        else
-            limite = sizeTestoModificato;
-
-        for(int i=0; i<limite; i++)
+        for(int riga=1; riga<=testoModificato.getNumRighe(); riga++)
         {
-            Frase frase1 = testoOriginale.getListaFrasi().get(i);
-            Frase frase2 = testoModificato.getListaFrasi().get(i);
+            ArrayList<Frase> rowOld = testoOriginale.getFrasiInRiga(riga);
+            ArrayList<Frase> rowNew = testoModificato.getFrasiInRiga(riga);
 
-            if(!(frase1.getContenuto().equals(frase2.getContenuto()))) //se non sono uguali
+            for(Frase fraseOld : rowOld)
             {
-                Modifica modifica = new Modifica(proposta, frase1.getRiga(), "data", utilizzatore, frase1.getContenuto(), frase2.getContenuto(),
-                        paginaOriginale.getStorico(), paginaOriginale);
+                String contenutoOld = fraseOld.getContenuto().replace("\n", "");
+                contenutoOld = contenutoOld.replace("-", "");
 
-                paginaOriginale.getStorico().addOperazione(modifica);
+                if(rowNew.isEmpty())
+                {
+                    Cancellazione cancellazione = new Cancellazione(proposta, riga, "data", utilizzatore, contenutoOld, storico, paginaOriginale);
+                    storico.addOperazione(cancellazione);
+                }
+                else {
+                    String contenutoNew = rowNew.getFirst().getContenuto().replace("\n", "");
+                    contenutoNew = contenutoNew.replace("-", "");
+                    rowNew.removeFirst();
+
+                    if (!(contenutoOld.equals(contenutoNew))) {
+                        Modifica modifica = new Modifica(proposta, riga, "data", utilizzatore, contenutoOld, contenutoNew, storico, paginaOriginale);
+                        storico.addOperazione(modifica);
+                    }
+                }
+
             }
+
+            if(!rowNew.isEmpty())
+            {
+                for(Frase f : rowNew)
+                {
+                    String contenuto = f.getContenuto().replace("\n", "");
+                    contenuto = contenuto.replace("-", "");
+
+                    Inserimento inserimento = new Inserimento(proposta, riga, "data", utilizzatore, contenuto, storico, paginaOriginale);
+                    storico.addOperazione(inserimento);
+                }
+            }
+
         }
 
-        if(sizeTestoOriginale<sizeTestoModificato) //è avvenuta una o più aggiunte
+        if(testoOriginale.getListaFrasi().size()>testoModificato.getListaFrasi().size())
         {
-            for(int i=sizeTestoOriginale; i<sizeTestoModificato; i++)
+            for(int riga= testoModificato.getNumRighe()+1; riga<= testoOriginale.getNumRighe(); riga++)
             {
-                Frase fraseAggiunta = testoModificato.getListaFrasi().get(i);
+                ArrayList<Frase> frasiEliminate = testoOriginale.getFrasiInRiga(riga);
 
-                Inserimento inserimento = new Inserimento(proposta, fraseAggiunta.getRiga(), "data", utilizzatore, fraseAggiunta.getContenuto(),
-                        paginaOriginale.getStorico(), paginaOriginale);
-                paginaOriginale.getStorico().addOperazione(inserimento);
-            }
-        }
-        else if(sizeTestoOriginale>sizeTestoModificato) //è avvenuta una o più cancellazioni
-        {
-            for(int i=sizeTestoModificato; i<sizeTestoOriginale; i++)
-            {
-                Frase fraseEliminata = testoOriginale.getListaFrasi().get(i);
+                for(Frase frase: frasiEliminate)
+                {
+                    String contenuto = frase.getContenuto().replace("\n", "");
+                    contenuto = contenuto.replace("-", "");
 
-                Cancellazione cancellazione = new Cancellazione(proposta, fraseEliminata.getRiga(), "data", utilizzatore, fraseEliminata.getContenuto(),
-                        paginaOriginale.getStorico(), paginaOriginale);
-                paginaOriginale.getStorico().addOperazione(cancellazione);
+                    Cancellazione cancellazione = new Cancellazione(proposta, riga, "data", utilizzatore, contenuto, storico, paginaOriginale);
+                    storico.addOperazione(cancellazione);
+                }
+
             }
         }
 
         paginaOriginale.setTestoRiferito(testoModificato);
-        System.out.println("------------------------------------------------------------"); //debug
+        //modifica pagina nel database (da fare)
         paginaOriginale.getStorico().stampaOperazioni();
+
     }
 
 
@@ -99,7 +115,7 @@ public class Controller {
 
         int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
-        listaPagineDAO.addFraseDB(idPagina, p.getTestoRiferito().getListaFrasi());
+        listaPagineDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi());
     }
 
     public void aggiungiUtente(String username, String email, String password, Timestamp data)
