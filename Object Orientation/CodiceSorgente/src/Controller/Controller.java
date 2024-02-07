@@ -80,7 +80,7 @@ public class Controller {
             }
 
         }
-
+/*
         if(testoOriginale.getListaFrasi().size()>testoModificato.getListaFrasi().size())
         {
             for(int riga= testoModificato.getNumRighe()+1; riga<= testoOriginale.getNumRighe(); riga++)
@@ -98,8 +98,8 @@ public class Controller {
 
             }
         }
-
-        paginaOriginale.setTestoRiferito(testoModificato);
+*/
+        //paginaOriginale.setTestoRiferito(testoModificato);
         //modifica pagina nel database (da fare)
         paginaOriginale.getStorico().stampaOperazioni();
 
