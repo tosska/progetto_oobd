@@ -13,7 +13,7 @@ CREATE DOMAIN PASSWORD_DOMINIO AS VARCHAR(40)
 		AND VALUE LIKE '________%');
 
 -- Vincolo Di Dominio: Username
-CREATE DOMAIN USERNAME_DOMINIO AS VARCHAR(20);
+CREATE DOMAIN USERNAME_DOMINIO AS VARCHAR(20); -- da fare
 
 -- Vincolo Di Dominio: Email
 CREATE DOMAIN EMAIL_DOMINIO AS VARCHAR(50)
@@ -36,7 +36,7 @@ CREATE DOMAIN TIPO_OPERAZIONE AS CHAR(1)
 */
 CREATE TABLE UTENTE
 (
-    Username VARCHAR(20) NOT NULL,
+    Username VARCHAR(20),
     Email EMAIL_DOMINIO NOT NULL,
     Password PASSWORD_DOMINIO NOT NULL,
     Autore BOOLEAN DEFAULT FALSE,
@@ -55,12 +55,12 @@ CREATE TABLE PAGINA
     ID_Pagina SERIAL,
     Titolo VARCHAR(50) NOT NULL,
     Tema VARCHAR(50) NOT NULL, 
-    DataCreazione TIMESTAMP,
-    UserAutore VARCHAR(20) DEFAULT 'non trovato', --NOT NULL?
+    DataCreazione TIMESTAMP NOT NULL,
+    UserAutore VARCHAR(20) NOT NULL,
 
     PRIMARY KEY(ID_Pagina),
     FOREIGN KEY(UserAutore) REFERENCES UTENTE(Username) 
-    ON DELETE SET DEFAULT
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
     UNIQUE(Titolo, Tema)
 );
@@ -72,7 +72,7 @@ CREATE TABLE PAGINA
 */
 CREATE TABLE FRASE 
 (
-    Ordine SERIAL,
+    Ordine INT,
     ID_Pagina SERIAL,
     Contenuto VARCHAR(100) NOT NULL,
     Riga INT NOT NULL,
@@ -91,13 +91,14 @@ CREATE TABLE FRASE
 */
 CREATE TABLE COLLEGAMENTO
 (
-    OrdineFrase SERIAL NOT NULL,
-    ID_Pagina SERIAL NOT NULL,
-    ID_PaginaCollegata SERIAL NOT NULL,
+    OrdineFrase INT,
+    ID_Pagina SERIAL,
+    ID_PaginaCollegata SERIAL,
 
     PRIMARY KEY(OrdineFrase, ID_Pagina, ID_PaginaCollegata),
     FOREIGN KEY(OrdineFrase, ID_Pagina) REFERENCES FRASE(Ordine, ID_Pagina)
-    ON DELETE CASCADE,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
     FOREIGN KEY(ID_PaginaCollegata) REFERENCES PAGINA(ID_Pagina)
     ON DELETE CASCADE
 );
@@ -118,7 +119,7 @@ CREATE TABLE OPERAZIONE
     FraseModificata VARCHAR(100),
     Data TIMESTAMP,
     ID_Pagina SERIAL NOT NULL,
-    Utente VARCHAR(20) NOT NULL DEFAULT 'non trovato',
+    Utente VARCHAR(20) NOT NULL DEFAULT 'Unknown',
 
     PRIMARY KEY(ID_Operazione),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina) ON DELETE CASCADE,
@@ -135,13 +136,13 @@ CREATE TABLE OPERAZIONE
 CREATE TABLE APPROVAZIONE
 (
     ID_Operazione SERIAL,
-    Autore VARCHAR(20) DEFAULT 'non trovato', 
+    Autore VARCHAR(20), 
     Data TIMESTAMP,
     Risposta BOOLEAN,
 
     PRIMARY KEY(ID_Operazione, Autore),
     FOREIGN KEY(ID_Operazione) REFERENCES OPERAZIONE(ID_Operazione) ON DELETE CASCADE,
-    FOREIGN KEY(Autore) REFERENCES UTENTE(Username) ON DELETE SET DEFAULT
+    FOREIGN KEY(Autore) REFERENCES UTENTE(Username) ON DELETE CASCADE
 );
 
 
@@ -161,7 +162,7 @@ ADD CONSTRAINT controlloModifica CHECK(NOT(Tipo LIKE 'M' AND FraseModificata IS 
 ALTER TABLE OPERAZIONE
 ADD CONSTRAINT controlloIC CHECK(NOT(Tipo LIKE 'I' OR Tipo LIKE 'C' AND FraseModificata IS NOT NULL));
 
--- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina.
+-- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. --DA SISTEMARE
 CREATE OR REPLACE FUNCTION before_insert_proposta()
 RETURNS TRIGGER AS $$
 BEGIN
