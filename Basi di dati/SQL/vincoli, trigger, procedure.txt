@@ -7,5 +7,11 @@ VINCOLI DA IMPLEMENTARE:
   - non posso esistere operazione di proposta non presenti in approvazione
 
 
+
 TRIGGER DA IMPLEMENTARE:
   - Se l'autore di una pagina viene cancellato, il nome dell'autore dovrà essere sostituito con "Rimosso" (viene rimosso il vincolo foreign?)
+
+  - Quando viene inserita una frase:
+  	- nel momento in cui inserisco una frase si deve sistemare l'ordine!!
+  	- l'inserimento del contenuto della frase nello storico
+	- 
