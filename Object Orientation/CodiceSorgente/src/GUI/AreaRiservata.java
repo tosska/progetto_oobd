@@ -152,6 +152,7 @@ public class AreaRiservata {
         // welcome panel
         welcomePanel.setBounds(250, 60, 550, 540);
         welcomePanel.setLayout(null);
+        welcomePanel.setBackground(Color.white);
 
         welcomeLabel.setBounds(20, 10, 530, 50);
         welcomeLabel.setFont(new Font("Monospaced", Font.ITALIC, 20));

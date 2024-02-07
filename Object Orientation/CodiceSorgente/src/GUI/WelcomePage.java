@@ -4,6 +4,7 @@ import Controller.Controller;
 import Model.Pagina;
 
 import javax.swing.*;
+import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -11,8 +12,6 @@ import java.awt.event.*;
 public class WelcomePage {
     private JFrame frame = new JFrame();
     private Controller controllerPrincipale;
-    private JButton createNewPageButton = new JButton("Crea nuova pagina");
-
 
 
     private JPanel menuPanel = new JPanel();
@@ -27,7 +26,14 @@ public class WelcomePage {
     private JLabel profileLabel = new JLabel();
 
 
-    private JPanel panelGrey = new JPanel();
+    private JPanel centralPanel = new JPanel();
+    private CardLayout cardLayout = new CardLayout();
+    private JPanel welcomePanel = new JPanel();
+    private JLabel welcomeLabel = new JLabel("<html>Benvenuti su <b>Danilo Wiki</b><br>L'enciclopedia libera e collaborativa</html>");
+    private JPanel createNewPagePanel = new JPanel();
+    private JLabel titleLabel = new JLabel("Inserisci titolo:");
+    private JTextField titleField = new JTextField();
+
 
     WelcomePage(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
@@ -112,6 +118,7 @@ public class WelcomePage {
         panelWhite.setBounds(200, 0, 700, 50);
         panelWhite.setLayout(null);
         panelWhite.setBackground(Color.white);
+        panelWhite.setBorder(new MatteBorder(0, 0, 1, 0, new Color(47,69,92)));
 
         searchField.setBounds(30, 10, 300, 30);
         ImageIcon searchImagine = new ImageIcon(this.getClass().getResource("/icon/search.png"));
@@ -170,13 +177,6 @@ public class WelcomePage {
             }
         });
 
-
-
-        panelGrey.setBounds(200, 50, 700, 450);
-        panelGrey.setLayout(null);
-        panelGrey.setBackground(new Color(244, 244, 244));
-
-
         // quando premo invio inizia la ricerca
         searchField.addKeyListener(new KeyAdapter() {
             @Override
@@ -190,12 +190,36 @@ public class WelcomePage {
         });
 
 
+        // pannelli centrale
+        centralPanel.setLayout(cardLayout);
+        centralPanel.setBounds(200, 50, 700, 450);
+        centralPanel.setBackground(Color.white);
+
+        welcomePanel.setBounds(200, 50, 700, 450);
+        welcomePanel.setLayout(null);
+        welcomePanel.setBackground(Color.white);
+
+        welcomeLabel.setBounds(20, 10, 500, 50);
+        welcomeLabel.setFont(new Font("Monospaced", Font.ITALIC, 20));
+
+        createNewPagePanel.setBounds(200, 50, 700, 450);
+        createNewPagePanel.setLayout(null);
+        createNewPagePanel.setBackground(Color.white);
+
+        titleLabel.setBounds(30, 10, 100, 20);
+
+        titleField.setBounds(30, 40, 300, 30);
+
+
+
+
+
 
 
 
         frame.add(menuPanel);
         frame.add(panelWhite);
-        frame.add(panelGrey);
+        frame.add(centralPanel);
 
         menuPanel.add(logoLabel);
         menuPanel.add(logoutLabel);
@@ -204,6 +228,16 @@ public class WelcomePage {
         panelWhite.add(searchField);
         panelWhite.add(searchLabel);
         panelWhite.add(profileLabel);
+
+        welcomePanel.add(welcomeLabel);
+
+        createNewPagePanel.add(titleLabel);
+        createNewPagePanel.add(titleField);
+
+        centralPanel.add(welcomePanel, "welcomePanel");
+        centralPanel.add(createNewPagePanel, "createNewPagePanel");
+
+
 
 
         ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
