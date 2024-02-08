@@ -15,3 +15,4 @@ TRIGGER DA IMPLEMENTARE:
   	- nel momento in cui inserisco una frase si deve sistemare l'ordine!!
   	- l'inserimento del contenuto della frase nello storico
 	- 
+ - Gestire la lunghezza massima di una riga

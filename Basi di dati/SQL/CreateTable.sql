@@ -13,7 +13,8 @@ CREATE DOMAIN PASSWORD_DOMINIO AS VARCHAR(40)
 		AND VALUE LIKE '________%');
 
 -- Vincolo Di Dominio: Username
-CREATE DOMAIN USERNAME_DOMINIO AS VARCHAR(20); -- da fare
+CREATE DOMAIN USERNAME_DOMINIO AS VARCHAR(30)
+    CHECK (VALUE ~ '^[a-z0-9_]{5,30}$');
 
 -- Vincolo Di Dominio: Email
 CREATE DOMAIN EMAIL_DOMINIO AS VARCHAR(50)
@@ -36,10 +37,10 @@ CREATE DOMAIN TIPO_OPERAZIONE AS CHAR(1)
 */
 CREATE TABLE UTENTE
 (
-    Username VARCHAR(20),
+    Username USERNAME_DOMINIO,
     Email EMAIL_DOMINIO NOT NULL,
     Password PASSWORD_DOMINIO NOT NULL,
-    Autore BOOLEAN DEFAULT FALSE,
+    Autore BOOLEAN DEFAULT FALSE NOT NULL,
 
     PRIMARY KEY(Username),
     UNIQUE(Email)
@@ -76,7 +77,7 @@ CREATE TABLE FRASE
     ID_Pagina SERIAL,
     Contenuto VARCHAR(100) NOT NULL,
     Riga INT NOT NULL,
-    Collegamento BOOLEAN NOT NULL,
+    Collegamento BOOLEAN DEFAULT FALSE DEFAULT FALSE,
 
     PRIMARY KEY(Ordine, ID_Pagina),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina) 
@@ -257,7 +258,23 @@ EXECUTE FUNCTION ordinamentoFrase();
     !INSERT->TABLE->UTENTE!
   ---------------------------------
 */
-INSERT INTO UTENTE VALUES;
+INSERT INTO UTENTE VALUES
+    ('john_doe', 'john.doe@gmail.com', 'P@ssw0rd123', default),
+    ('jane_smith', 'jane.smith@yahoo.com', 'JaneSmith!456', default),
+    ('alex_brown', 'alex.brown@hotmail.com', 'SecurePwd789@', default),
+    ('lisa_johnson', 'lisa.johnson@outlook.com', 'LisaPass123@', default),
+    ('mike_williams', 'mike.williams@aol.com', 'Williams123$', default),
+    ('sarah_davis', 'sarah.davis@icloud.com', 'Sar@hDav!s678', default),
+    ('chris_miller', 'chris.miller@protonmail.com', 'MillerPass456@', default),
+    ('emily_taylor', 'emily.taylor@yandex.com', 'P@ssw0rdTaylor', default),
+    ('ryan_anderson', 'ryan.anderson@zoho.com', 'AndersonRy@n789', default),
+    ('amanda_thompson', 'amanda.thompson@mail.com', 'ThompsonPwd456@', default),
+    ('david_clark', 'david.clark@inbox.com', 'D@v!dCl@rk123', default),
+    ('samantha_wilson', 'samantha.wilson@tutanota.com', 'Wilson!Sam789', default),
+    ('kevin_martin', 'kevin.martin@fastmail.com', 'M@rt!nK3v!n', default),
+    ('jessica_taylor', 'jessica.taylor@yandex.com', 'TaylorJess123@', default),
+    ('brandon_carter', 'brandon.carter@zoho.com', 'CarterBr@nd0n', default);
+
 
 
 /*
@@ -265,8 +282,17 @@ INSERT INTO UTENTE VALUES;
     !INSERT->TABLE->PAGINA!
   ---------------------------------
 */
-INSERT INTO PAGINA VALUES;
-
+INSERT INTO PAGINA VALUES
+    (default, 'Storia dell''Impero Romano', 'Storia', '2024-02-08 09:00:00', 'john_doe'),
+    (default, 'Teoria della relatività di Einstein', 'Fisica', '2024-02-07 10:30:00', 'jane_smith'),
+    (default, 'Biografia di Leonardo da Vinci', 'Biografia', '2024-02-06 11:45:00', 'alex_brown'),
+    (default, 'Economia degli Stati Uniti', 'Economia', '2024-02-05 12:15:00', 'lisa_johnson'),
+    (default, 'Filosofia del Rinascimento', 'Filosofia', '2024-02-04 13:20:00', 'mike_williams'),
+    (default, 'Scienza della computazione', 'Informatica', '2024-02-03 14:30:00', 'sarah_davis'),
+    (default, 'Arte moderna: Movimento surrealista', 'Arte', '2024-02-02 15:45:00', 'chris_miller'),
+    (default, 'Medicina alternativa e tradizionale', 'Medicina', '2024-02-01 16:50:00', 'emily_taylor'),
+    (default, 'Biologia molecolare: DNA e genetica', 'Biologia', '2024-01-31 17:00:00', 'ryan_anderson'),
+    (default, 'Storia dell''arte antica: Grecia classica', 'Storia dell''arte', '2024-01-30 18:15:00', 'amanda_thompson');
 
 /*
   ---------------------------------
