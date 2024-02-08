@@ -193,10 +193,63 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER check_approvazione
 BEFORE INSERT
 ON APPROVAZIONE
-FOR EACH ROW
+FOR EACH ROW --Da mettere?
 EXECUTE FUNCTION before_insert_approvazione();
 
 -- un autore di una pagina non può approvare proposte di operazioni su pagine non scritte da lui
+
+/*
+  ---------------------------------
+    TRIGGER
+  ---------------------------------
+*/
+
+
+CREATE OR REPLACE FUNCTION ordinamentoFrase() RETURNS TRIGGER AS
+$$
+DECLARE
+    maxFrase INT;
+BEGIN
+    SELECT MAX(ordine) INTO maxFrase FROM FRASE WHERE ID_Pagina=NEW.ID_Pagina;
+    
+    IF(maxFrase IS NOT NULL AND maxFrase>=NEW.ordine) THEN
+        
+        FOR i IN REVERSE maxFrase..NEW.ordine LOOP
+            
+            RAISE NOTICE 'Ordine: %', i;
+            UPDATE FRASE 
+            SET ordine = ordine + 1
+            WHERE ordine = i AND id_pagina = NEW.id_pagina;
+            
+            
+        END LOOP;
+
+    END IF;
+
+    RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER ordinaFrase
+BEFORE INSERT 
+ON FRASE 
+FOR EACH ROW
+EXECUTE FUNCTION ordinamentoFrase();
+
+
+
+
+/*
+  ---------------------------------
+    PROCEDURE E FUNZIONI
+  ---------------------------------
+*/
+
+
+
+
+
+
 
 
 /*
