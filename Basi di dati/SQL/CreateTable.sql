@@ -24,6 +24,8 @@ CREATE DOMAIN EMAIL_DOMINIO AS VARCHAR(50)
 CREATE DOMAIN TIPO_OPERAZIONE AS CHAR(1)
   CHECK (VALUE LIKE 'I' OR VALUE LIKE 'M' OR VALUE LIKE 'C'); 
 
+CREATE DOMAIN LEN_FRASE AS VARCHAR(100);
+
         
 /*
     ---------------------------
@@ -40,7 +42,7 @@ CREATE TABLE UTENTE
     Username USERNAME_DOMINIO,
     Email EMAIL_DOMINIO NOT NULL,
     Password PASSWORD_DOMINIO NOT NULL,
-    Autore BOOLEAN DEFAULT FALSE NOT NULL,
+    Autore BOOLEAN DEFAULT FALSE NOT NULL, --forse il not null va eliminato
 
     PRIMARY KEY(Username),
     UNIQUE(Email)
@@ -56,8 +58,8 @@ CREATE TABLE PAGINA
     ID_Pagina SERIAL,
     Titolo VARCHAR(50) NOT NULL,
     Tema VARCHAR(50) NOT NULL, 
-    DataCreazione TIMESTAMP NOT NULL,
-    UserAutore VARCHAR(20) NOT NULL,
+    DataCreazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UserAutore USERNAME_DOMINIO NOT NULL,
 
     PRIMARY KEY(ID_Pagina),
     FOREIGN KEY(UserAutore) REFERENCES UTENTE(Username) 
@@ -73,13 +75,13 @@ CREATE TABLE PAGINA
 */
 CREATE TABLE FRASE 
 (
+    Riga INT,
     Ordine INT,
-    ID_Pagina SERIAL,
-    Contenuto VARCHAR(100) NOT NULL,
-    Riga INT NOT NULL,
-    Collegamento BOOLEAN DEFAULT FALSE DEFAULT FALSE,
+    ID_Pagina INT,
+    Contenuto LEN_FRASE NOT NULL,
+    Collegamento BOOLEAN DEFAULT FALSE NOT NULL, --forse il not null va eliminato
 
-    PRIMARY KEY(Ordine, ID_Pagina),
+    PRIMARY KEY(Riga, Ordine, ID_Pagina),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina) 
     ON DELETE CASCADE
 
@@ -92,12 +94,13 @@ CREATE TABLE FRASE
 */
 CREATE TABLE COLLEGAMENTO
 (
+    RigaFrase INT,
     OrdineFrase INT,
-    ID_Pagina SERIAL,
-    ID_PaginaCollegata SERIAL,
+    ID_Pagina INT,
+    ID_PaginaCollegata INT,
 
-    PRIMARY KEY(OrdineFrase, ID_Pagina, ID_PaginaCollegata),
-    FOREIGN KEY(OrdineFrase, ID_Pagina) REFERENCES FRASE(Ordine, ID_Pagina)
+    PRIMARY KEY(RigaFrase, OrdineFrase, ID_Pagina, ID_PaginaCollegata),
+    FOREIGN KEY(RigaFrase, OrdineFrase, ID_Pagina) REFERENCES FRASE(Riga, Ordine, ID_Pagina)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
     FOREIGN KEY(ID_PaginaCollegata) REFERENCES PAGINA(ID_Pagina)
@@ -116,11 +119,12 @@ CREATE TABLE OPERAZIONE
     Tipo TIPO_OPERAZIONE NOT NULL,
     Proposta BOOLEAN NOT NULL,
     Riga INT NOT NULL,
+    Ordine INT NOT NULL,
     FraseCoinvolta VARCHAR(100) NOT NULL,
     FraseModificata VARCHAR(100),
-    Data TIMESTAMP,
+    Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ID_Pagina SERIAL NOT NULL,
-    Utente VARCHAR(20) NOT NULL DEFAULT 'Unknown',
+    Utente USERNAME_DOMINIO NOT NULL DEFAULT 'Unknown', -- forse il NOT null va eliminato
 
     PRIMARY KEY(ID_Operazione),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina) ON DELETE CASCADE,
@@ -137,7 +141,7 @@ CREATE TABLE OPERAZIONE
 CREATE TABLE APPROVAZIONE
 (
     ID_Operazione SERIAL,
-    Autore VARCHAR(20), 
+    Autore USERNAME_DOMINIO, 
     Data TIMESTAMP,
     Risposta BOOLEAN,
 
@@ -161,7 +165,7 @@ ADD CONSTRAINT controlloModifica CHECK(NOT(Tipo LIKE 'M' AND FraseModificata IS 
 
 -- non può esistere un operazione di cancellamento o di inserimento che abbia l'attributo "fraseModificata" not null.
 ALTER TABLE OPERAZIONE
-ADD CONSTRAINT controlloIC CHECK(NOT(Tipo LIKE 'I' OR Tipo LIKE 'C' AND FraseModificata IS NOT NULL));
+ADD CONSTRAINT controlloIC CHECK(NOT((Tipo LIKE 'I' OR Tipo LIKE 'C') AND FraseModificata IS NOT NULL)); --sembra non funzionare
 
 -- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. --DA SISTEMARE
 CREATE OR REPLACE FUNCTION before_insert_proposta()
@@ -206,36 +210,70 @@ EXECUTE FUNCTION before_insert_approvazione();
 */
 
 
-CREATE OR REPLACE FUNCTION ordinamentoFrase() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION ordinamentoFraseInserimento() RETURNS TRIGGER AS
 $$
 DECLARE
     maxFrase INT;
 BEGIN
-    SELECT MAX(ordine) INTO maxFrase FROM FRASE WHERE ID_Pagina=NEW.ID_Pagina;
+    SELECT MAX(ordine) INTO maxFrase FROM FRASE WHERE ID_Pagina=NEW.ID_Pagina AND Riga=NEW.riga;
+    
+    IF(maxFrase IS NULL) THEN
+        maxFrase := 0;
+    END IF;
     
     IF(maxFrase IS NOT NULL AND maxFrase>=NEW.ordine) THEN
         
         FOR i IN REVERSE maxFrase..NEW.ordine LOOP
             
-            RAISE NOTICE 'Ordine: %', i;
             UPDATE FRASE 
             SET ordine = ordine + 1
-            WHERE ordine = i AND id_pagina = NEW.id_pagina;
+            WHERE ordine = i AND id_pagina = NEW.id_pagina AND Riga = NEW.riga;
             
             
         END LOOP;
 
+    ELSIF (NEW.ordine IS NULL OR NEW.ordine > maxFrase) THEN
+        NEW.ordine = maxFrase + 1;
     END IF;
 
     RETURN NEW;
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER ordinaFrase
+CREATE OR REPLACE TRIGGER ordinaFraseInserimento
 BEFORE INSERT 
 ON FRASE 
 FOR EACH ROW
-EXECUTE FUNCTION ordinamentoFrase();
+EXECUTE FUNCTION ordinamentoFraseInserimento();
+
+
+CREATE OR REPLACE FUNCTION ordinamentoFraseCancellazione() RETURNS TRIGGER AS
+$$
+DECLARE
+    maxFrase INT;
+BEGIN
+    SELECT MAX(ordine) INTO maxFrase FROM FRASE WHERE ID_Pagina=OLD.ID_Pagina AND Riga=OLD.riga;
+    
+    IF(maxFrase IS NOT NULL AND maxFrase>OLD.ordine) THEN
+        
+        FOR i IN OLD.ordine+1..maxFrase LOOP
+            
+            UPDATE FRASE 
+            SET ordine = ordine - 1
+            WHERE ordine = i AND id_pagina = OLD.id_pagina AND Riga = OLD.riga;
+            
+        END LOOP;
+    END IF;
+
+    RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER ordinaFraseCancellazione 
+AFTER DELETE 
+ON FRASE 
+FOR EACH ROW
+EXECUTE FUNCTION ordinamentoFraseCancellazione();
 
 
 
@@ -245,6 +283,77 @@ EXECUTE FUNCTION ordinamentoFrase();
     PROCEDURE E FUNZIONI
   ---------------------------------
 */
+
+CREATE OR REPLACE PROCEDURE inserimentoFrase(riga INT, ordine INT, ID_Pagina INT, Contenuto LEN_FRASE, collegamento BOOLEAN, nomeUtente USERNAME_DOMINIO, proposta BOOLEAN)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    
+BEGIN
+    IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
+        RAISE EXCEPTION 'utente indicato non esistente';
+    END IF;
+
+    INSERT INTO FRASE VALUES(Riga, Ordine, ID_Pagina, Contenuto, collegamento);
+    
+    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'I', proposta, riga, ordine, Contenuto, null, DEFAULT, ID_Pagina, nomeUtente); 
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE EXCEPTION 'Si è verificata un''eccezione: %', SQLERRM;
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE modificaFrase(rigaF INT, ordineF INT, ID_PaginaF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO, proposta BOOLEAN)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    oldFrase LEN_FRASE;
+BEGIN
+    IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
+        RAISE EXCEPTION 'utente indicato non esistente';
+    END IF;
+
+    SELECT Contenuto INTO oldFrase FROM FRASE WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
+
+    UPDATE FRASE
+    SET Contenuto = ContenutoF
+    WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
+
+    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'M', proposta, rigaF, ordineF, oldFrase, ContenutoF, DEFAULT, ID_PaginaF, nomeUtente);  
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE EXCEPTION 'Si è verificata un''eccezione: %', SQLERRM;
+
+    
+END;
+$$;
+
+CREATE OR REPLACE PROCEDURE rimuoviFrase(rigaF INT, ordineF INT, ID_PaginaF INT, nomeUtente USERNAME_DOMINIO, proposta BOOLEAN)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    oldFrase LEN_FRASE;
+BEGIN
+    IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
+        RAISE EXCEPTION 'utente indicato non esistente';
+    END IF;
+
+    SELECT Contenuto INTO oldFrase FROM FRASE WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
+
+    DELETE FROM FRASE
+    WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
+ 
+    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'C', proposta, rigaF, ordineF,oldFrase, DEFAULT, ID_PaginaF, nomeUtente);  
+
+    EXCEPTION
+        WHEN OTHERS THEN
+            RAISE EXCEPTION 'Si è verificata un''eccezione: %', SQLERRM;
+
+    
+END;
+$$;
 
 
 
