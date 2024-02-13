@@ -50,6 +50,19 @@ CREATE TABLE UTENTE
 
 /*
     ---------------------------
+        !Table-TEMA!
+    ---------------------------
+*/
+
+CREATE TABLE TEMA
+(
+    nome VARCHAR(50),
+
+    PRIMARY KEY(nome)
+);
+
+/*
+    ---------------------------
         !Table-PAGINA!
     ---------------------------
 */
@@ -57,16 +70,20 @@ CREATE TABLE PAGINA
 (
     ID_Pagina SERIAL,
     Titolo VARCHAR(50) NOT NULL,
-    Tema VARCHAR(50) NOT NULL, 
+    Tema VARCHAR(50), 
     DataCreazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UserAutore USERNAME_DOMINIO NOT NULL,
 
     PRIMARY KEY(ID_Pagina),
     FOREIGN KEY(UserAutore) REFERENCES UTENTE(Username) 
     ON DELETE CASCADE
-    ON UPDATE CASCADE,
-    UNIQUE(Titolo, Tema)
+    ON UPDATE CASCADE
+    FOREIGN KEY(Tema) REFERENCES TEMA(nome)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
 );
+
+
 
 /*
     ---------------------------
@@ -79,7 +96,7 @@ CREATE TABLE FRASE
     Ordine INT,
     ID_Pagina INT,
     Contenuto LEN_FRASE NOT NULL,
-    Collegamento BOOLEAN DEFAULT FALSE NOT NULL, --forse il not null va eliminato
+    Collegamento BOOLEAN DEFAULT FALSE,
 
     PRIMARY KEY(Riga, Ordine, ID_Pagina),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina) 
@@ -124,7 +141,7 @@ CREATE TABLE OPERAZIONE
     FraseModificata VARCHAR(100),
     Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ID_Pagina SERIAL NOT NULL,
-    Utente USERNAME_DOMINIO NOT NULL DEFAULT 'Unknown', -- forse il NOT null va eliminato
+    Utente USERNAME_DOMINIO DEFAULT 'Unknown', 
 
     PRIMARY KEY(ID_Operazione),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina) ON DELETE CASCADE,
@@ -276,6 +293,60 @@ FOR EACH ROW
 EXECUTE FUNCTION ordinamentoFraseCancellazione();
 
 
+CREATE OR REPLACE FUNCTION creazioneApprovazione() RETURNS TRIGGER AS
+$$
+DECLARE
+    autore USERNAME_DOMINIO;
+BEGIN
+    SELECT UserAutore INTO Autore FROM PAGINA WHERE ID_Pagina = NEW.id_pagina;
+
+    INSERT INTO APPROVAZIONE VALUES (NEW.ID_Operazione, autore, null, null);
+
+    RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE TRIGGER creazioneApprovazioneTrigger 
+AFTER INSERT 
+ON OPERAZIONE 
+FOR EACH ROW
+WHEN (NEW.proposta = TRUE)
+EXECUTE FUNCTION creazioneApprovazione();
+
+
+CREATE OR REPLACE FUNCTION effettuaProposta() RETURNS TRIGGER AS
+$$
+DECLARE
+    operazioneProposta OPERAZIONE%ROWTYPE;
+BEGIN
+    SELECT * INTO operazioneProposta FROM OPERAZIONE WHERE ID_Operazione = NEW.ID_Operazione;
+
+    IF(operazioneProposta.tipo LIKE 'I') THEN
+        INSERT INTO FRASE VALUES (operazioneProposta.Riga, operazioneProposta.ordine, operazioneProposta.ID_Pagina, operazioneProposta.FraseCoinvolta, false);
+    ELSIF (operazioneProposta.tipo LIKE 'M') THEN
+        UPDATE FRASE
+        SET Contenuto = operazioneProposta.FraseModificata
+        WHERE riga= operazioneProposta.riga AND ordine = operazioneProposta.ordine AND ID_Pagina = operazioneProposta.id_pagina;
+    ELSIF (operazioneProposta.tipo LIKE 'C') THEN
+        DELETE FROM FRASE
+        WHERE riga= operazioneProposta.riga AND ordine = operazioneProposta.ordine AND ID_Pagina = operazioneProposta.id_pagina;
+    END IF;
+
+    RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER controlloEsitoApprovazioneTrigger
+AFTER UPDATE 
+OF Risposta ON APPROVAZIONE 
+FOR EACH ROW
+WHEN (NEW.Risposta = TRUE)
+EXECUTE FUNCTION effettuaProposta();
+
+
 
 
 /*
@@ -284,76 +355,145 @@ EXECUTE FUNCTION ordinamentoFraseCancellazione();
   ---------------------------------
 */
 
-CREATE OR REPLACE PROCEDURE inserimentoFrase(riga INT, ordine INT, ID_Pagina INT, Contenuto LEN_FRASE, collegamento BOOLEAN, nomeUtente USERNAME_DOMINIO, proposta BOOLEAN)
+CREATE OR REPLACE PROCEDURE inserimentoFrase(rigaF INT, ordineF INT, ID_PaginaF INT, ContenutoF LEN_FRASE, collegamento BOOLEAN, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    
+    maxFrase INT;
+    ordineFrase INT;
+    autorePagina USERNAME_DOMINIO;
+    proposta BOOLEAN;
 BEGIN
     IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
         RAISE EXCEPTION 'utente indicato non esistente';
     END IF;
 
-    INSERT INTO FRASE VALUES(Riga, Ordine, ID_Pagina, Contenuto, collegamento);
+    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
     
-    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'I', proposta, riga, ordine, Contenuto, null, DEFAULT, ID_Pagina, nomeUtente); 
+    SELECT MAX(ordine) INTO maxFrase FROM FRASE WHERE ID_Pagina = ID_PaginaF AND riga = rigaF;
+	
+	  IF(maxFrase IS NULL) THEN
+		  maxFrase:=0;
+	  END IF;
+	
+    IF(ordineF IS NOT NULL AND maxFrase>ordineF) THEN
+        ordineFrase := OrdineF;
+    ELSE
+        ordineFrase := maxFrase+1;
+    END IF;
+	
+	
+    IF(autorePagina = nomeUtente) THEN
+      INSERT INTO FRASE VALUES(RigaF, ordineFrase, ID_PaginaF, ContenutoF, collegamento);
+      proposta:=false;
+    ELSE
+      proposta:=true;
+    END IF;
 
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Si è verificata un''eccezione: %', SQLERRM;
+    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'I', proposta, rigaF, ordineFrase, ContenutoF, null, DEFAULT, ID_PaginaF, nomeUtente); 
+   
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE modificaFrase(rigaF INT, ordineF INT, ID_PaginaF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO, proposta BOOLEAN)
+CREATE OR REPLACE PROCEDURE modificaFrase(rigaF INT, ordineF INT, ID_PaginaF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
     oldFrase LEN_FRASE;
+    autorePagina USERNAME_DOMINIO;
+    proposta BOOLEAN;
 BEGIN
     IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
         RAISE EXCEPTION 'utente indicato non esistente';
     END IF;
 
+    IF(EXISTS(SELECT * FROM FRASE WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF)=FALSE) THEN
+        RAISE EXCEPTION 'la frase indicata non esiste';
+    END IF;
+
+    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
+
     SELECT Contenuto INTO oldFrase FROM FRASE WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
 
-    UPDATE FRASE
-    SET Contenuto = ContenutoF
-    WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
+    IF(autorePagina = nomeUtente) THEN
+        UPDATE FRASE
+        SET Contenuto = ContenutoF
+        WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
+        proposta := false;
+    ELSE
+        proposta := true;
+    END IF;
 
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'M', proposta, rigaF, ordineF, oldFrase, ContenutoF, DEFAULT, ID_PaginaF, nomeUtente);  
 
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Si è verificata un''eccezione: %', SQLERRM;
+
 
     
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE rimuoviFrase(rigaF INT, ordineF INT, ID_PaginaF INT, nomeUtente USERNAME_DOMINIO, proposta BOOLEAN)
+CREATE OR REPLACE PROCEDURE rimuoviFrase(rigaF INT, ordineF INT, ID_PaginaF INT, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
     oldFrase LEN_FRASE;
+    autorePagina USERNAME_DOMINIO;
+    proposta BOOLEAN;
 BEGIN
     IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
         RAISE EXCEPTION 'utente indicato non esistente';
     END IF;
 
+    IF(EXISTS(SELECT * FROM FRASE WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF)=FALSE) THEN
+        RAISE EXCEPTION 'la frase indicata non esiste';
+    END IF;
+
     SELECT Contenuto INTO oldFrase FROM FRASE WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
 
-    DELETE FROM FRASE
-    WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
+    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
+
+    IF(autorePagina = nomeUtente) THEN
+        DELETE FROM FRASE
+        WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
+        proposta := false;
+    ELSE
+        proposta := true;
+    END IF;
  
-    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'C', proposta, rigaF, ordineF,oldFrase, DEFAULT, ID_PaginaF, nomeUtente);  
+    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'C', proposta, rigaF, ordineF, oldFrase, null, DEFAULT, ID_PaginaF, nomeUtente);  
 
-    EXCEPTION
-        WHEN OTHERS THEN
-            RAISE EXCEPTION 'Si è verificata un''eccezione: %', SQLERRM;
-
-    
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE approvaProposta(id INT, risp BOOLEAN)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    oldFrase LEN_FRASE;
+BEGIN
+    UPDATE APPROVAZIONE 
+    SET Risposta = risp
+    WHERE id_operazione = id;
+END;
+$$;
+
+
+/*
+  ---------------------------------
+    VISTE
+  ---------------------------------
+*/
+
+
+CREATE OR REPLACE VIEW storicoPagine AS 
+(SELECT *
+FROM OPERAZIONE 
+WHERE proposta=false)
+UNION 
+(SELECT O.*
+FROM OPERAZIONE O, APPROVAZIONE A
+WHERE O.id_operazione = A.ID_Operazione AND A.Risposta=true)
+ORDER BY id_pagina;
 
 
 
