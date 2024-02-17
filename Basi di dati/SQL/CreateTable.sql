@@ -77,7 +77,7 @@ CREATE TABLE PAGINA
     PRIMARY KEY(ID_Pagina),
     FOREIGN KEY(UserAutore) REFERENCES UTENTE(Username) 
     ON DELETE CASCADE
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
     FOREIGN KEY(Tema) REFERENCES TEMA(nome)
     ON DELETE SET NULL
     ON UPDATE CASCADE
@@ -215,7 +215,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER check_approvazione
 BEFORE INSERT
 ON APPROVAZIONE
-FOR EACH ROW --Da mettere?
+FOR EACH ROW 
 EXECUTE FUNCTION before_insert_approvazione();
 
 -- un autore di una pagina non può approvare proposte di operazioni su pagine non scritte da lui
@@ -320,18 +320,65 @@ CREATE OR REPLACE FUNCTION effettuaProposta() RETURNS TRIGGER AS
 $$
 DECLARE
     operazioneProposta OPERAZIONE%ROWTYPE;
+    stringaId VARCHAR(50);
+    id_collegamento INT;
+    fraseConsiderata FRASE%ROWTYPE;
 BEGIN
     SELECT * INTO operazioneProposta FROM OPERAZIONE WHERE ID_Operazione = NEW.ID_Operazione;
 
+    --controllare se la frase da modificare o rimuovere esiste ancora
+    SELECT * INTO fraseConsiderata FROM FRASE WHERE id_pagina=operazioneProposta.id_pagina AND riga = operazioneProposta.riga AND ordine = operazioneProposta.ordine;
+
     IF(operazioneProposta.tipo LIKE 'I') THEN
+
         INSERT INTO FRASE VALUES (operazioneProposta.Riga, operazioneProposta.ordine, operazioneProposta.ID_Pagina, operazioneProposta.FraseCoinvolta, false);
+
     ELSIF (operazioneProposta.tipo LIKE 'M') THEN
-        UPDATE FRASE
-        SET Contenuto = operazioneProposta.FraseModificata
-        WHERE riga= operazioneProposta.riga AND ordine = operazioneProposta.ordine AND ID_Pagina = operazioneProposta.id_pagina;
+
+        IF(fraseConsiderata IS NULL) THEN
+            RAISE EXCEPTION 'la frase coinvolta nel operazione non esiste più';
+        END IF;
+
+        IF(operazioneProposta.fraseModificata LIKE '#+%') THEN --se è stato aggiunto un collegamento
+            
+            SELECT regexp_replace(operazioneProposta.fraseModificata, '\D', '', 'g') INTO stringaId; --cancella qualsiasi carattere che non è una cifra
+            SELECT stringaId::INT INTO id_collegamento;
+            
+            IF(EXISTS(SELECT * FROM COLLEGAMENTO WHERE id_pagina = operazioneProposta.ID_Pagina AND rigaFrase=operazioneProposta.riga AND ordineFrase=operazioneProposta.ordine)=FALSE) THEN
+                INSERT INTO COLLEGAMENTO VALUES(operazioneProposta.riga, operazioneProposta.ordine, operazioneProposta.id_pagina, id_collegamento);
+
+                UPDATE FRASE
+                SET Collegamento = true
+                WHERE riga= operazioneProposta.riga AND ordine = operazioneProposta.ordine AND ID_Pagina = operazioneProposta.id_pagina;
+            ELSE
+                UPDATE COLLEGAMENTO
+                SET ID_PaginaCollegata = id_collegamento
+                WHERE id_pagina = operazioneProposta.ID_Pagina AND rigaFrase=operazioneProposta.riga AND ordineFrase=operazioneProposta.ordine;
+            END IF;
+        ELSIF(operazioneProposta.fraseModificata LIKE '#-%') THEN --se è stato rimosso un collegamento
+            
+            DELETE FROM COLLEGAMENTO
+            WHERE id_pagina = operazioneProposta.ID_Pagina AND rigaFrase=operazioneProposta.riga AND ordineFrase=operazioneProposta.ordine;
+            
+            UPDATE FRASE
+            SET Collegamento = false
+            WHERE riga= operazioneProposta.riga AND ordine = operazioneProposta.ordine AND ID_Pagina = operazioneProposta.id_pagina;
+
+        ELSE --è stato modificato il contenuto della frase
+            UPDATE FRASE
+            SET Contenuto = operazioneProposta.FraseModificata
+            WHERE riga= operazioneProposta.riga AND ordine = operazioneProposta.ordine AND ID_Pagina = operazioneProposta.id_pagina;
+        END IF;
+
     ELSIF (operazioneProposta.tipo LIKE 'C') THEN
+
+        IF(fraseConsiderata IS NULL) THEN
+            RAISE EXCEPTION 'la frase coinvolta nel operazione non esiste più';
+        END IF;
+
         DELETE FROM FRASE
         WHERE riga= operazioneProposta.riga AND ordine = operazioneProposta.ordine AND ID_Pagina = operazioneProposta.id_pagina;
+
     END IF;
 
     RETURN NEW;
@@ -355,7 +402,7 @@ EXECUTE FUNCTION effettuaProposta();
   ---------------------------------
 */
 
-CREATE OR REPLACE PROCEDURE inserimentoFrase(rigaF INT, ordineF INT, ID_PaginaF INT, ContenutoF LEN_FRASE, collegamento BOOLEAN, nomeUtente USERNAME_DOMINIO)
+CREATE OR REPLACE PROCEDURE inserimentoFrase(ID_PaginaF INT, rigaF INT, ordineF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -371,23 +418,26 @@ BEGIN
     SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
     
     SELECT MAX(ordine) INTO maxFrase FROM FRASE WHERE ID_Pagina = ID_PaginaF AND riga = rigaF;
-	
-	  IF(maxFrase IS NULL) THEN
-		  maxFrase:=0;
-	  END IF;
+
+	IF(maxFrase IS NULL) THEN
+		maxFrase:=0;
+	END IF;
 	
     IF(ordineF IS NOT NULL AND maxFrase>ordineF) THEN
         ordineFrase := OrdineF;
     ELSE
         ordineFrase := maxFrase+1;
     END IF;
-	
+
 	
     IF(autorePagina = nomeUtente) THEN
-      INSERT INTO FRASE VALUES(RigaF, ordineFrase, ID_PaginaF, ContenutoF, collegamento);
-      proposta:=false;
+        
+        proposta:=false;
+
+        INSERT INTO FRASE VALUES(RigaF, ordineFrase, ID_PaginaF, ContenutoF, false);
+
     ELSE
-      proposta:=true;
+        proposta:=true;
     END IF;
 
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'I', proposta, rigaF, ordineFrase, ContenutoF, null, DEFAULT, ID_PaginaF, nomeUtente); 
@@ -395,7 +445,108 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE modificaFrase(rigaF INT, ordineF INT, ID_PaginaF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
+CREATE OR REPLACE PROCEDURE inserisciCollegamento(ID_PaginaF INT, rigaF INT, ordineF INT, id_collegamento INT, nomeUtente USERNAME_DOMINIO)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    stringaFrase LEN_FRASE;
+    titoloCollegamento VARCHAR(100);
+	stringaCollegamento LEN_FRASE;
+    autorePagina USERNAME_DOMINIO;
+    proposta BOOLEAN;
+BEGIN
+    IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
+        RAISE EXCEPTION 'utente indicato non esistente';
+    END IF;
+
+    SELECT Contenuto INTO stringaFrase FROM FRASE WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF;
+
+    IF(stringaFrase IS NULL) THEN
+        RAISE EXCEPTION 'la frase indicata non esiste';
+    END IF;
+
+    SELECT titolo INTO titoloCollegamento FROM PAGINA WHERE id_pagina = id_collegamento;
+
+    IF(titoloCollegamento IS NULL) THEN
+        RAISE EXCEPTION 'La pagina indicata per il collegamento non esiste';
+    END IF;
+
+    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
+
+    IF(autorePagina = nomeUtente) THEN
+        proposta := false;
+        --controlliamo se esiste già una tupla in collegamento, altrimenti la creiamo
+        IF(EXISTS(SELECT * FROM COLLEGAMENTO WHERE rigaFrase = rigaF AND ordineFrase=ordineF AND ID_Pagina = ID_PaginaF)=FALSE) THEN --se non esiste
+            INSERT INTO COLLEGAMENTO VALUES (rigaF, ordineF, ID_PaginaF, id_collegamento);
+
+            UPDATE FRASE
+            SET collegamento = true
+            WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF;
+        ELSE
+            UPDATE COLLEGAMENTO
+            SET ID_PaginaCollegata = id_collegamento
+            WHERE rigaFrase = rigaF AND ordineFrase=ordineF AND ID_Pagina = ID_PaginaF;
+        END IF;
+    ELSE 
+        proposta := true;
+    END IF;
+    
+    stringaCollegamento := '#+' || id_collegamento || ' ' || titoloCollegamento;
+    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'M', proposta, rigaF, ordineF, stringaFrase, stringaCollegamento, DEFAULT, ID_PaginaF, nomeUtente); 
+
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE rimuoviCollegamento(ID_PaginaF INT, rigaF INT, ordineF INT, nomeUtente USERNAME_DOMINIO)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    stringaFrase LEN_FRASE;
+    titoloCollegamento VARCHAR(100);
+	stringaCollegamento LEN_FRASE;
+    autorePagina USERNAME_DOMINIO;
+    proposta BOOLEAN;
+BEGIN
+    IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
+        RAISE EXCEPTION 'utente indicato non esistente';
+    END IF;
+
+    SELECT Contenuto INTO stringaFrase FROM FRASE WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF;
+
+    IF(stringaFrase IS NULL) THEN
+        RAISE EXCEPTION 'la frase indicata non esiste';
+    END IF;
+
+    IF(EXISTS(SELECT * FROM COLLEGAMENTO WHERE rigaFrase = rigaF AND ordineFrase=ordineF AND ID_Pagina = ID_PaginaF)=FALSE) THEN
+        RAISE EXCEPTION 'la frase non possiede collegamento';
+    END IF;
+
+
+    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
+
+    IF(autorePagina = nomeUtente) THEN
+        proposta := false;
+        
+        DELETE FROM COLLEGAMENTO
+        WHERE rigaFrase = rigaF AND ordineFrase=ordineF AND ID_Pagina = ID_PaginaF;
+
+        UPDATE FRASE
+        SET collegamento = false
+        WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF;
+ 
+    ELSE 
+        proposta := true;
+    END IF;
+    
+    stringaCollegamento := '#- COLLEGAMENTO RIMOSSO';
+    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'M', proposta, rigaF, ordineF, stringaFrase, stringaCollegamento, DEFAULT, ID_PaginaF, nomeUtente); 
+
+END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE modificaFrase(ID_PaginaF INT, rigaF INT, ordineF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -416,23 +567,22 @@ BEGIN
     SELECT Contenuto INTO oldFrase FROM FRASE WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
 
     IF(autorePagina = nomeUtente) THEN
+
+        proposta := false;
+
         UPDATE FRASE
         SET Contenuto = ContenutoF
-        WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;
-        proposta := false;
+        WHERE riga=rigaF AND ordine = ordineF AND ID_Pagina = ID_PaginaF;        
     ELSE
         proposta := true;
     END IF;
 
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'M', proposta, rigaF, ordineF, oldFrase, ContenutoF, DEFAULT, ID_PaginaF, nomeUtente);  
-
-
-
     
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE rimuoviFrase(rigaF INT, ordineF INT, ID_PaginaF INT, nomeUtente USERNAME_DOMINIO)
+CREATE OR REPLACE PROCEDURE rimuoviFrase(ID_PaginaF INT, rigaF INT, ordineF INT, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -472,10 +622,12 @@ DECLARE
     oldFrase LEN_FRASE;
 BEGIN
     UPDATE APPROVAZIONE 
-    SET Risposta = risp
+    SET Risposta = risp, data = CURRENT_TIMESTAMP
     WHERE id_operazione = id;
 END;
 $$;
+
+
 
 
 /*
@@ -494,10 +646,6 @@ UNION
 FROM OPERAZIONE O, APPROVAZIONE A
 WHERE O.id_operazione = A.ID_Operazione AND A.Risposta=true)
 ORDER BY id_pagina;
-
-
-
-
 
 
 
@@ -525,6 +673,30 @@ INSERT INTO UTENTE VALUES
     ('brandon_carter', 'brandon.carter@zoho.com', 'CarterBr@nd0n', default);
 
 
+/*
+  ---------------------------------
+    !INSERT->TABLE->TEMA!
+  ---------------------------------
+*/
+
+INSERT INTO tema (nome) VALUES
+	('Enciclopedia generale'),
+	('Cultura popolare'),
+	('Scienze e tecnologie'),
+	('Storia'),
+	('Letteratura e arti visive'),
+	('Cucina'),
+	('Viaggi'),
+	('Linguistica'),
+	('Filosofia e pensiero'),
+	('Ambiente e sostenibilità'),
+	('Salute e benessere'),
+	('Educazione'),
+	('Diritto e giustizia'),
+	('Economia e finanza'),
+	('Politica e governance'),
+	('Religione e spiritualità'),
+	('Tecnologia dell''informazione');
 
 /*
   ---------------------------------
@@ -532,16 +704,16 @@ INSERT INTO UTENTE VALUES
   ---------------------------------
 */
 INSERT INTO PAGINA VALUES
-    (default, 'Storia dell''Impero Romano', 'Storia', '2024-02-08 09:00:00', 'john_doe'),
-    (default, 'Teoria della relatività di Einstein', 'Fisica', '2024-02-07 10:30:00', 'jane_smith'),
-    (default, 'Biografia di Leonardo da Vinci', 'Biografia', '2024-02-06 11:45:00', 'alex_brown'),
-    (default, 'Economia degli Stati Uniti', 'Economia', '2024-02-05 12:15:00', 'lisa_johnson'),
-    (default, 'Filosofia del Rinascimento', 'Filosofia', '2024-02-04 13:20:00', 'mike_williams'),
-    (default, 'Scienza della computazione', 'Informatica', '2024-02-03 14:30:00', 'sarah_davis'),
-    (default, 'Arte moderna: Movimento surrealista', 'Arte', '2024-02-02 15:45:00', 'chris_miller'),
-    (default, 'Medicina alternativa e tradizionale', 'Medicina', '2024-02-01 16:50:00', 'emily_taylor'),
-    (default, 'Biologia molecolare: DNA e genetica', 'Biologia', '2024-01-31 17:00:00', 'ryan_anderson'),
-    (default, 'Storia dell''arte antica: Grecia classica', 'Storia dell''arte', '2024-01-30 18:15:00', 'amanda_thompson');
+	(default, 'Storia dell''Impero Romano', 'Storia', '2024-02-08 09:00:00', 'john_doe'),
+	(default, 'Teoria della relatività di Einstein', 'Scienze e tecnologie', '2024-02-07 10:30:00', 'jane_smith'),
+	(default, 'Biografia di Leonardo da Vinci', 'Letteratura e arti visive', '2024-02-06 11:45:00', 'alex_brown'),
+	(default, 'Economia degli Stati Uniti', 'Economia e finanza', '2024-02-05 12:15:00', 'lisa_johnson'),
+	(default, 'Filosofia del Rinascimento', 'Filosofia e pensiero', '2024-02-04 13:20:00', 'mike_williams'),
+	(default, 'Scienza della computazione', 'Tecnologia dell''informazione', '2024-02-03 14:30:00', 'sarah_davis'),
+	(default, 'Arte moderna: Movimento surrealista', 'Letteratura e arti visive', '2024-02-02 15:45:00', 'chris_miller'),
+	(default, 'Medicina alternativa e tradizionale', 'Salute e benessere', '2024-02-01 16:50:00', 'emily_taylor'),
+	(default, 'Biologia molecolare: DNA e genetica', 'Scienze e tecnologie', '2024-01-31 17:00:00', 'ryan_anderson'),
+	(default, 'Storia dell''arte antica: Grecia classica', 'Letteratura e arti visive', '2024-01-30 18:15:00', 'amanda_thompson');
 
 /*
   ---------------------------------
