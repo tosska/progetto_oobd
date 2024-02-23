@@ -42,6 +42,7 @@ CREATE TABLE UTENTE
     Username USERNAME_DOMINIO,
     Email EMAIL_DOMINIO NOT NULL,
     Password PASSWORD_DOMINIO NOT NULL,
+    DataIscrizione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Autore BOOLEAN DEFAULT FALSE NOT NULL, --forse il not null va eliminato
 
     PRIMARY KEY(Username),
@@ -226,7 +227,12 @@ EXECUTE FUNCTION before_insert_approvazione();
   ---------------------------------
 */
 
+/*
+    TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (INSERIMENTO)
+------------------------------------------------------------------------------------------------------------------------------
+*/
 
+--ordinamento del campo 'ordine' nel momento in cui avviene un inserimento in frase.
 CREATE OR REPLACE FUNCTION ordinamentoFraseInserimento() RETURNS TRIGGER AS
 $$
 DECLARE
@@ -263,7 +269,12 @@ ON FRASE
 FOR EACH ROW
 EXECUTE FUNCTION ordinamentoFraseInserimento();
 
+/*
+    TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (RIMOZIONE)
+------------------------------------------------------------------------------------------------------------------------------
+*/
 
+--ordinamento del campo 'ordine' nel momento in cui avviene una rimozione in frase.
 CREATE OR REPLACE FUNCTION ordinamentoFraseCancellazione() RETURNS TRIGGER AS
 $$
 DECLARE
@@ -292,7 +303,12 @@ ON FRASE
 FOR EACH ROW
 EXECUTE FUNCTION ordinamentoFraseCancellazione();
 
+/*
+    TRIGGER E FUNZIONE: QUANDO VIENE INSERITA UNA TUPLA OPERAZIONE CON PROPOSTA=TRUE
+------------------------------------------------------------------------------------------------------------------------------
+*/
 
+--nel momento in cui inseriamo una tupla in operazione che ha il campo proposta = true, viene inserita una tupla a cui fa riferimento in 'Approvazione'
 CREATE OR REPLACE FUNCTION creazioneApprovazione() RETURNS TRIGGER AS
 $$
 DECLARE
@@ -306,8 +322,6 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-
-
 CREATE OR REPLACE TRIGGER creazioneApprovazioneTrigger 
 AFTER INSERT 
 ON OPERAZIONE 
@@ -315,7 +329,12 @@ FOR EACH ROW
 WHEN (NEW.proposta = TRUE)
 EXECUTE FUNCTION creazioneApprovazione();
 
+/*
+    TRIGGER E FUNZIONE: QUANDO UNA PROPOSTA VIENE ACCETTATA
+------------------------------------------------------------------------------------------------------------------------------
+*/
 
+--Quando una proposta viene accettata, viene chiamata la funzione 'effettuaProposta' che eseguirà l'operazione indicata
 CREATE OR REPLACE FUNCTION effettuaProposta() RETURNS TRIGGER AS
 $$
 DECLARE
@@ -344,6 +363,7 @@ BEGIN
             SELECT regexp_replace(operazioneProposta.fraseModificata, '\D', '', 'g') INTO stringaId; --cancella qualsiasi carattere che non è una cifra
             SELECT stringaId::INT INTO id_collegamento;
             
+            -- controllo se esiste già il collegamento
             IF(EXISTS(SELECT * FROM COLLEGAMENTO WHERE id_pagina = operazioneProposta.ID_Pagina AND rigaFrase=operazioneProposta.riga AND ordineFrase=operazioneProposta.ordine)=FALSE) THEN
                 INSERT INTO COLLEGAMENTO VALUES(operazioneProposta.riga, operazioneProposta.ordine, operazioneProposta.id_pagina, id_collegamento);
 
@@ -618,9 +638,11 @@ $$;
 CREATE OR REPLACE PROCEDURE approvaProposta(id INT, risp BOOLEAN)
 LANGUAGE plpgsql
 AS $$
-DECLARE
-    oldFrase LEN_FRASE;
 BEGIN
+    IF((SELECT proposta FROM OPERAZIONE WHERE id_operazione = id)=false) THEN
+        RAISE EXCEPTION 'Errore, id indicato non è una proposta di un operazione';
+    END IF;
+
     UPDATE APPROVAZIONE 
     SET Risposta = risp, data = CURRENT_TIMESTAMP
     WHERE id_operazione = id;
@@ -645,7 +667,7 @@ UNION
 (SELECT O.*
 FROM OPERAZIONE O, APPROVAZIONE A
 WHERE O.id_operazione = A.ID_Operazione AND A.Risposta=true)
-ORDER BY id_pagina;
+ORDER BY id_pagina ASC, data DESC;
 
 
 
