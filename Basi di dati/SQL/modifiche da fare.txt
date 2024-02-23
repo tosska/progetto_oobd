@@ -1,0 +1,19 @@
+1. Inserimento 
+2. Modifica
+3. Cancellazione
+4. Collegamenti
+5. Proposta
+6. Notifiche
+7. Accettare proposte
+8. Storico
+
+MIGLIORAMENTI
+- funzione: effettuaProposta -> #+id#titolo pagina
+- creare trigger: se una proposta si riferisce ad una frase che è stata poi modificata (dopo la proposta), va cancellata quella proposta (gestione proposte antiche)
+- gestione righe
+- elimina ridondanze
+- aggiungere parametro USERNAME nella procedura approva_proposta
+- vista join proposte-approvazione (per vedere tutte le proposte e il loro stato di approvazione)
+- gestire quando si approva più volte una proposta già approvata CAZZO
+- non si possono accettare le proposte già rifiutate o le proposte inesistenti
+- un utente non può proporre due volte la stessa operazione

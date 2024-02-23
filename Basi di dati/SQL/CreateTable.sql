@@ -226,11 +226,14 @@ EXECUTE FUNCTION before_insert_approvazione();
     TRIGGER
   ---------------------------------
 */
-
+-- quando un utente crea una pagina il suo valore Autore diventa true
+CREATE TRIGGER 
 /*
     TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (INSERIMENTO)
 ------------------------------------------------------------------------------------------------------------------------------
 */
+
+
 
 --ordinamento del campo 'ordine' nel momento in cui avviene un inserimento in frase.
 CREATE OR REPLACE FUNCTION ordinamentoFraseInserimento() RETURNS TRIGGER AS
@@ -361,7 +364,7 @@ BEGIN
         IF(operazioneProposta.fraseModificata LIKE '#+%') THEN --se è stato aggiunto un collegamento
             
             SELECT regexp_replace(operazioneProposta.fraseModificata, '\D', '', 'g') INTO stringaId; --cancella qualsiasi carattere che non è una cifra
-            SELECT stringaId::INT INTO id_collegamento;
+            SELECT stringaId::INT INTO id_collegamento; -- conversione da VARCHAR a INT
             
             -- controllo se esiste già il collegamento
             IF(EXISTS(SELECT * FROM COLLEGAMENTO WHERE id_pagina = operazioneProposta.ID_Pagina AND rigaFrase=operazioneProposta.riga AND ordineFrase=operazioneProposta.ordine)=FALSE) THEN
@@ -426,38 +429,48 @@ CREATE OR REPLACE PROCEDURE inserimentoFrase(ID_PaginaF INT, rigaF INT, ordineF 
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    maxFrase INT;
+    maxOrdine INT;
     ordineFrase INT;
     autorePagina USERNAME_DOMINIO;
     proposta BOOLEAN;
 BEGIN
+    -- controllo se esiste l'utente
     IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
         RAISE EXCEPTION 'utente indicato non esistente';
     END IF;
 
-    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
-    
-    SELECT MAX(ordine) INTO maxFrase FROM FRASE WHERE ID_Pagina = ID_PaginaF AND riga = rigaF;
-
-	IF(maxFrase IS NULL) THEN
-		maxFrase:=0;
-	END IF;
-	
-    IF(ordineF IS NOT NULL AND maxFrase>ordineF) THEN
-        ordineFrase := OrdineF;
-    ELSE
-        ordineFrase := maxFrase+1;
+    -- controllo se esiste la pagina
+    IF(EXISTS(SELECT * FROM PAGINA WHERE ID_Pagina=ID_PaginaF)=FALSE) THEN
+        RAISE EXCEPTION 'pagina indicata non esistente';
     END IF;
 
-	
+    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
+    
+    -- prendo l'ordine massimo sulla riga coinvolta
+    SELECT MAX(ordine) INTO maxOrdine FROM FRASE WHERE ID_Pagina = ID_PaginaF AND riga = rigaF;
+
+    -- se si tratta della prima frase sulla riga
+	IF(maxOrdine IS NULL) THEN
+		maxOrdine:=0;
+	END IF;
+    
+    /* se l'utente specifica l'ordine della frase che sta inserendo e quest'ultimo si trova nel mezzo della 
+    riga (ordineF < maxOrdine) allora l'ordine della frase è quello indicato, altrimenti l'ordine sarà il massimo +1 */
+    IF(ordineF IS NOT NULL AND maxOrdine>ordineF) THEN
+        ordineFrase := OrdineF;
+    ELSE
+        ordineFrase := maxOrdine+1;
+    END IF;
+    
+	-- controlla se l'utente è l'autore stesso
     IF(autorePagina = nomeUtente) THEN
         
-        proposta:=false;
+        proposta:=false;    -- inserimento diretto (da parte dell'autore stesso)
 
         INSERT INTO FRASE VALUES(RigaF, ordineFrase, ID_PaginaF, ContenutoF, false);
 
     ELSE
-        proposta:=true;
+        proposta:=true; -- altrimenti l'operazione è solo di proposta
     END IF;
 
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'I', proposta, rigaF, ordineFrase, ContenutoF, null, DEFAULT, ID_PaginaF, nomeUtente); 
@@ -475,10 +488,17 @@ DECLARE
     autorePagina USERNAME_DOMINIO;
     proposta BOOLEAN;
 BEGIN
+    -- controllo se esiste l'utente
     IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
         RAISE EXCEPTION 'utente indicato non esistente';
     END IF;
 
+    -- controllo se esiste la pagina
+    IF(EXISTS(SELECT * FROM PAGINA WHERE ID_Pagina=ID_PaginaF)=FALSE) THEN
+        RAISE EXCEPTION 'pagina indicata non esistente';
+    END IF;
+
+    -- controllo se esiste la frase (e di conseguenza la pagina) 
     SELECT Contenuto INTO stringaFrase FROM FRASE WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF;
 
     IF(stringaFrase IS NULL) THEN
@@ -528,10 +548,17 @@ DECLARE
     autorePagina USERNAME_DOMINIO;
     proposta BOOLEAN;
 BEGIN
+    -- controllo se esiste l'utente
     IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
         RAISE EXCEPTION 'utente indicato non esistente';
     END IF;
 
+    -- controllo se esiste la pagina
+    IF(EXISTS(SELECT * FROM PAGINA WHERE ID_Pagina=ID_PaginaF)=FALSE) THEN
+        RAISE EXCEPTION 'pagina indicata non esistente';
+    END IF;
+
+    -- controllo se esiste la frase (e di conseguenza la pagina) 
     SELECT Contenuto INTO stringaFrase FROM FRASE WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF;
 
     IF(stringaFrase IS NULL) THEN
@@ -574,10 +601,17 @@ DECLARE
     autorePagina USERNAME_DOMINIO;
     proposta BOOLEAN;
 BEGIN
+    -- controllo se esiste l'utente
     IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
         RAISE EXCEPTION 'utente indicato non esistente';
     END IF;
 
+    -- controllo se esiste la pagina
+    IF(EXISTS(SELECT * FROM PAGINA WHERE ID_Pagina=ID_PaginaF)=FALSE) THEN
+        RAISE EXCEPTION 'pagina indicata non esistente';
+    END IF;
+
+    -- controllo se esiste la frase (e di conseguenza la pagina) 
     IF(EXISTS(SELECT * FROM FRASE WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF)=FALSE) THEN
         RAISE EXCEPTION 'la frase indicata non esiste';
     END IF;
@@ -610,10 +644,17 @@ DECLARE
     autorePagina USERNAME_DOMINIO;
     proposta BOOLEAN;
 BEGIN
+    -- controllo se esiste l'utente
     IF(EXISTS(SELECT * FROM UTENTE WHERE Username=nomeUtente)=FALSE) THEN
         RAISE EXCEPTION 'utente indicato non esistente';
     END IF;
 
+    -- controllo se esiste la pagina
+    IF(EXISTS(SELECT * FROM PAGINA WHERE ID_Pagina=ID_PaginaF)=FALSE) THEN
+        RAISE EXCEPTION 'pagina indicata non esistente';
+    END IF;
+
+    -- controllo se esiste la frase (e di conseguenza la pagina) 
     IF(EXISTS(SELECT * FROM FRASE WHERE riga = rigaF AND ordine=ordineF AND ID_Pagina = ID_PaginaF)=FALSE) THEN
         RAISE EXCEPTION 'la frase indicata non esiste';
     END IF;
@@ -651,7 +692,6 @@ $$;
 
 
 
-
 /*
   ---------------------------------
     VISTE
@@ -665,11 +705,9 @@ FROM OPERAZIONE
 WHERE proposta=false)
 UNION 
 (SELECT O.*
-FROM OPERAZIONE O, APPROVAZIONE A
-WHERE O.id_operazione = A.ID_Operazione AND A.Risposta=true)
+FROM OPERAZIONE O NATURAL JOIN APPROVAZIONE A
+WHERE A.Risposta=true)
 ORDER BY id_pagina ASC, data DESC;
-
-
 
 
 /*
