@@ -635,12 +635,30 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE PROCEDURE approvaProposta(id INT, risp BOOLEAN)
+CREATE OR REPLACE PROCEDURE approvaProposta(id INT, risp BOOLEAN, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
+DECLARE
+    autorePagina USERNAME_DOMINIO;
+    paginaInteressata INT;
 BEGIN
+    SELECT ID_Pagina INTO paginaInteressata FROM OPERAZIONE WHERE id_operazione = id;
+    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = paginaInteressata;
+
+    IF(UserAutore <> nomeUtente) THEN
+        RAISE EXCEPTION 'Errore, l''utente indicato non è l''autore della pagina';
+    END IF;
+
+    IF(EXISTS(SELECT * FROM OPERAZIONE WHERE id_operazione = id) = false) THEN
+        RAISE EXCEPTION 'Errore, l''operazione indicata non esiste';
+    END IF;
+
     IF((SELECT proposta FROM OPERAZIONE WHERE id_operazione = id)=false) THEN
         RAISE EXCEPTION 'Errore, id indicato non è una proposta di un operazione';
+    END IF;
+
+    IF((SELECT Risposta FROM APPROVAZIONE WHERE id_operazione = id) IS NOT NULL) THEN
+        RAISE EXCEPTION 'Errore, La proposta indicata ha già avuto risposta';
     END IF;
 
     UPDATE APPROVAZIONE 
