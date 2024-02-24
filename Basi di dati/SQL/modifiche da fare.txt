@@ -17,6 +17,5 @@ MIGLIORAMENTI
 (FATTO) - gestire quando si approva più volte una proposta già approvata CAZZO
 (FATTO) - non si possono accettare le proposte già rifiutate o le proposte inesistenti
 - un utente non può proporre due volte la stessa operazione
+- funzione per ritirare una proposta fatta
 
-
-#+12#
