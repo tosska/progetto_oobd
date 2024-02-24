@@ -142,7 +142,7 @@ CREATE TABLE OPERAZIONE
     FraseModificata VARCHAR(100),
     Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ID_Pagina SERIAL NOT NULL,
-    Utente USERNAME_DOMINIO DEFAULT 'Unknown', 
+    Utente USERNAME_DOMINIO DEFAULT 'Unknown', --?
 
     PRIMARY KEY(ID_Operazione),
     FOREIGN KEY(ID_Pagina) REFERENCES PAGINA(ID_Pagina) ON DELETE CASCADE,
@@ -186,28 +186,28 @@ ALTER TABLE OPERAZIONE
 ADD CONSTRAINT controlloIC CHECK(NOT((Tipo LIKE 'I' OR Tipo LIKE 'C') AND FraseModificata IS NOT NULL)); --sembra non funzionare
 
 -- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. --DA SISTEMARE
-CREATE TRIGGER check_proposta
-BEFORE INSERT
-ON OPERAZIONE
-FOR EACH ROW
-EXECUTE FUNCTION 
-$$
+CREATE OR REPLACE FUNCTION check_proposta_function()
+RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.proposta=TRUE AND NEW.utente = (SELECT UserAutore FROM PAGINA WHERE ID_Pagina=NEW.ID_Pagina) THEN
         RAISE EXCEPTION 'Impossibile inserire un record in "OPERAZIONE" con proposta=true e utente è lo stesso autore della pagina';
     END IF;
-END;
-$$;
 
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_proposta
+BEFORE INSERT
+ON OPERAZIONE
+FOR EACH ROW
+EXECUTE FUNCTION check_proposta_function();
 
 -- non può esistere un approvazione riferita ad un'operazione che non è una proposta.
 -- un autore di una pagina non può approvare proposte di operazioni su pagine non scritte da lui
-CREATE TRIGGER check_approvazione
-BEFORE INSERT
-ON APPROVAZIONE
-FOR EACH ROW 
-EXECUTE FUNCTION 
-$$
+
+CREATE OR REPLACE FUNCTION check_approvazione_function()
+RETURNS TRIGGER AS $$
 DECLARE 
     paginaInteressata INT;
     autorePagina USERNAME_DOMINIO;
@@ -222,8 +222,17 @@ BEGIN
     IF(autorePagina <> NEW.autore) THEN
         RAISE EXCEPTION 'Impossibile inserire un record in "APPROVAZIONE" che fa riferimento ad un operazione di una pagina, il cui autore non è l''utente indicato';
     END IF;
+
+    RETURN NEW;
 END;
-$$;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER check_approvazione
+BEFORE INSERT
+ON APPROVAZIONE
+FOR EACH ROW 
+EXECUTE FUNCTION check_approvazione_function();
 
 
 
@@ -240,7 +249,9 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE UTENTE
     SET autore = TRUE
-    WHERE Username = NEW.UserAutore
+    WHERE Username = NEW.UserAutore;
+
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -358,6 +369,38 @@ WHEN (NEW.proposta = TRUE)
 EXECUTE FUNCTION creazioneApprovazione();
 
 /*
+    TRIGGER E FUNZIONE: QUANDO VENGONO PROPOSTE OPERAZIONI IDENTICHE
+------------------------------------------------------------------------------------------------------------------------------
+*/
+
+CREATE OR REPLACE FUNCTION sovrascizioneProposta_function() RETURNS TRIGGER AS
+$$
+BEGIN
+    DELETE FROM OPERAZIONE O 
+    USING APPROVAZIONE A
+    WHERE O.id_operazione = A.id_operazione 
+    AND O.proposta = true 
+    AND O.id_pagina = NEW.id_pagina
+    AND O.riga = NEW.riga
+    AND O.ordine = NEW.ordine
+    AND O.utente = NEW.utente
+    AND A.risposta IS NULL;
+
+    RAISE NOTICE 'proposta di operazione sovrascritta';
+
+    RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER sovrascizioneProposta
+BEFORE INSERT 
+ON OPERAZIONE 
+FOR EACH ROW
+WHEN (NEW.proposta = TRUE)
+EXECUTE FUNCTION sovrascizioneProposta_function();
+
+
+/*
     TRIGGER E FUNZIONE: QUANDO UNA PROPOSTA VIENE ACCETTATA
 ------------------------------------------------------------------------------------------------------------------------------
 */
@@ -367,7 +410,7 @@ CREATE OR REPLACE FUNCTION effettuaProposta() RETURNS TRIGGER AS
 $$
 DECLARE
     operazioneProposta OPERAZIONE%ROWTYPE;
-    stringaId VARCHAR(50);
+    stringaId VARCHAR(100);
     id_collegamento INT;
     fraseConsiderata FRASE%ROWTYPE;
 BEGIN
@@ -388,7 +431,8 @@ BEGIN
 
         IF(operazioneProposta.fraseModificata LIKE '#+%') THEN --se è stato aggiunto un collegamento
             
-            SELECT regexp_replace(operazioneProposta.fraseModificata, '\D', '', 'g') INTO stringaId; --cancella qualsiasi carattere che non è una cifra
+            SELECT SUBSTRING(operazioneProposta.fraseModificata FROM 3) INTO stringaId;
+            SELECT SUBSTRING(stringaId, 1, (SELECT strpos(stringaId, '#')-1)) INTO stringaId;
             SELECT stringaId::INT INTO id_collegamento; -- conversione da VARCHAR a INT
             
             -- controllo se esiste già il collegamento
@@ -556,7 +600,7 @@ BEGIN
         proposta := true;
     END IF;
     
-    stringaCollegamento := '#+' || id_collegamento || ' ' || titoloCollegamento;
+    stringaCollegamento := '#+' || id_collegamento || '# ' || titoloCollegamento;
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'M', proposta, rigaF, ordineF, stringaFrase, stringaCollegamento, DEFAULT, ID_PaginaF, nomeUtente); 
 
 END;
@@ -611,7 +655,7 @@ BEGIN
         proposta := true;
     END IF;
     
-    stringaCollegamento := '#- COLLEGAMENTO RIMOSSO';
+    stringaCollegamento := '#-# COLLEGAMENTO RIMOSSO';
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'M', proposta, rigaF, ordineF, stringaFrase, stringaCollegamento, DEFAULT, ID_PaginaF, nomeUtente); 
 
 END;
