@@ -24,7 +24,7 @@ CREATE DOMAIN EMAIL_DOMINIO AS VARCHAR(50)
 CREATE DOMAIN TIPO_OPERAZIONE AS CHAR(1)
   CHECK (VALUE LIKE 'I' OR VALUE LIKE 'M' OR VALUE LIKE 'C'); 
 
-CREATE DOMAIN LEN_FRASE AS VARCHAR(100);
+CREATE DOMAIN LEN_FRASE AS VARCHAR(150);
 
         
 /*
@@ -186,48 +186,73 @@ ALTER TABLE OPERAZIONE
 ADD CONSTRAINT controlloIC CHECK(NOT((Tipo LIKE 'I' OR Tipo LIKE 'C') AND FraseModificata IS NOT NULL)); --sembra non funzionare
 
 -- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. --DA SISTEMARE
-CREATE OR REPLACE FUNCTION before_insert_proposta()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.proposta=TRUE AND NEW.utente = (SELECT UserAutore FROM PAGINA WHERE ID_Pagina=NEW.ID_Pagina) THEN
-        RAISE EXCEPTION 'Impossibile inserire un record in "OPERAZIONE" con proposta=true e utente è lo stesso autore della pagina';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE TRIGGER check_proposta
 BEFORE INSERT
 ON OPERAZIONE
 FOR EACH ROW
-EXECUTE FUNCTION before_insert_proposta();
+EXECUTE FUNCTION 
+$$
+BEGIN
+    IF NEW.proposta=TRUE AND NEW.utente = (SELECT UserAutore FROM PAGINA WHERE ID_Pagina=NEW.ID_Pagina) THEN
+        RAISE EXCEPTION 'Impossibile inserire un record in "OPERAZIONE" con proposta=true e utente è lo stesso autore della pagina';
+    END IF;
+END;
+$$;
+
 
 -- non può esistere un approvazione riferita ad un'operazione che non è una proposta.
-CREATE OR REPLACE FUNCTION before_insert_approvazione()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF (SELECT proposta FROM OPERAZIONE WHERE ID_Operazione=NEW.ID_Operazione)=FALSE THEN
-        RAISE EXCEPTION 'Impossibile inserire un record in "APPROVAZIONE" il cui id_operazione faccia riferimento ad una tupla di OPERAZIONE con proposta=false';
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
+-- un autore di una pagina non può approvare proposte di operazioni su pagine non scritte da lui
 CREATE TRIGGER check_approvazione
 BEFORE INSERT
 ON APPROVAZIONE
 FOR EACH ROW 
-EXECUTE FUNCTION before_insert_approvazione();
+EXECUTE FUNCTION 
+$$
+DECLARE 
+    paginaInteressata INT;
+    autorePagina USERNAME_DOMINIO;
+BEGIN
+    IF((SELECT proposta FROM OPERAZIONE WHERE ID_Operazione=NEW.ID_Operazione)=FALSE) THEN
+        RAISE EXCEPTION 'Impossibile inserire un record in "APPROVAZIONE" il cui id_operazione faccia riferimento ad una tupla di OPERAZIONE con proposta=false';
+    END IF;
 
--- un autore di una pagina non può approvare proposte di operazioni su pagine non scritte da lui
+    SELECT id_pagina INTO paginaInteressata FROM OPERAZIONE WHERE id_operazione = NEW.id_operazione;
+    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = paginaInteressata;
+
+    IF(autorePagina <> NEW.autore) THEN
+        RAISE EXCEPTION 'Impossibile inserire un record in "APPROVAZIONE" che fa riferimento ad un operazione di una pagina, il cui autore non è l''utente indicato';
+    END IF;
+END;
+$$;
+
+
+
 
 /*
   ---------------------------------
-    TRIGGER
+    TRIGGER E FUNZIONI ANNESSE 
   ---------------------------------
 */
+
+
+CREATE OR REPLACE FUNCTION setAutore()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE UTENTE
+    SET autore = TRUE
+    WHERE Username = NEW.UserAutore
+END;
+$$ LANGUAGE plpgsql;
+
+
 -- quando un utente crea una pagina il suo valore Autore diventa true
-CREATE TRIGGER 
+CREATE TRIGGER diventaAutore
+AFTER INSERT ON PAGINA
+FOR EACH ROW
+EXECUTE FUNCTION setAutore();
+
+
+
 /*
     TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (INSERIMENTO)
 ------------------------------------------------------------------------------------------------------------------------------
@@ -681,12 +706,10 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
     autorePagina USERNAME_DOMINIO;
-    paginaInteressata INT;
 BEGIN
-    SELECT ID_Pagina INTO paginaInteressata FROM OPERAZIONE WHERE id_operazione = id;
-    SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = paginaInteressata;
+    SELECT autore INTO autorePagina FROM APPROVAZIONE WHERE id_operazione = id;
 
-    IF(UserAutore <> nomeUtente) THEN
+    IF(autorePagina <> nomeUtente) THEN
         RAISE EXCEPTION 'Errore, l''utente indicato non è l''autore della pagina';
     END IF;
 
