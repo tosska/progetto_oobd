@@ -119,7 +119,7 @@ CREATE TABLE COLLEGAMENTO
     ID_Pagina INT,
     ID_PaginaCollegata INT,
 
-    PRIMARY KEY(RigaFrase, OrdineFrase, ID_Pagina, ID_PaginaCollegata),
+    PRIMARY KEY(RigaFrase, OrdineFrase, ID_Pagina),
     FOREIGN KEY(RigaFrase, OrdineFrase, ID_Pagina) REFERENCES FRASE(Riga, Ordine, ID_Pagina)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
@@ -165,7 +165,7 @@ CREATE TABLE APPROVAZIONE
     Data TIMESTAMP,
     Risposta BOOLEAN,
 
-    PRIMARY KEY(ID_Operazione, Autore),
+    PRIMARY KEY(ID_Operazione),
     FOREIGN KEY(ID_Operazione) REFERENCES OPERAZIONE(ID_Operazione) ON DELETE CASCADE,
     FOREIGN KEY(Autore) REFERENCES UTENTE(Username) ON DELETE CASCADE
 );
