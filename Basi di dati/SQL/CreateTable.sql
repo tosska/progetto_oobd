@@ -57,9 +57,11 @@ CREATE TABLE UTENTE
 
 CREATE TABLE TEMA
 (
-    nome VARCHAR(50),
+    idTema SERIAL,
+    Nome VARCHAR(50),
 
-    PRIMARY KEY(nome)
+    PRIMARY KEY(idTema),
+    UNIQUE(Nome)
 );
 
 /*
