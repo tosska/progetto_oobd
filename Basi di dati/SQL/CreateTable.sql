@@ -73,7 +73,7 @@ CREATE TABLE PAGINA
 (
     ID_Pagina SERIAL,
     Titolo VARCHAR(50) NOT NULL,
-    Tema VARCHAR(50), 
+    Tema SERIAL, 
     DataCreazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UserAutore USERNAME_DOMINIO NOT NULL,
 
@@ -81,7 +81,7 @@ CREATE TABLE PAGINA
     FOREIGN KEY(UserAutore) REFERENCES UTENTE(Username) 
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-    FOREIGN KEY(Tema) REFERENCES TEMA(nome)
+    FOREIGN KEY(Tema) REFERENCES TEMA(idTema)
     ON DELETE SET NULL
     ON UPDATE CASCADE
 );
@@ -963,24 +963,24 @@ INSERT INTO UTENTE VALUES
   ---------------------------------
 */
 
-INSERT INTO tema (nome) VALUES
-	('Enciclopedia generale'),
-	('Cultura popolare'),
-	('Scienze e tecnologie'),
-	('Storia'),
-	('Letteratura e arti visive'),
-	('Cucina'),
-	('Viaggi'),
-	('Linguistica'),
-	('Filosofia e pensiero'),
-	('Ambiente e sostenibilità'),
-	('Salute e benessere'),
-	('Educazione'),
-	('Diritto e giustizia'),
-	('Economia e finanza'),
-	('Politica e governance'),
-	('Religione e spiritualità'),
-	('Tecnologia dell''informazione');
+INSERT INTO TEMA VALUES
+	(default, 'Enciclopedia generale'),
+	(default, 'Cultura popolare'),
+	(default, 'Scienze e tecnologie'),
+	(default, 'Storia'),
+	(default, 'Letteratura e arti visive'),
+	(default, 'Cucina'),
+	(default, 'Viaggi'),
+	(default, 'Linguistica'),
+	(default, 'Filosofia e pensiero'),
+	(default, 'Ambiente e sostenibilità'),
+	(default, 'Salute e benessere'),
+	(default, 'Educazione'),
+	(default, 'Diritto e giustizia'),
+	(default, 'Economia e finanza'),
+	(default, 'Politica e governance'),
+	(default, 'Religione e spiritualità'),
+	(default, 'Tecnologia dell''informazione');
 
 /*
   ---------------------------------
@@ -988,16 +988,16 @@ INSERT INTO tema (nome) VALUES
   ---------------------------------
 */
 INSERT INTO PAGINA VALUES
-	(default, 'Storia dell''Impero Romano', 'Storia', '2024-02-08 09:00:00', 'john_doe'),
-	(default, 'Teoria della relatività di Einstein', 'Scienze e tecnologie', '2024-02-07 10:30:00', 'jane_smith'),
-	(default, 'Biografia di Leonardo da Vinci', 'Letteratura e arti visive', '2024-02-06 11:45:00', 'alex_brown'),
-	(default, 'Economia degli Stati Uniti', 'Economia e finanza', '2024-02-05 12:15:00', 'lisa_johnson'),
-	(default, 'Filosofia del Rinascimento', 'Filosofia e pensiero', '2024-02-04 13:20:00', 'mike_williams'),
-	(default, 'Scienza della computazione', 'Tecnologia dell''informazione', '2024-02-03 14:30:00', 'sarah_davis'),
-	(default, 'Arte moderna: Movimento surrealista', 'Letteratura e arti visive', '2024-02-02 15:45:00', 'chris_miller'),
-	(default, 'Medicina alternativa e tradizionale', 'Salute e benessere', '2024-02-01 16:50:00', 'emily_taylor'),
-	(default, 'Biologia molecolare: DNA e genetica', 'Scienze e tecnologie', '2024-01-31 17:00:00', 'ryan_anderson'),
-	(default, 'Storia dell''arte antica: Grecia classica', 'Letteratura e arti visive', '2024-01-30 18:15:00', 'amanda_thompson');
+	(default, 'Storia dell''Impero Romano', 4, '2024-02-08 09:00:00', 'john_doe'),
+	(default, 'Teoria della relatività di Einstein', 3, '2024-02-07 10:30:00', 'jane_smith'),
+	(default, 'Biografia di Leonardo da Vinci', 5, '2024-02-06 11:45:00', 'alex_brown'),
+	(default, 'Economia degli Stati Uniti', 14, '2024-02-05 12:15:00', 'lisa_johnson'),
+	(default, 'Filosofia del Rinascimento', 9, '2024-02-04 13:20:00', 'mike_williams'),
+	(default, 'Scienza della computazione', 17, '2024-02-03 14:30:00', 'sarah_davis'),
+	(default, 'Arte moderna: Movimento surrealista', 5, '2024-02-02 15:45:00', 'chris_miller'),
+	(default, 'Medicina alternativa e tradizionale', 11, '2024-02-01 16:50:00', 'emily_taylor'),
+	(default, 'Biologia molecolare: DNA e genetica', 3, '2024-01-31 17:00:00', 'ryan_anderson'),
+	(default, 'Storia dell''arte antica: Grecia classica', 5, '2024-01-30 18:15:00', 'amanda_thompson');
 
 /*
   ---------------------------------
