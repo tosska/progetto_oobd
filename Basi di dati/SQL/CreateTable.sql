@@ -846,6 +846,41 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE PROCEDURE ritiraProposta(id INT, nomeUtente USERNAME_DOMINIO)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    autorePagina USERNAME_DOMINIO;
+    utenteProposta USERNAME_DOMINIO;
+BEGIN
+    SELECT autore INTO autorePagina FROM APPROVAZIONE WHERE id_operazione = id;
+    SELECT utente INTO utenteProposta FROM OPERAZIONE WHERE id_operazione = id;
+
+    IF(autorePagina = nomeUtente) THEN
+        RAISE EXCEPTION 'Errore, l''utente indicato è l''autore della pagina';
+    END IF;
+
+    IF(utenteProposta <> nomeUtente) THEN
+        RAISE EXCEPTION 'Errore, l''utente indicato non è colui che ha proposta l''operazione';
+    END IF;
+
+    IF(EXISTS(SELECT * FROM OPERAZIONE WHERE id_operazione = id) = false) THEN
+        RAISE EXCEPTION 'Errore, l''operazione indicata non esiste';
+    END IF;
+
+    IF((SELECT proposta FROM OPERAZIONE WHERE id_operazione = id)=false) THEN
+        RAISE EXCEPTION 'Errore, id indicato non è una proposta di un operazione';
+    END IF;
+
+    IF((SELECT Risposta FROM APPROVAZIONE WHERE id_operazione = id) IS NOT NULL) THEN
+        RAISE EXCEPTION 'Errore, La proposta indicata ha già avuto risposta, non puoi ritirarla';
+    END IF;
+
+    DELETE FROM OPERAZIONE
+    WHERE id_operazione = id AND utente = nomeUtente;
+END;
+$$;
+
 
 
 /*
