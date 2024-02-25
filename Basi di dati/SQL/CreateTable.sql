@@ -246,6 +246,12 @@ EXECUTE FUNCTION check_approvazione_function();
 */
 
 
+/*
+    TRIGGER E FUNZIONE: QUANDO UN UTENTE CREA UNA PAGINA
+------------------------------------------------------------------------------------------------------------------------------
+*/
+
+
 CREATE OR REPLACE FUNCTION setAutore()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -270,8 +276,6 @@ EXECUTE FUNCTION setAutore();
     TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (INSERIMENTO)
 ------------------------------------------------------------------------------------------------------------------------------
 */
-
-
 
 --ordinamento del campo 'ordine' nel momento in cui avviene un inserimento in frase.
 CREATE OR REPLACE FUNCTION ordinamentoFraseInserimento() RETURNS TRIGGER AS
@@ -309,6 +313,14 @@ BEFORE INSERT
 ON FRASE 
 FOR EACH ROW
 EXECUTE FUNCTION ordinamentoFraseInserimento();
+
+
+/*
+    TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (PROPOSTA: INSERIMENTO)
+------------------------------------------------------------------------------------------------------------------------------
+*/
+
+
 
 /*
     TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (RIMOZIONE)
@@ -460,7 +472,7 @@ AFTER INSERT
 ON OPERAZIONE 
 FOR EACH ROW
 WHEN (NEW.proposta=FALSE)
-EXECUTE FUNCTION eliminaProposteAntiche_function();
+EXECUTE FUNCTION eliminaProposteAntiche_function1();
 
 CREATE OR REPLACE TRIGGER eliminaProposteAntiche2
 AFTER UPDATE OF risposta ON APPROVAZIONE
@@ -559,6 +571,7 @@ EXECUTE FUNCTION effettuaProposta();
 
 
 
+
 /*
   ---------------------------------
     PROCEDURE E FUNZIONI
@@ -586,31 +599,47 @@ BEGIN
 
     SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
     
-    -- prendo l'ordine massimo sulla riga coinvolta
-    SELECT MAX(ordine) INTO maxOrdine FROM FRASE WHERE ID_Pagina = ID_PaginaF AND riga = rigaF;
-
-    -- se si tratta della prima frase sulla riga
-	IF(maxOrdine IS NULL) THEN
-		maxOrdine:=0;
-	END IF;
-    
-    /* se l'utente specifica l'ordine della frase che sta inserendo e quest'ultimo si trova nel mezzo della 
-    riga (ordineF < maxOrdine) allora l'ordine della frase è quello indicato, altrimenti l'ordine sarà il massimo +1 */
-    IF(ordineF IS NOT NULL AND maxOrdine>ordineF) THEN
-        ordineFrase := OrdineF;
-    ELSE
-        ordineFrase := maxOrdine+1;
-    END IF;
+ 
     
 	-- controlla se l'utente è l'autore stesso
     IF(autorePagina = nomeUtente) THEN
         
         proposta:=false;    -- inserimento diretto (da parte dell'autore stesso)
 
+        -- prendo l'ordine massimo sulla riga coinvolta
+        SELECT MAX(ordine) INTO maxOrdine FROM FRASE WHERE ID_Pagina = ID_PaginaF AND riga = rigaF;
+
+        -- se si tratta della prima frase sulla riga
+        IF(maxOrdine IS NULL) THEN
+            maxOrdine:=0;
+        END IF;
+        
+        /* se l'utente specifica l'ordine della frase che sta inserendo e quest'ultimo si trova nel mezzo della 
+        riga (ordineF < maxOrdine) allora l'ordine della frase è quello indicato, altrimenti l'ordine sarà il massimo +1 */
+        IF(ordineF IS NOT NULL AND maxOrdine>ordineF) THEN
+            ordineFrase := OrdineF;
+        ELSE
+            ordineFrase := maxOrdine+1;
+        END IF;
+
         INSERT INTO FRASE VALUES(RigaF, ordineFrase, ID_PaginaF, ContenutoF, false);
 
     ELSE
         proposta:=true; -- altrimenti l'operazione è solo di proposta
+
+        SELECT MAX(ORDINE) INTO maxOrdine FROM OPERAZIONE NATURAL JOIN APPROVAZIONE A WHERE O.id_pagina= ID_PaginaF AND O.riga = rigaF AND O.utente = nomeUtente AND A.Risposta IS NULL;
+
+        IF(maxOrdine IS NULL) THEN
+            maxOrdine:=0;
+        END IF;
+
+        IF(ordineF IS NOT NULL AND maxOrdine>ordineF) THEN
+            ordineFrase := OrdineF;
+        ELSE
+            ordineFrase := maxOrdine+1;
+        END IF;
+
+
     END IF;
 
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'I', proposta, rigaF, ordineFrase, ContenutoF, null, DEFAULT, ID_PaginaF, nomeUtente); 
