@@ -386,6 +386,7 @@ BEGIN
     AND O.utente = NEW.utente
     AND A.risposta IS NULL;
 
+
     RAISE NOTICE 'proposta di operazione sovrascritta';
 
     RETURN NEW;
