@@ -43,7 +43,7 @@ CREATE TABLE UTENTE
     Email EMAIL_DOMINIO NOT NULL,
     Password PASSWORD_DOMINIO NOT NULL,
     DataIscrizione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Autore BOOLEAN DEFAULT FALSE NOT NULL, --forse il not null va eliminato
+    Autore BOOLEAN DEFAULT FALSE, 
 
     PRIMARY KEY(Username),
     UNIQUE(Email)
