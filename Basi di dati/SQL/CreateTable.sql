@@ -375,6 +375,8 @@ EXECUTE FUNCTION creazioneApprovazione();
 
 CREATE OR REPLACE FUNCTION sovrascizioneProposta_function() RETURNS TRIGGER AS
 $$
+DECLARE
+    tupleRimosse INT;
 BEGIN
     DELETE FROM OPERAZIONE O 
     USING APPROVAZIONE A
@@ -386,8 +388,11 @@ BEGIN
     AND O.utente = NEW.utente
     AND A.risposta IS NULL;
 
+    GET DIAGNOSTICS tupleRimosse = ROW_COUNT;
 
-    RAISE NOTICE 'proposta di operazione sovrascritta';
+    IF(tupleRimosse<>0) THEN
+        RAISE NOTICE 'proposta di operazione sovrascritta';
+    END IF;
 
     RETURN NEW;
 END
@@ -399,6 +404,69 @@ ON OPERAZIONE
 FOR EACH ROW
 WHEN (NEW.proposta = TRUE)
 EXECUTE FUNCTION sovrascizioneProposta_function();
+
+/*
+    TRIGGER E FUNZIONE: QUANDO LE PROPOSTE NON ANCORA ACCETTATE NON SI RIFERISCONO PIù AD UN TESTO ESISTENTE
+------------------------------------------------------------------------------------------------------------------------------
+*/
+
+CREATE OR REPLACE FUNCTION eliminaProposteAntiche_function1() RETURNS TRIGGER AS
+$$
+BEGIN
+    
+    UPDATE APPROVAZIONE AS A
+    SET Risposta = false
+    FROM OPERAZIONE O
+    WHERE A.id_operazione = O.id_operazione
+    AND O.proposta = true 
+    AND O.id_pagina = NEW.id_pagina
+    AND O.riga = NEW.riga
+    AND O.ordine = NEW.ordine
+    AND A.risposta IS NULL;
+
+	
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION eliminaProposteAntiche_function2() RETURNS TRIGGER AS
+$$
+DECLARE
+    operazioneInteressata OPERAZIONE%ROWTYPE;
+BEGIN
+    SELECT * INTO operazioneInteressata FROM OPERAZIONE WHERE ID_Operazione = NEW.ID_Operazione;
+
+    UPDATE APPROVAZIONE AS A
+    SET Risposta = false
+    FROM OPERAZIONE O
+    WHERE A.id_operazione = O.id_operazione
+    AND O.proposta = true 
+    AND O.id_pagina = operazioneInteressata.id_pagina
+    AND O.riga = operazioneInteressata.riga
+    AND O.ordine = operazioneInteressata.ordine
+    AND A.risposta IS NULL;
+    
+	
+	RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER eliminaProposteAntiche1
+AFTER INSERT   
+ON OPERAZIONE 
+FOR EACH ROW
+WHEN (NEW.proposta=FALSE)
+EXECUTE FUNCTION eliminaProposteAntiche_function();
+
+CREATE OR REPLACE TRIGGER eliminaProposteAntiche2
+AFTER UPDATE OF risposta ON APPROVAZIONE
+FOR EACH ROW
+WHEN(NEW.risposta = TRUE)
+EXECUTE FUNCTION eliminaProposteAntiche_function2();
+
+
 
 
 /*
@@ -794,6 +862,10 @@ UNION
 FROM OPERAZIONE O NATURAL JOIN APPROVAZIONE A
 WHERE A.Risposta=true)
 ORDER BY id_pagina ASC, data DESC;
+
+CREATE OR REPLACE VIEW listaProposte AS
+SELECT *
+FROM OPERAZIONE O NATURAL JOIN APPROVAZIONE A;
 
 
 /*
