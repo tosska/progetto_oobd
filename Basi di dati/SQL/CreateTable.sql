@@ -187,6 +187,10 @@ ADD CONSTRAINT controlloModifica CHECK(NOT(Tipo LIKE 'M' AND FraseModificata IS 
 ALTER TABLE OPERAZIONE
 ADD CONSTRAINT controlloIC CHECK(NOT((Tipo LIKE 'I' OR Tipo LIKE 'C') AND FraseModificata IS NOT NULL)); --sembra non funzionare
 
+--non può esiste un tupla in approvazione che abbia data NOT NULL e risposta NULL o viceversa
+ALTER TABLE APPROVAZIONE
+ADD CONSTRAINT dataRisposta CHECK((data IS NULL AND risposta IS NULL) OR (data IS NOT NULL AND risposta IS NOT NULL));
+
 -- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. --DA SISTEMARE
 CREATE OR REPLACE FUNCTION check_proposta_function()
 RETURNS TRIGGER AS $$
@@ -314,14 +318,6 @@ ON FRASE
 FOR EACH ROW
 EXECUTE FUNCTION ordinamentoFraseInserimento();
 
-
-/*
-    TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (PROPOSTA: INSERIMENTO)
-------------------------------------------------------------------------------------------------------------------------------
-*/
-
-
-
 /*
     TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (RIMOZIONE)
 ------------------------------------------------------------------------------------------------------------------------------
@@ -395,6 +391,7 @@ BEGIN
     DELETE FROM OPERAZIONE O 
     USING APPROVAZIONE A
     WHERE O.id_operazione = A.id_operazione 
+    AND O.id_operazione <> NEW.id_operazione
     AND O.proposta = true 
     AND O.id_pagina = NEW.id_pagina
     AND O.riga = NEW.riga
@@ -413,7 +410,7 @@ END
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER sovrascizioneProposta
-BEFORE INSERT 
+AFTER INSERT 
 ON OPERAZIONE 
 FOR EACH ROW
 WHEN (NEW.proposta = TRUE)
@@ -429,7 +426,7 @@ $$
 BEGIN
     
     UPDATE APPROVAZIONE AS A
-    SET Risposta = false
+    SET Risposta = false, data = CURRENT_TIMESTAMP
     FROM OPERAZIONE O
     WHERE A.id_operazione = O.id_operazione
     AND O.proposta = true 
@@ -452,7 +449,7 @@ BEGIN
     SELECT * INTO operazioneInteressata FROM OPERAZIONE WHERE ID_Operazione = NEW.ID_Operazione;
 
     UPDATE APPROVAZIONE AS A
-    SET Risposta = false
+    SET Risposta = false, data = CURRENT_TIMESTAMP
     FROM OPERAZIONE O
     WHERE A.id_operazione = O.id_operazione
     AND O.proposta = true 
@@ -578,7 +575,7 @@ EXECUTE FUNCTION effettuaProposta();
   ---------------------------------
 */
 
-CREATE OR REPLACE PROCEDURE inserimentoFrase(ID_PaginaF INT, rigaF INT, ordineF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
+CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -627,8 +624,8 @@ BEGIN
     ELSE
         proposta:=true; -- altrimenti l'operazione è solo di proposta
 
-        SELECT MAX(ORDINE) INTO maxOrdine FROM OPERAZIONE NATURAL JOIN APPROVAZIONE A WHERE O.id_pagina= ID_PaginaF AND O.riga = rigaF AND O.utente = nomeUtente AND A.Risposta IS NULL;
-
+        SELECT MAX(O.ordine) INTO maxOrdine FROM OPERAZIONE O, APPROVAZIONE A WHERE O.id_operazione=A.id_operazione AND O.id_pagina= ID_PaginaF AND O.riga = rigaF AND O.utente = nomeUtente AND A.Risposta IS NULL;
+        RAISE NOTICE '%', maxOrdine;
         IF(maxOrdine IS NULL) THEN
             maxOrdine:=0;
         END IF;
