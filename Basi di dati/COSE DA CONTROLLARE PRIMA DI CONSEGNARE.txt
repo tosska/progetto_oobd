@@ -1,1 +1,0 @@
-- controllare se si può creare una frase che ha più collegamenti (se si, è da risolvere)
