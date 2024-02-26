@@ -24,7 +24,7 @@ CREATE DOMAIN EMAIL_DOMINIO AS VARCHAR(50)
 CREATE DOMAIN TIPO_OPERAZIONE AS CHAR(1)
   CHECK (VALUE LIKE 'I' OR VALUE LIKE 'M' OR VALUE LIKE 'C'); 
 
-CREATE DOMAIN LEN_FRASE AS VARCHAR(150);
+CREATE DOMAIN LEN_FRASE AS VARCHAR(300);
 
         
 /*
@@ -185,13 +185,13 @@ ADD CONSTRAINT controlloModifica CHECK(NOT(Tipo LIKE 'M' AND FraseModificata IS 
 
 -- non può esistere un operazione di cancellamento o di inserimento che abbia l'attributo "fraseModificata" not null.
 ALTER TABLE OPERAZIONE
-ADD CONSTRAINT controlloIC CHECK(NOT((Tipo LIKE 'I' OR Tipo LIKE 'C') AND FraseModificata IS NOT NULL)); --sembra non funzionare
+ADD CONSTRAINT controlloIC CHECK(NOT((Tipo LIKE 'I' OR Tipo LIKE 'C') AND FraseModificata IS NOT NULL)); 
 
 --non può esiste un tupla in approvazione che abbia data NOT NULL e risposta NULL o viceversa
 ALTER TABLE APPROVAZIONE
 ADD CONSTRAINT dataRisposta CHECK((data IS NULL AND risposta IS NULL) OR (data IS NOT NULL AND risposta IS NOT NULL));
 
--- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. --DA SISTEMARE
+-- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. 
 CREATE OR REPLACE FUNCTION check_proposta_function()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -571,11 +571,11 @@ EXECUTE FUNCTION effettuaProposta();
 
 /*
   ---------------------------------
-    PROCEDURE E FUNZIONI
+    PROCEDURE
   ---------------------------------
 */
 
-CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
+CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT DEFAULT NULL, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -625,7 +625,7 @@ BEGIN
         proposta:=true; -- altrimenti l'operazione è solo di proposta
 
         SELECT MAX(O.ordine) INTO maxOrdine FROM OPERAZIONE O, APPROVAZIONE A WHERE O.id_operazione=A.id_operazione AND O.id_pagina= ID_PaginaF AND O.riga = rigaF AND O.utente = nomeUtente AND A.Risposta IS NULL;
-        RAISE NOTICE '%', maxOrdine;
+        
         IF(maxOrdine IS NULL) THEN
             maxOrdine:=0;
         END IF;
@@ -924,7 +924,7 @@ UNION
 (SELECT O.*
 FROM OPERAZIONE O NATURAL JOIN APPROVAZIONE A
 WHERE A.Risposta=true)
-ORDER BY id_pagina ASC, data DESC;
+ORDER BY id_pagina ASC, data ASC;
 
 CREATE OR REPLACE VIEW listaProposte AS
 SELECT *
