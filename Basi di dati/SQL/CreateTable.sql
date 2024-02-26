@@ -24,7 +24,7 @@ CREATE DOMAIN EMAIL_DOMINIO AS VARCHAR(50)
 CREATE DOMAIN TIPO_OPERAZIONE AS CHAR(1)
   CHECK (VALUE LIKE 'I' OR VALUE LIKE 'M' OR VALUE LIKE 'C'); 
 
-CREATE DOMAIN LEN_FRASE AS VARCHAR(500);
+CREATE DOMAIN LEN_FRASE AS VARCHAR(300);
 
         
 /*
@@ -140,8 +140,8 @@ CREATE TABLE OPERAZIONE
     Proposta BOOLEAN NOT NULL,
     Riga INT NOT NULL,
     Ordine INT NOT NULL,
-    FraseCoinvolta LEN_FRASE NOT NULL,
-    FraseModificata LEN_FRASE,
+    FraseCoinvolta VARCHAR(100) NOT NULL,
+    FraseModificata VARCHAR(100),
     Data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ID_Pagina SERIAL NOT NULL,
     Utente USERNAME_DOMINIO,
@@ -185,13 +185,13 @@ ADD CONSTRAINT controlloModifica CHECK(NOT(Tipo LIKE 'M' AND FraseModificata IS 
 
 -- non può esistere un operazione di cancellamento o di inserimento che abbia l'attributo "fraseModificata" not null.
 ALTER TABLE OPERAZIONE
-ADD CONSTRAINT controlloIC CHECK(NOT((Tipo LIKE 'I' OR Tipo LIKE 'C') AND FraseModificata IS NOT NULL)); --sembra non funzionare
+ADD CONSTRAINT controlloIC CHECK(NOT((Tipo LIKE 'I' OR Tipo LIKE 'C') AND FraseModificata IS NOT NULL)); 
 
 --non può esiste un tupla in approvazione che abbia data NOT NULL e risposta NULL o viceversa
 ALTER TABLE APPROVAZIONE
 ADD CONSTRAINT dataRisposta CHECK((data IS NULL AND risposta IS NULL) OR (data IS NOT NULL AND risposta IS NOT NULL));
 
--- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. --DA SISTEMARE
+-- non può esistere un operazione con proposta=true effettuata da un utente che è lo stesso autore della pagina. 
 CREATE OR REPLACE FUNCTION check_proposta_function()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -571,11 +571,11 @@ EXECUTE FUNCTION effettuaProposta();
 
 /*
   ---------------------------------
-    PROCEDURE E FUNZIONI
+    PROCEDURE
   ---------------------------------
 */
 
-CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
+CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT DEFAULT NULL, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -625,7 +625,7 @@ BEGIN
         proposta:=true; -- altrimenti l'operazione è solo di proposta
 
         SELECT MAX(O.ordine) INTO maxOrdine FROM OPERAZIONE O, APPROVAZIONE A WHERE O.id_operazione=A.id_operazione AND O.id_pagina= ID_PaginaF AND O.riga = rigaF AND O.utente = nomeUtente AND A.Risposta IS NULL;
-        RAISE NOTICE '%', maxOrdine;
+        
         IF(maxOrdine IS NULL) THEN
             maxOrdine:=0;
         END IF;
@@ -924,12 +924,11 @@ UNION
 (SELECT O.*
 FROM OPERAZIONE O NATURAL JOIN APPROVAZIONE A
 WHERE A.Risposta=true)
-ORDER BY id_pagina ASC, data DESC;
+ORDER BY id_pagina ASC, data ASC;
 
 CREATE OR REPLACE VIEW listaProposte AS
-SELECT O.*, A.data AS dataRisposta, A.risposta 
-FROM OPERAZIONE O, APPROVAZIONE A
-WHERE O.id_operazione = A.id_operazione;
+SELECT *
+FROM OPERAZIONE O NATURAL JOIN APPROVAZIONE A;
 
 
 /*
@@ -938,21 +937,21 @@ WHERE O.id_operazione = A.id_operazione;
   ---------------------------------
 */
 INSERT INTO UTENTE VALUES
-    ('giovanni_rossi', 'giovanni.rossi@gmail.com', 'P@ssw0rd123', default),
-    ('gianna_bianchi', 'gianna.bianchi@yahoo.it', 'GiannaBianchi!456', default),
-    ('alessandro_verdi', 'alessandro.verdi@hotmail.it', 'SecurePwd789@', default),
-    ('luisa_giorgi', 'luisa.giorgi@outlook.com', 'LuisaPass123@', default),
-    ('michele_romano', 'michele.romano@libero.it', 'Romano123$', default),
-    ('sara_ferrari', 'sara.ferrari@icloud.com', 'Sar@hFerr@r!678', default),
-    ('cristina_rizzo', 'cristina.rizzo@gmail.com', 'RizzoPass456@', default),
-    ('elena_fontana', 'elena.fontana@gmail.com', 'P@ssw0rdFontana', default),
-    ('marco_casale', 'marco.casale@gmail.com', 'CasaleMar@co789', default),
-    ('alessandra_colombo', 'alessandra.colombo@hotmail.it', 'ColomboPwd456@', default),
-    ('davide_monti', 'davide.monti@gmail.com', 'D@v!dM0nt!123', default),
-    ('simona_piazza', 'simona.piazza@gmail.com', 'PiazzaSim!789', default),
-    ('enrico_martini', 'enrico.martini@gmail.com', 'M@rt!n!Enr1c0', default),
-    ('giulia_russo', 'giulia.russo@gmai.com', 'RussoGiul!123@', default),
-    ('fabio_marino', 'fabio.marino@gmail.com', 'MarinoF@b!0', default);
+    ('john_doe', 'john.doe@gmail.com', 'P@ssw0rd123', default),
+    ('jane_smith', 'jane.smith@yahoo.com', 'JaneSmith!456', default),
+    ('alex_brown', 'alex.brown@hotmail.com', 'SecurePwd789@', default),
+    ('lisa_johnson', 'lisa.johnson@outlook.com', 'LisaPass123@', default),
+    ('mike_williams', 'mike.williams@aol.com', 'Williams123$', default),
+    ('sarah_davis', 'sarah.davis@icloud.com', 'Sar@hDav!s678', default),
+    ('chris_miller', 'chris.miller@protonmail.com', 'MillerPass456@', default),
+    ('emily_taylor', 'emily.taylor@yandex.com', 'P@ssw0rdTaylor', default),
+    ('ryan_anderson', 'ryan.anderson@zoho.com', 'AndersonRy@n789', default),
+    ('amanda_thompson', 'amanda.thompson@mail.com', 'ThompsonPwd456@', default),
+    ('david_clark', 'david.clark@inbox.com', 'D@v!dCl@rk123', default),
+    ('samantha_wilson', 'samantha.wilson@tutanota.com', 'Wilson!Sam789', default),
+    ('kevin_martin', 'kevin.martin@fastmail.com', 'M@rt!nK3v!n', default),
+    ('jessica_taylor', 'jessica.taylor@yandex.com', 'TaylorJess123@', default),
+    ('brandon_carter', 'brandon.carter@zoho.com', 'CarterBr@nd0n', default);
 
 
 /*
@@ -986,65 +985,79 @@ INSERT INTO TEMA VALUES
   ---------------------------------
 */
 INSERT INTO PAGINA VALUES
-	(default, 'Storia dell''Impero Romano', 4, '2024-02-08 09:00:00', 'giovanni_rossi'),
-	(default, 'Teoria della relatività di Einstein', 3, '2024-02-07 10:30:00', 'sara_ferrari'),
-	(default, 'Biografia di Leonardo da Vinci', 5, '2024-02-06 11:45:00', 'sara_ferrari'),
-	(default, 'Economia degli Stati Uniti', 14, '2024-02-05 12:15:00', 'davide_monti'),
-	(default, 'Filosofia del Rinascimento', 9, '2024-02-04 13:20:00', 'simona_piazza'),
-	(default, 'Scienza della computazione', 17, '2024-02-03 14:30:00', 'simona_piazza'),
-	(default, 'Arte moderna: Movimento surrealista', 5, '2024-02-02 15:45:00', 'fabio_marino'),
-	(default, 'Medicina alternativa e tradizionale', 11, '2024-02-01 16:50:00', 'enrico_martini'),
-	(default, 'Biologia molecolare: DNA e genetica', 3, '2024-01-31 17:00:00', 'elena_fontana'),
-	(default, 'Storia dell''arte antica: Grecia classica', 5, '2024-01-30 18:15:00', 'luisa_giorgi');
+	(default, 'Storia dell''Impero Romano', 4, '2024-02-08 09:00:00', 'john_doe'),
+	(default, 'Teoria della relatività di Einstein', 3, '2024-02-07 10:30:00', 'jane_smith'),
+	(default, 'Biografia di Leonardo da Vinci', 5, '2024-02-06 11:45:00', 'alex_brown'),
+	(default, 'Economia degli Stati Uniti', 14, '2024-02-05 12:15:00', 'lisa_johnson'),
+	(default, 'Filosofia del Rinascimento', 9, '2024-02-04 13:20:00', 'mike_williams'),
+	(default, 'Scienza della computazione', 17, '2024-02-03 14:30:00', 'sarah_davis'),
+	(default, 'Arte moderna: Movimento surrealista', 5, '2024-02-02 15:45:00', 'chris_miller'),
+	(default, 'Medicina alternativa e tradizionale', 11, '2024-02-01 16:50:00', 'emily_taylor'),
+	(default, 'Biologia molecolare: DNA e genetica', 3, '2024-01-31 17:00:00', 'ryan_anderson'),
+	(default, 'Storia dell''arte antica: Grecia classica', 5, '2024-01-30 18:15:00', 'amanda_thompson');
 
 /*
   ---------------------------------
     !INSERT->TABLE->FRASE!
   ---------------------------------
 */
-
--- Pagina 1
--- Inserimenti diretti da parte dell'autore
-CALL inseriscifrase(1, 1, 1, 'L''Impero Romano è stato uno dei più influenti e duraturi nella storia dell''umanità.', 'giovanni_rossi');
-CALL inseriscifrase(1, 1, 2, 'La politica, l''architettura e il diritto romani hanno lasciato un''impronta duratura sulla civiltà occidentale.', 'giovanni_rossi');
-CALL inseriscifrase(1, 1, 3, 'La Pax Romana ha portato stabilità e prosperità a molte regioni sotto il dominio romano.', 'giovanni_rossi');
-
--- Proposte
-CALL inseriscifrase(1, 2, 1, 'L''Impero Romano ha lasciato un''eredità culturale e politica che ancora influenza il mondo moderno.', 'sara_ferrari');
-CALL inseriscifrase(1, 2, 2, 'Le conquiste romane hanno portato alla diffusione della lingua latina e dei valori romani in gran parte dell''Europa.', 'sara_ferrari');
-CALL inseriscifrase(1, 2, 3, 'L''Impero Romano è stato un esempio di ingegneria militare e civile senza precedenti nella storia antica.', 'sara_ferrari');
-
--- Pagina 2
--- Inserimenti diretti da parte dell'autore
-CALL inseriscifrase(2, 1, 1, 'E=mc²', 'sara_ferrari');
-CALL inseriscifrase(2, 1, 2, 'Spiegazione della gravità come curvatura dello spazio-tempo.', 'sara_ferrari');
-CALL inseriscifrase(2, 1, 3, 'Rivoluzionaria teoria sulla natura dello spazio e del tempo.', 'sara_ferrari');
-
--- Proposte
-CALL inseriscifrase(2, 2, 1, 'Curvatura dello spazio-tempo', 'davide_monti');
-CALL inseriscifrase(2, 2, 2, 'Luce come entità soggetta alla gravità', 'davide_monti');
-CALL inseriscifrase(2, 2, 3, 'Teoria che unifica spazio, tempo e gravità', 'davide_monti');
+INSERT INTO FRASE VALUES;
 
 
--- Pagina 3
--- Inserimenti diretti da parte dell'autore
-CALL inseriscifrase(3, 1, 1, 'Polimatia rinascimentale', 'sara_ferrari');
-CALL inseriscifrase(3, 1, 2, 'Mente geniale del Rinascimento', 'sara_ferrari');
-CALL inseriscifrase(3, 1, 3, 'Artista, scienziato e inventore', 'sara_ferrari');
-
--- Proposte
-CALL inseriscifrase(3, 2, 1, 'Genio del Rinascimento', 'elena_fontana');
-CALL inseriscifrase(3, 2, 2, 'Studio della natura e dell''anatomia', 'elena_fontana');
-CALL inseriscifrase(3, 2, 3, 'Opere celebri come la "Gioconda"', 'elena_fontana');
+/*
+  ---------------------------------
+    !INSERT->TABLE->COLLEGAMENTO!
+  ---------------------------------
+*/
+INSERT INTO COLLEGAMENTO VALUES;
 
 
-CALL approvaproposta(4, true, 'giovanni_rossi');
-CALL approvaproposta(5, true, 'giovanni_rossi');
-CALL approvaproposta(6, true, 'giovanni_rossi');
+/*
+  ---------------------------------
+    !INSERT->TABLE->INSERIMENTO!
+  ---------------------------------
+*/
+INSERT INTO INSERIMENTO VALUES;
 
-CALL approvaproposta(10, false, 'sara_ferrari');
-CALL approvaproposta(11, false, 'sara_ferrari');
-CALL approvaproposta(12, false, 'sara_ferrari');
+
+/*
+  ---------------------------------
+    !INSERT->TABLE->MODIFICA !
+  ---------------------------------
+*/
+INSERT INTO MODIFICA VALUES;
+
+
+/*
+  ---------------------------------
+    !INSERT->TABLE->CANCELLAZIONE !
+  ---------------------------------
+*/
+INSERT INTO CANCELLAZIONE VALUES;
+
+
+/*
+  ---------------------------------
+    !INSERT->TABLE->APPROVAZIONE_INSERIMENTO!
+  ---------------------------------
+*/
+INSERT INTO APPROVAZIONE_INSERIMENTO VALUES;
+
+
+/*
+  ---------------------------------
+    !INSERT->TABLE->APPROVAZIONE_MODIFICA!
+  ---------------------------------
+*/
+INSERT INTO APPROVAZIONE_MODIFICA VALUES;
+
+
+/*
+  ---------------------------------
+    !INSERT->TABLE->APPROVAZIONE_CANCELLAZIONE!
+  ---------------------------------
+*/
+INSERT INTO APPROVAZIONE_CANCELLAZIONE VALUES;
 
 
 
