@@ -30,22 +30,21 @@ In questo README è presente una breve descrizione dei vari files riguardanti la
 
 📝 La creazione di tutte le tabelle
 
-📝 I vincoli di Primary Key
+📝 I vincoli semantici
 
-📝 I vincoli di Foreign Key
-
-📝 La creazione di tutte le Sequence
-
-📝 I Triggers
+📝 Triggers e funzioni annesse
 
 📝 Le procedure in PL/PGSQL
 
-📝 Le funzioni in PL/PGSQL
-
-📝 Le Insert per la popolazione del DB
+📝 Le Insert e le Call alle procedure per la popolazione del DB
 
 ### 🧩 Indicizzazione per il file *SQL*
-..
+- [Dalla riga 11 alla riga 27 viene mostrata la creazione dei *domini*;](https://github.com/tosska/progetto_oobd/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L11)
+- [Dalla riga 40 alla riga 171 viene mostrata la creazione delle *tabelle*;](https://github.com/tosska/progetto_oobd/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L40)
+- [Dalla riga 183 alla riga 908 vengono mostrati i *trigger*, le *procedure* e  i *vincoli* implementati;](https://github.com/tosska/progetto_oobd/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L183)
+- [Dalla riga 919 alla riga 933 vengono mostrate le *viste* del database;](https://github.com/tosska/progetto_oobd/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L919)
+- [Dalla riga 941 alla riga 1070 viene mostrata la *popolazione* del database;](https://github.com/tosska/progetto_oobd/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L941)
+- [Dalla riga 1076 alla riga 1077 viene creato uno User specifico per il Docente;](https://github.com/tosska/progetto_oobd/blob/main/Basi%20Di%20Dati/SQL/CreateTable.sql#L1076)
 
 ## 🗺 Istruzioni per l'accesso al Database 
 ```
