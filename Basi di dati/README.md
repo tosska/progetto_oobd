@@ -49,7 +49,7 @@ In questo README è presente una breve descrizione dei vari files riguardanti la
 ## 🗺 Istruzioni per l'accesso al Database 
 ```
 Username : silvio_barra 
-Password : ProgettoOOBD
+Password : ProgettoOOBD@
 host name / address / port : verranno comunicati per motivi di sicurezza in privato via Email📩
 
 ```
