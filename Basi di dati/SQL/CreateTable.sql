@@ -922,10 +922,12 @@ FROM OPERAZIONE
 WHERE proposta=false)
 UNION 
 (SELECT O.*
-FROM OPERAZIONE O NATURAL JOIN APPROVAZIONE A
-WHERE A.Risposta=true)
+FROM OPERAZIONE O, APPROVAZIONE A
+WHERE O.id_operazione = A.id_operazione 
+AND A.Risposta=true)
 ORDER BY id_pagina ASC, data ASC;
 
+CREATE OR REPLACE VIEW listaproposte AS
 SELECT O.*, A.data AS dataRisposta, A.risposta 
 FROM OPERAZIONE O, APPROVAZIONE A
 WHERE O.id_operazione = A.id_operazione;
@@ -998,7 +1000,7 @@ INSERT INTO PAGINA VALUES
 
 /*
   ---------------------------------
-    !INSERT->TABLE->FRASE!
+        UTILIZZO PROCEDURE
   ---------------------------------
 */
 -- Pagina 1
@@ -1037,6 +1039,7 @@ CALL inseriscifrase(3, 2, 2, 'Studio della natura e dell''anatomia', 'elena_font
 CALL inseriscifrase(3, 2, 3, 'Opere celebri come la "Gioconda"', 'elena_fontana');
 
 
+-- Approva proposte
 CALL approvaproposta(4, true, 'giovanni_rossi');
 CALL approvaproposta(5, true, 'giovanni_rossi');
 CALL approvaproposta(6, true, 'giovanni_rossi');
@@ -1044,6 +1047,28 @@ CALL approvaproposta(6, true, 'giovanni_rossi');
 CALL approvaproposta(10, false, 'sara_ferrari');
 CALL approvaproposta(11, false, 'sara_ferrari');
 CALL approvaproposta(12, false, 'sara_ferrari');
+
+-- Ritira proposte
+CALL ritiraproposta(16, 'elena_fontana');
+CALL ritiraproposta(17, 'elena_fontana');
+CALL ritiraproposta(18, 'elena_fontana');
+
+-- Inserisci collegamenti
+CALL inseriscicollegamento(3, 1, 2, 1, 'sara_ferrari');
+CALL inseriscicollegamento(3, 1, 3, 1, 'sara_ferrari');
+
+-- Rimuovi collegamenti (proposta ed approvazione)
+CALL rimuovicollegamento(3, 1, 3, 'giovanni_rossi');
+CALL approvaproposta(21, true, 'sara_ferrari');
+
+-- Modifica frase (proposta e rifiuto)
+CALL modificaFrase(1, 1, 1, 'Inventore di macchine e dispositivi innovativi', 'sara_ferrari');
+CALL approvaproposta(22, false, 'giovanni_rossi');
+
+-- Rimuovi frase (proposta e rifiuto)
+CALL rimuoviFrase(1, 1, 1, 'sara_ferrari');
+CALL approvaproposta(23, false, 'giovanni_rossi');
+
 
 
 
