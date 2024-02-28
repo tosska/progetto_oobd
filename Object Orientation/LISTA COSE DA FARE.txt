@@ -1,0 +1,8 @@
+- DATE IN TIMESTAMP
+- gestione lettura frasi
+- gestione delle modifiche dei testi (inserimento, modifica, cancellazione)
+- proposte
+- approvazioni
+- funzionamento collegamenti
+- gestione temi
+

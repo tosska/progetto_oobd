@@ -49,7 +49,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
     public void addPaginaDB(String titolo, Timestamp data, String autore) {
         try {
             PreparedStatement addPaginaPS = connection.prepareStatement("INSERT INTO pagina VALUES"
-                    + "(default,'"+titolo+"','"+data+"', '"+autore+"')");
+                    + "(default,'"+titolo+"',1, '"+data+"', '"+autore+"')");
             addPaginaPS.executeUpdate();
             // connection.close();
         } catch (Exception e) {
@@ -86,7 +86,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
         {
             try {
                 PreparedStatement addFrasePS = connection.prepareStatement("INSERT INTO frase VALUES"
-                        + "(default,'"+idPagina+"','"+f.getContenuto()+"', '"+f.getRiga()+"', '"+false+"')");
+                        + "('"+f.getRiga()+"','"+1+"','"+idPagina+"', '"+f.getContenuto()+"', '"+false+"')");
                 addFrasePS.executeUpdate();
                 // connection.close();
             } catch (Exception e) {
