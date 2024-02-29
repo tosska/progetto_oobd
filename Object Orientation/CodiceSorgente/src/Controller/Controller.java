@@ -115,7 +115,7 @@ public class Controller {
 
         int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
-        listaPagineDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi());
+        listaPagineDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi(), utilizzatore);
     }
 
     public void aggiungiUtente(String username, String email, String password, Timestamp data)

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public interface ListaPagineDAO {
     public void addPaginaDB(String titolo, Timestamp data, String autore);
-    public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi);
+    public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi, Utente utilizzatore);
 
     public void addFraseDB(int idPagina, Frase fraseInserita);
     public void removeFraseDB(int idPagina, Frase fraseEliminata);

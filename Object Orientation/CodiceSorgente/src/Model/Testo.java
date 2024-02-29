@@ -72,6 +72,7 @@ public class Testo {
                     while(f.charAt(0) == '\n') //se ad inizio frase vi è un new line incremento il valore di riga
                     {
                         riga++;
+                        numFrasi=1;
                         f = f.substring(1); //li tolgo perchè non le devo più contare per far incrementare riga
                     }
 
@@ -89,8 +90,10 @@ public class Testo {
 
 
                 int occurences = getNumOccurences(f, '\n'); //conto quante righe si estende la frase considerata
-                if(occurences > 0)
+                if(occurences > 0) {
                     riga = riga + occurences;
+                    numFrasi = 0;
+                }
 
                 System.out.println("Ho come newline: " + occurences);
 

@@ -12,8 +12,6 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
     private Connection connection;
 
 
-
-
     public ListaPagineImplementazionePostgresDAO() {
         try {
             connection = ConnessioneDatabase.getInstance().getConnection();
@@ -81,13 +79,21 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
     }
 
     @Override
-    public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi) {
+    public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi, Utente utilizzatore) {
         for (Frase f: listaFrasi)
         {
             try {
-                PreparedStatement addFrasePS = connection.prepareStatement("INSERT INTO frase VALUES"
-                        + "('"+f.getRiga()+"','"+1+"','"+idPagina+"', '"+f.getContenuto()+"', '"+false+"')");
-                addFrasePS.executeUpdate();
+                System.out.println("Sono arrivato");
+                CallableStatement cs = connection.prepareCall("CALL inserisciFrase(?, ?, null, ?, ?)");
+                cs.setInt(1, idPagina);
+                cs.setInt(2, f.getRiga());
+                cs.setString(3, f.getContenuto());
+                cs.setString(4, utilizzatore.getUsername());
+                cs.execute();
+
+                /*PreparedStatement addFrasePS = connection.prepareStatement("INSERT INTO frase VALUES"
+                        + "('"+f.getRiga()+"','"+1+"','"+idPagina+"', '"+f.getContenuto()+"', '"+false+"')");*/
+                //addFrasePS.executeUpdate();
                 // connection.close();
             } catch (Exception e) {
                 System.out.println("Errore: " + e.getMessage());
