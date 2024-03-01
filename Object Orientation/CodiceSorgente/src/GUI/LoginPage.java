@@ -231,6 +231,7 @@ public class LoginPage {
         controllerPrincipale.impostaUtilizzatore(userID);
         controllerPrincipale.caricaPagineCreate();
         controllerPrincipale.caricaProposteDaApprovare();
+        controllerPrincipale.caricaStoricoOperazioniUtente();
     }
 
 

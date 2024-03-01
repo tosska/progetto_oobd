@@ -18,6 +18,7 @@ public class Controller {
     public ArrayList<Pagina> pagineCreate;
 
     public ArrayList<Operazione> proposteDaApprovare;
+    public ArrayList<Operazione> storicoOperazioniUtente;
 
     public Controller()
     {
@@ -35,6 +36,12 @@ public class Controller {
     {
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
         proposteDaApprovare= l.getProposteDaApprovareDB(utilizzatore);
+    }
+
+    public void caricaStoricoOperazioniUtente()
+    {
+        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        storicoOperazioniUtente = l.getOperazioniDB(utilizzatore);
     }
 
     public void caricaStoricoDaPagina(Pagina pagina)

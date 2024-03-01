@@ -1,11 +1,13 @@
 package GUI;
 
 import Controller.Controller;
+import Model.*;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 
 
@@ -37,6 +39,7 @@ public class AreaRiservata {
     CardLayout cardLayout = new CardLayout();
     JPanel welcomePanel = new JPanel();
     JPanel propostePanel = new JPanel();
+    JPanel operazioniPanel = new JPanel();
 
     public AreaRiservata(Controller controller, JFrame frameChiamante, JLabel userLabel) {
 
@@ -112,6 +115,30 @@ public class AreaRiservata {
             @Override
             public void mouseClicked(MouseEvent e) {
                 cardLayout.show(centralPanel, "propostePanel");
+                // Aggiunta di margini al pannello
+                propostePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Imposta i margini a 10 pixel da tutti i lati del pannello
+
+                for (Operazione proposta : controller.proposteDaApprovare) {
+
+                    JLabel label = new JLabel("Utente: " + proposta.getUtente().getUsername() + " - " + proposta.getData());
+                    label.setOpaque(true);
+                    label.setBackground(Color.WHITE);
+
+                    // Personalizzazione del bordo rotondo
+                    Border border = BorderFactory.createLineBorder(Color.lightGray, 1);
+                    label.setBorder(border);
+
+                    // Imposta i margini per spaziare il testo dal bordo
+                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+
+                    // Imposta i margini per spaziare il testo dal bordo e aumentare lo spazio tra le etichette
+                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+
+                    propostePanel.add(label);
+                    propostePanel.add(Box.createVerticalStrut(10)); // Aggiunge un vuoto verticale tra le etichette
+
+
+                }
             }
 
             @Override
@@ -139,6 +166,56 @@ public class AreaRiservata {
         operazioniLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         operazioniLabel.setForeground(new Color(47,69,92));
         operazioniLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
+        operazioniLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                cardLayout.show(centralPanel, "operazioniPanel");
+                // Aggiunta di margini al pannello
+                operazioniPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Imposta i margini a 10 pixel da tutti i lati del pannello
+
+                for (Operazione operazione : controller.storicoOperazioniUtente) {
+
+                    JLabel label = new JLabel("Utente: " + operazione.getUtente().getUsername() + " - " + operazione.getData());
+                    label.setOpaque(true);
+                    label.setBackground(Color.WHITE);
+
+                    // Personalizzazione del bordo rotondo
+                    Border border = BorderFactory.createLineBorder(Color.lightGray, 1);
+                    label.setBorder(border);
+
+                    // Imposta i margini per spaziare il testo dal bordo
+                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+
+                    // Imposta i margini per spaziare il testo dal bordo e aumentare lo spazio tra le etichette
+                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+
+                    operazioniPanel.add(label);
+                    operazioniPanel.add(Box.createVerticalStrut(10)); // Aggiunge un vuoto verticale tra le etichette
+
+
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                operazioniLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 
         esciLabel.setBounds(0, 120, 230, 30);
         esciLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -188,8 +265,13 @@ public class AreaRiservata {
 
         // proposte panel
         propostePanel.setBounds(250, 60, 550, 540);
-        propostePanel.setLayout(null);
+        propostePanel.setLayout(new BoxLayout(propostePanel, BoxLayout.Y_AXIS));
         propostePanel.setBackground(Color.white);
+
+        // proposte panel
+        operazioniPanel.setBounds(250, 60, 550, 540);
+        operazioniPanel.setLayout(new BoxLayout(operazioniPanel, BoxLayout.Y_AXIS));
+        operazioniPanel.setBackground(Color.white);
 
         // gestione profilo panel
         gestProfiloPanel.setBounds(250, 60, 550, 540);
@@ -468,6 +550,14 @@ public class AreaRiservata {
         centralPanel.add(welcomePanel, "welcomePanel");
         centralPanel.add(gestProfiloPanel, "gestProfiloPanel");
         centralPanel.add(propostePanel, "propostePanel");
+        centralPanel.add(operazioniPanel, "operazioniPanel");
+
+
+
+
+
+
+
 
         ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
         frame.setResizable(false);
