@@ -48,12 +48,11 @@ public class EditPage {
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(checkAutore())
-                {
-                    Testo testoModificato = new Testo(editPg);
-                    testoModificato.setTestoString(textArea.getText());
-                    controllerPrincipale.caricaModifichePagina(editPg, testoModificato, false);
-                }
+
+                Testo testoModificato = new Testo(editPg);
+                testoModificato.setTestoString(textArea.getText());
+                controllerPrincipale.caricaModifichePagina(editPg, testoModificato, false); //da modificare la gestione del parametro proposta
+
 
             }
         });

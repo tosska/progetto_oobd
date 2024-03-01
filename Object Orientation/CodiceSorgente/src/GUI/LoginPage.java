@@ -118,8 +118,11 @@ public class LoginPage {
         loginButton.setForeground(Color.white);
         loginButton.setFocusable(false);
 
-        usernameField.setText("lorenzo");
-        passwordField.setText("Password123@");
+        //usernameField.setText("lorenzo");
+        //passwordField.setText("Password123@");
+
+        usernameField.setText("gianna_bianchi");
+        passwordField.setText("GiannaBianchi!456");
 
         loginButton.addActionListener(new ActionListener() {
             @Override

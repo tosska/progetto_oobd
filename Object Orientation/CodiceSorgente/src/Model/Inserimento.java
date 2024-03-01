@@ -1,19 +1,17 @@
 package Model;
 
 public class Inserimento extends Operazione {
-    private String fraseInserita;
 
-    public Inserimento(Boolean proposta, int riga, String data, Utente utente, String fraseInserita, Storico storico, Pagina pagina) {
-        super(proposta, riga, data, utente, storico, pagina);
-        setFraseInserita(fraseInserita);
+
+    public Inserimento(Boolean proposta, Frase fraseInserita, String data, Utente utente, Storico storico, Pagina pagina) {
+        super(proposta, fraseInserita, data, utente, storico, pagina);
+
     }
 
-    public String getFraseInserita() { return fraseInserita; }
-    public void setFraseInserita(String fraseInserita) { this.fraseInserita = fraseInserita; }
 
     @Override
     public void stampa() //debug
     {
-        System.out.println("Inserimento " + getProposta() + " " + getRiga() +" "+ getData() + " " + getUtente().getUsername() +" " + fraseInserita);
+        System.out.println("Inserimento " + getProposta() + " " + super.getFraseCoinvolta().getRiga() +" "+ getData() + " " + getUtente().getUsername() +" " + super.getFraseCoinvolta().getContenuto());
     }
 }

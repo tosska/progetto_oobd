@@ -37,7 +37,7 @@ public class Controller {
     public void caricaModifichePagina(Pagina paginaOriginale, Testo testoModificato, Boolean proposta)
     {
         Testo testoOriginale  = paginaOriginale.getTestoRiferito();
-        Storico storico = paginaOriginale.getStorico();
+        ArrayList<Operazione> listaOperazioni = new ArrayList<>();
 
         for(int riga=1; riga<=testoModificato.getNumRighe(); riga++)
         {
@@ -51,17 +51,17 @@ public class Controller {
 
                 if(rowNew.isEmpty())
                 {
-                    Cancellazione cancellazione = new Cancellazione(proposta, riga, "data", utilizzatore, contenutoOld, storico, paginaOriginale);
-                    storico.addOperazione(cancellazione);
+                    Cancellazione cancellazione = new Cancellazione(proposta,  fraseOld, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    listaOperazioni.add(cancellazione);
                 }
                 else {
                     String contenutoNew = rowNew.getFirst().getContenuto().replace("\n", "");
-                    contenutoNew = contenutoNew.replace("-", "");
+                    Frase fraseNew = rowNew.getFirst();
                     rowNew.removeFirst();
 
                     if (!(contenutoOld.equals(contenutoNew))) {
-                        Modifica modifica = new Modifica(proposta, riga, "data", utilizzatore, contenutoOld, contenutoNew, storico, paginaOriginale);
-                        storico.addOperazione(modifica);
+                        Modifica modifica = new Modifica(proposta, fraseOld, fraseNew, "data", utilizzatore,  paginaOriginale.getStorico(), paginaOriginale);
+                        listaOperazioni.add(modifica);
                     }
                 }
 
@@ -74,13 +74,13 @@ public class Controller {
                     String contenuto = f.getContenuto().replace("\n", "");
                     contenuto = contenuto.replace("-", "");
 
-                    Inserimento inserimento = new Inserimento(proposta, riga, "data", utilizzatore, contenuto, storico, paginaOriginale);
-                    storico.addOperazione(inserimento);
+                    Inserimento inserimento = new Inserimento(proposta,  f, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    listaOperazioni.add(inserimento);
                 }
             }
 
         }
-/*
+
         if(testoOriginale.getListaFrasi().size()>testoModificato.getListaFrasi().size())
         {
             for(int riga= testoModificato.getNumRighe()+1; riga<= testoOriginale.getNumRighe(); riga++)
@@ -92,17 +92,19 @@ public class Controller {
                     String contenuto = frase.getContenuto().replace("\n", "");
                     contenuto = contenuto.replace("-", "");
 
-                    Cancellazione cancellazione = new Cancellazione(proposta, riga, "data", utilizzatore, contenuto, storico, paginaOriginale);
-                    storico.addOperazione(cancellazione);
+                    Cancellazione cancellazione = new Cancellazione(proposta, frase, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    listaOperazioni.add(cancellazione);
+
                 }
 
             }
         }
-*/
+
         //paginaOriginale.setTestoRiferito(testoModificato);
         //modifica pagina nel database (da fare)
-        paginaOriginale.getStorico().stampaOperazioni();
-
+        //paginaOriginale.getStorico().stampaOperazioni();
+        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        l.editPageDB(paginaOriginale, listaOperazioni);
     }
 
 

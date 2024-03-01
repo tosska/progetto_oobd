@@ -1,12 +1,14 @@
 package Model;
 
 public class Frase {
+
+    private int riga;
     private int ordine;
     private String contenuto;
-    private int riga;
+
     private Testo testo;
 
-    public Frase(int ordine, String contenuto, int riga, Testo testo) {
+    public Frase(int riga, int ordine, String contenuto,  Testo testo) {
         setOrdine(ordine);
         setContenuto(contenuto);
         setRiga(riga);

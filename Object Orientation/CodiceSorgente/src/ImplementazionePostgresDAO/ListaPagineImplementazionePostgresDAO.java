@@ -107,12 +107,12 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
         Testo t = new Testo(p);
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM FRASE WHERE id_Pagina=" + p.getId());
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM FRASE WHERE id_Pagina=" + p.getId() + " ORDER BY riga, ordine");
             ResultSet rs = ps.executeQuery();
 
             while(rs.next())
             {
-                t.inserisciFrase(new Frase(rs.getInt("Ordine"), rs.getString("Contenuto"), rs.getInt("riga"), t));
+                t.inserisciFrase(new Frase(rs.getInt("riga"),rs.getInt("Ordine"), rs.getString("Contenuto"), t));
             }
             rs.close();
         }
@@ -184,26 +184,35 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
                 ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
                 Utente utente = l.getUtenteDB(rs.getString("utente"));
 
+                int riga = rs.getInt("riga");
+                int ordine = rs.getInt("ordine");
+                String contenuto = rs.getString("fraseCoinvolta");
+                Frase fraseCoinvolta = new Frase(riga, ordine, contenuto, pagina.getTestoRiferito());
+                Boolean proposta = rs.getBoolean("proposta");
+                Timestamp data = rs.getTimestamp("data");
+
+
                 if(rs.getString("tipo").equals("I")) {
-                    Inserimento inserimento = new Inserimento(rs.getBoolean("proposta"), rs.getInt("riga"),
-                            rs.getString("data"), utente, rs.getString("frasecoinvolta"), s, pagina);
+
+                    Inserimento inserimento = new Inserimento(proposta, fraseCoinvolta, data.toString(), utente, s, pagina);
                     s.addOperazione(inserimento);
                 }
                 else if(rs.getString("tipo").equals("M"))
                 {
-                    Modifica modifica = new Modifica(rs.getBoolean("proposta"), rs.getInt("riga"),
-                            rs.getString("data"), utente, rs.getString("frasecoinvolta"), rs.getString("frasemodificata"), s, pagina);
+                    Frase fraseModificata = new Frase(riga, ordine, rs.getString("fraseModificata"), pagina.getTestoRiferito());
+                    Modifica modifica = new Modifica(proposta, fraseCoinvolta, fraseModificata, data.toString(), utente, s, pagina);
                     s.addOperazione(modifica);
+
                 }
                 else if(rs.getString("tipo").equals("C"))
                 {
-                    Cancellazione cancellazione = new Cancellazione(rs.getBoolean("proposta"), rs.getInt("riga"),
-                            rs.getString("data"), utente, rs.getString("frasecoinvolta"), s, pagina);
+                    Cancellazione cancellazione = new Cancellazione(proposta, fraseCoinvolta, data.toString(), utente, s, pagina);
                     s.addOperazione(cancellazione);
                 }
             }
 
             rs.close();
+            ps.close();
         }
         catch (Exception e)
         {
@@ -229,33 +238,54 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
     public void editTextDB(Pagina pagina, ArrayList<Operazione> listaOperazioni)
     {
-        try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM FRASE WHERE id_pagina=" + pagina.getId());
-            ResultSet rs = ps.executeQuery();
-
-            for(Operazione op : listaOperazioni)
-            {
-                rs.next();
-
-
+        for(Operazione op : listaOperazioni)
+        {
+            if(op instanceof Inserimento)
+                addFraseDB(pagina, (Inserimento) op);
+            else if (op instanceof Modifica) {
+                editFraseDB(pagina, (Modifica) op);
             }
-
-            rs.close();
-
+            else if (op instanceof Cancellazione) {
+                removeFraseDB(pagina, (Cancellazione) op);
+            }
         }
-        catch (Exception e)
-        {
-            System.out.println("Errore: " + e.getMessage());
-        }
-
     }
 
-    public void addFraseDB(int idPagina, Frase fraseInserita)
+    public void addFraseDB(Pagina pagina, Inserimento inserimento)
     {
+        String comandoSql;
+        Frase fraseCoinvolta = inserimento.getFraseCoinvolta();
         try {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO FRASE(ordine)");
-            ps.executeUpdate();
 
+            CallableStatement cs = connection.prepareCall("CALL inserisciFrase(?, ?, ?, ?, ?)");
+            cs.setInt(1, pagina.getId());
+            cs.setInt(2, fraseCoinvolta.getRiga());
+            cs.setInt(3, fraseCoinvolta.getOrdine());
+            cs.setString(4, fraseCoinvolta.getContenuto());
+            cs.setString(5, inserimento.getUtente().getUsername());
+            cs.execute();
+
+            cs.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+        }
+    }
+    public void removeFraseDB(Pagina pagina, Cancellazione cancellazione)
+    {
+        String comandoSql;
+        Frase fraseCoinvolta = cancellazione.getFraseCoinvolta();
+        try {
+
+            CallableStatement cs = connection.prepareCall("CALL rimuoviFrase(?, ?, ?, ?)");
+            cs.setInt(1, pagina.getId());
+            cs.setInt(2, fraseCoinvolta.getRiga());
+            cs.setInt(3, fraseCoinvolta.getOrdine());
+            cs.setString(4, cancellazione.getUtente().getUsername());
+            cs.execute();
+
+            cs.close();
 
         }
         catch (Exception e)
@@ -263,13 +293,26 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
             System.out.println("Errore: " + e.getMessage());
         }
     }
-    public void removeFraseDB(int idPagina, Frase fraseEliminata)
+    public void editFraseDB(Pagina pagina, Modifica modifica)
     {
+        String comandoSql;
+        Frase fraseModificata = modifica.getFraseModificata();
 
-    }
-    public void editFraseDB(int idPagina, Frase fraseOriginale, Frase fraseModificata)
-    {
+        try {
 
+            CallableStatement cs = connection.prepareCall("CALL modificaFrase(?, ?, ?, ?, ?)");
+            cs.setInt(1, pagina.getId());
+            cs.setInt(2, fraseModificata.getRiga());
+            cs.setInt(3, fraseModificata.getOrdine());
+            cs.setString(4, fraseModificata.getContenuto());
+            cs.setString(5, modifica.getUtente().getUsername());
+            cs.execute();
+
+        }
+        catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+        }
     }
 
 
@@ -295,9 +338,10 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
         return approvazione;
     }
-
+/*
     public ArrayList<Operazione> getProposteDaApprovareDB(Utente utilizzatore)
     {
+
         ArrayList<Operazione> proposte = new ArrayList<>();
 
         try {
@@ -343,7 +387,12 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
         }
 
         return proposte;
+
+
     }
+*/
+
 
 
 }
+

@@ -9,9 +9,9 @@ public interface ListaPagineDAO {
     public void addPaginaDB(String titolo, Timestamp data, String autore);
     public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi, Utente utilizzatore);
 
-    public void addFraseDB(int idPagina, Frase fraseInserita);
-    public void removeFraseDB(int idPagina, Frase fraseEliminata);
-    public void editFraseDB(int idPagina, Frase fraseOriginale, Frase fraseModificata);
+    public void addFraseDB(Pagina pagina, Inserimento inserimento);
+    public void removeFraseDB(Pagina pagina, Cancellazione cancellazione);
+    public void editFraseDB(Pagina pagina, Modifica modifica);
 
     public int recuperaIdPagina();
     public Pagina cercaPaginaDB(String titolo);
@@ -24,7 +24,7 @@ public interface ListaPagineDAO {
 
     public ArrayList<Pagina> getPagineCreateDB(Utente utilizzatore);
 
-    public ArrayList<Operazione> getProposteDaApprovareDB(Utente utilizzatore);
+    //public ArrayList<Operazione> getProposteDaApprovareDB(Utente utilizzatore);
 
     public Pagina getPaginaByIdDB(int idPagina);
 }

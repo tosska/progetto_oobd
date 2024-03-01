@@ -1,19 +1,16 @@
 package Model;
 
 public class Cancellazione extends Operazione {
-    private String fraseEliminata;
 
-    public Cancellazione(Boolean proposta, int riga, String data, Utente utente, String fraseEliminata, Storico storico, Pagina pagina) {
-        super(proposta, riga, data, utente, storico, pagina);
-        setFraseEliminata(fraseEliminata);
+
+    public Cancellazione(Boolean proposta, Frase fraseEliminata, String data, Utente utente, Storico storico, Pagina pagina) {
+        super(proposta, fraseEliminata, data, utente, storico, pagina);
+
     }
-
-    public String getFraseEliminata() { return fraseEliminata; }
-    public void setFraseEliminata(String fraseEliminata) { this.fraseEliminata = fraseEliminata; }
 
     @Override
     public void stampa() //debug
     {
-        System.out.println("Cancellazione: " + getProposta() + " " + getRiga() +" "+ getData() + " " + getUtente().getUsername() +" " + fraseEliminata);
+        System.out.println("Cancellazione: " + getProposta() + " " + super.getFraseCoinvolta().getContenuto() +" "+ getData() + " " + getUtente().getUsername());
     }
 }

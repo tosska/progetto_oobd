@@ -49,20 +49,20 @@ public class Testo {
         }
 
         int riga=1;
-        int numFrasi=0;
+        int ordine=0;
         String textFormatted = formattaTesto(testo);
 
         textFormatted = textFormatted.substring(0, textFormatted.length()-1); //cancelliamo l'ultimo new line
 
         for(String f : textFormatted.split("\\."))
         {
-            if(!f.equals(" "))
+            if(!isStringaVuota(f))
             {
                 String frasePulita;
-                numFrasi++;
+                ordine++;
 
                 f = cancellaSpazi(f); // cancello gli spazi ad inizio e fine frase
-                frasePulita = f;
+                frasePulita = f.replace("\n", "");
 
                 try {
 
@@ -72,7 +72,7 @@ public class Testo {
                     while(f.charAt(0) == '\n') //se ad inizio frase vi è un new line incremento il valore di riga
                     {
                         riga++;
-                        numFrasi=1;
+                        ordine=1;
                         f = f.substring(1); //li tolgo perchè non le devo più contare per far incrementare riga
                     }
 
@@ -85,14 +85,15 @@ public class Testo {
                     System.out.println(eg.getMessage());
                 }
 
-                Frase frase = new Frase(numFrasi, frasePulita, riga, this);
+                Frase frase = new Frase(riga, ordine, frasePulita, this);
                 listaFrasi.add(frase);
 
 
                 int occurences = getNumOccurences(f, '\n'); //conto quante righe si estende la frase considerata
                 if(occurences > 0) {
                     riga = riga + occurences;
-                    numFrasi = 0;
+
+                    ordine = 0;
                 }
 
                 System.out.println("Ho come newline: " + occurences);
@@ -107,11 +108,19 @@ public class Testo {
 
     public String getTestoString()
     {
+        int cursoreRiga=1;
         String testo="";
 
         for(Frase f : listaFrasi)
         {
+            while(cursoreRiga<f.getRiga())
+            {
+                testo = testo + '\n';
+                cursoreRiga++;
+            }
+
             testo = testo + f.getContenuto() + ". ";
+
         }
         return testo;
 
@@ -145,33 +154,21 @@ public class Testo {
 
     public void inserisciFrase(Frase f)
     {
-        f.setOrdine(numFrasi);
         listaFrasi.add(f);
-        numFrasi++;
     }
-    private void inserisciFrasePura(String frase, int riga)
-    {
-        Frase f;
-
-        //frase = cancellaSpazi_NewLine(frase);
-
-        if(frase.charAt(0)== '#' && frase.charAt(frase.length()+1)=='#')
-        {
-            frase = frase.substring(frase.indexOf("#")+1, frase.lastIndexOf('#'));
-            f = new Collegamento(numFrasi, frase, riga, this, null); //da cambiare
-        }
-        else
-            f = new Frase(numFrasi, frase, riga, this);
-
-        listaFrasi.add(f);
-        numFrasi++;
-    }
-
 
     private void stampaFrasi()
     {
         for(Frase f : listaFrasi)
             f.stampa();
+    }
+//controllo se una stringa ha solo caratteri speciali come " " o "\n"
+    private boolean isStringaVuota(String s)
+    {
+        s = s.replace("\n", "");
+        s = s.replace(" ", "");
+
+        return s.isEmpty();
     }
 
     private int getNumOccurences(String line, char occurence)
@@ -218,9 +215,19 @@ public class Testo {
 
     private String cancellaSpazi(String str)
     {
+        String temp;
+        int count=0;
         try {
-            if (str.charAt(0) == ' ')
-                str = str.substring(1);
+            //conto per trovare la posizione di dove effettivamente comincia la frase
+            while(str.charAt(count)== ' ' || str.charAt(count)=='\n')
+            {
+                count++;
+            }
+
+            //cancello tutti gli spazi presenti prima della frase e poi li concateno con la stringa che comincia dalla prima lettera della frase
+            temp = str.substring(0, count);
+            temp = temp.replace(" ", "");
+            str = temp + str.substring(count);
 
             if (str.charAt(str.length() - 1) == ' ')
                 str = str.substring(0, str.length() - 1);

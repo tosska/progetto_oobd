@@ -1,23 +1,21 @@
 package Model;
 
 public class Modifica extends Operazione {
-    private String fraseOriginale;
-    private String fraseModificata;
+    private Frase fraseModificata;
 
-    public Modifica(Boolean proposta, int riga, String data, Utente utente, String fraseOriginale, String fraseModificata, Storico storico, Pagina pagina) {
-        super(proposta, riga, data, utente, storico, pagina);
-        setFraseOriginale(fraseOriginale);
+    public Modifica(Boolean proposta, Frase fraseOriginale, Frase fraseModificata, String data, Utente utente, Storico storico, Pagina pagina) {
+        super(proposta, fraseOriginale, data, utente, storico, pagina);
+
         setFraseModificata(fraseModificata);
     }
 
-    public String getFraseOriginale() { return fraseOriginale; }
-    public void setFraseOriginale(String fraseOriginale) { this.fraseOriginale = fraseOriginale; }
-    public String getFraseModificata() { return fraseModificata; }
-    public void setFraseModificata(String fraseModificata) { this.fraseModificata = fraseModificata; }
+
+    public Frase getFraseModificata() { return fraseModificata; }
+    public void setFraseModificata(Frase fraseModificata) { this.fraseModificata = fraseModificata; }
 
     @Override
     public void stampa() //debug
     {
-        System.out.println("Modifica: " + getProposta() + " " + getRiga() +" "+ getData() + " " + getUtente().getUsername() +" " + fraseOriginale + " "+fraseModificata);
+        System.out.println("Modifica: " + getProposta() + " " + fraseModificata.getRiga() +" "+ getData() + " " + getUtente().getUsername() +" " + super.getFraseCoinvolta().getContenuto() + " "+fraseModificata.getContenuto());
     }
 }
