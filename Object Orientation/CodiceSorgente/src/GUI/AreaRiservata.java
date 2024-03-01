@@ -36,6 +36,7 @@ public class AreaRiservata {
     JLabel esciLabel = new JLabel("  Esci");
     CardLayout cardLayout = new CardLayout();
     JPanel welcomePanel = new JPanel();
+    JPanel propostePanel = new JPanel();
 
     public AreaRiservata(Controller controller, JFrame frameChiamante, JLabel userLabel) {
 
@@ -107,6 +108,32 @@ public class AreaRiservata {
         proposteLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         proposteLabel.setForeground(new Color(47,69,92));
         proposteLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
+        proposteLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                cardLayout.show(centralPanel, "propostePanel");
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                proposteLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
 
         operazioniLabel.setBounds(0, 90, 230, 30);
         operazioniLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -158,6 +185,11 @@ public class AreaRiservata {
         welcomeLabel.setFont(new Font("Monospaced", Font.ITALIC, 20));
         welcomeLabel.setText("<html>Ciao " + controllerPrincipale.utilizzatore.getUsername() + "!<br>" +
                 "Benvenuto nella tua area riservata.</html>");
+
+        // proposte panel
+        propostePanel.setBounds(250, 60, 550, 540);
+        propostePanel.setLayout(null);
+        propostePanel.setBackground(Color.white);
 
         // gestione profilo panel
         gestProfiloPanel.setBounds(250, 60, 550, 540);
@@ -435,6 +467,7 @@ public class AreaRiservata {
 
         centralPanel.add(welcomePanel, "welcomePanel");
         centralPanel.add(gestProfiloPanel, "gestProfiloPanel");
+        centralPanel.add(propostePanel, "propostePanel");
 
         ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
         frame.setResizable(false);

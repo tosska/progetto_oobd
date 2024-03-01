@@ -1,3 +1,4 @@
 dubbi da risolvere
-- gestire meglio il concetto di numFrasi
 - quando apriamo una pagina nella gui, mando l'oggetto pagina esterno al controller (va messo dentro il controller?)
+- problema new line dentro le frasi: risoluzione con la considerazioni di nuove frasi quando c'è il new line
+- gestione interruzione riga
