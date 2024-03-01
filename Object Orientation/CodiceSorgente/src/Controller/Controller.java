@@ -1,7 +1,9 @@
 package Controller;
 
+import DAO.ListaOperazioneDAO;
 import DAO.ListaPagineDAO;
 import DAO.ListaUtentiDAO;
+import ImplementazionePostgresDAO.ListaOperazioneImplementazionePostgresDAO;
 import ImplementazionePostgresDAO.ListaPagineImplementazionePostgresDAO;
 import ImplementazionePostgresDAO.ListaUtentiImplementazionePostgresDAO;
 import Model.*;
@@ -15,6 +17,8 @@ public class Controller {
     public Utente utilizzatore;
     public ArrayList<Pagina> pagineCreate;
 
+    public ArrayList<Operazione> proposteDaApprovare;
+
     public Controller()
     {
         ListaUtenti = new ArrayList<Utente>();
@@ -25,6 +29,12 @@ public class Controller {
         ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
         pagineCreate = l.getPagineCreateDB(utilizzatore);
         stampaPagineCreate();
+    }
+
+    public void caricaProposteDaApprovare()
+    {
+        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        proposteDaApprovare= l.getProposteDaApprovareDB(utilizzatore);
     }
 
     public void caricaStoricoDaPagina(Pagina pagina)

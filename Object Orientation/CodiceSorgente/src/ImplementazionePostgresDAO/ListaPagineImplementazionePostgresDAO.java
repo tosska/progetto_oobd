@@ -338,59 +338,9 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
         return approvazione;
     }
-/*
-    public ArrayList<Operazione> getProposteDaApprovareDB(Utente utilizzatore)
-    {
-
-        ArrayList<Operazione> proposte = new ArrayList<>();
-
-        try {
-            PreparedStatement ps = connection.prepareStatement(
-                    "SELECT O.* FROM OPERAZIONE O, APPROVAZIONE A WHERE O.id_operazione=A.id_operazione AND A.risposta IS NULL AND A.autore=" + "'" + utilizzatore.getUsername() + "'" );
-            ResultSet rs = ps.executeQuery();
-
-            while(rs.next())
-            {
-                Pagina pagina = getPaginaByIdDB(rs.getInt("id_pagina")); //preleviamo la pagina che fa riferimento la proposta
-                ListaUtentiDAO l= new ListaUtentiImplementazionePostgresDAO();
-                Utente generico = l.getUtenteDB(rs.getString("utente")); //preleviamo l'utente che ha proposto la modifica
-                Operazione operazione = null;
-
-                if(rs.getString("tipo").equals("I")) {
-                    operazione = new Inserimento(rs.getBoolean("proposta"), rs.getInt("riga"),
-                            rs.getString("data"), generico, rs.getString("frasecoinvolta"), null, pagina);
-                    proposte.add(operazione);
-                }
-                else if(rs.getString("tipo").equals("M"))
-                {
-                    operazione = new Modifica(rs.getBoolean("proposta"), rs.getInt("riga"),
-                            rs.getString("data"), generico, rs.getString("frasecoinvolta"), rs.getString("frasemodificata"), null, pagina);
-                    proposte.add(operazione);
-                }
-                else if(rs.getString("tipo").equals("C"))
-                {
-                    operazione = new Cancellazione(rs.getBoolean("proposta"), rs.getInt("riga"),
-                            rs.getString("data"), generico, rs.getString("frasecoinvolta"), null, pagina);
-                    proposte.add(operazione);
-                }
-
-                Approvazione approvazione = getApprovazioneDB(rs.getInt("id_operazione"), operazione);
-                operazione.setApprovazione(approvazione);
-
-            }
-            rs.close();
-            ps.close();
-        }
-        catch (Exception e)
-        {
-            System.out.println("Errore: " + e.getMessage());
-        }
-
-        return proposte;
 
 
-    }
-*/
+
 
 
 
