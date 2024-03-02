@@ -66,7 +66,7 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
                     operazione = new Cancellazione(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
                 }
 
-                Approvazione approvazione = new Approvazione(rs.getTimestamp("dataRisposta"), rs.getBoolean("risposta"), operazione, utilizzatore);
+                Approvazione approvazione = new Approvazione(rs.getTimestamp("dataRisposta"), null, operazione, utilizzatore);
                 operazione.setApprovazione(approvazione);
                 proposte.add(operazione);
             }
@@ -79,7 +79,6 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
         }
 
         return proposte;
-
 
     }
 
