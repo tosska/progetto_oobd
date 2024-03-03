@@ -45,6 +45,7 @@ public class AreaRiservata {
 
         centralPanel.setLayout(cardLayout);
 
+
         controllerPrincipale = controller;
 
         // pannello superiore
@@ -111,6 +112,10 @@ public class AreaRiservata {
         proposteLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         proposteLabel.setForeground(new Color(47,69,92));
         proposteLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
+        ImageIcon profileImagine = new ImageIcon(this.getClass().getResource("/icon/profile.png"));
+        ImageIcon anteprimaImagine = new ImageIcon(this.getClass().getResource("/icon/anteprima.png"));
+        ImageIcon approvaImagine = new ImageIcon(this.getClass().getResource("/icon/approva.png"));
+        ImageIcon rifiutaImagine = new ImageIcon(this.getClass().getResource("/icon/rifiuta.png"));
         proposteLabel.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -120,23 +125,78 @@ public class AreaRiservata {
 
                 for (Operazione proposta : controller.proposteDaApprovare) {
 
-                    JLabel label = new JLabel("Utente: " + proposta.getUtente().getUsername() + " - " + proposta.getData());
+                    // Crea un Box con orientamento orizzontale
+                    Box box = Box.createHorizontalBox();
+                    box.setAlignmentX(Component.LEFT_ALIGNMENT); // Imposta l'allineamento a sinistra
+
+                    JLabel label = new JLabel(proposta.getUtente().getUsername());
                     label.setOpaque(true);
                     label.setBackground(Color.WHITE);
+                    label.setIcon(profileImagine);
+                    label.setHorizontalTextPosition(JLabel.RIGHT);
+                    label.setIconTextGap(10);
 
-                    // Personalizzazione del bordo rotondo
-                    Border border = BorderFactory.createLineBorder(Color.lightGray, 1);
-                    label.setBorder(border);
+                    JLabel anteprimaLabel = new JLabel();
+                    anteprimaLabel.setOpaque(true);
+                    anteprimaLabel.setBackground(Color.white);
+                    anteprimaLabel.setIcon(anteprimaImagine);
 
-                    // Imposta i margini per spaziare il testo dal bordo
-                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+                    JLabel approvaLabel = new JLabel();
+                    approvaLabel.setOpaque(true);
+                    approvaLabel.setBackground(Color.white);
+                    approvaLabel.setIcon(approvaImagine);
+
+                    JLabel rifiutaLabel = new JLabel();
+                    rifiutaLabel.setOpaque(true);
+                    rifiutaLabel.setBackground(Color.white);
+                    rifiutaLabel.setIcon(rifiutaImagine);
+
 
                     // Imposta i margini per spaziare il testo dal bordo e aumentare lo spazio tra le etichette
                     label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(10, 20, 10, 20)));
 
-                    propostePanel.add(label);
+                    // Aggiunge i JLabel al Box
+                    box.add(label);
+                    box.add(Box.createHorizontalStrut(10)); // Aggiunge uno spazio orizzontale tra i label
+                    box.add(anteprimaLabel);
+                    box.add(Box.createHorizontalStrut(10)); // Aggiunge uno spazio orizzontale tra i label
+                    box.add(approvaLabel);
+                    box.add(Box.createHorizontalStrut(10)); // Aggiunge uno spazio orizzontale tra i label
+                    box.add(rifiutaLabel);
+
+                    propostePanel.add(box);
                     propostePanel.add(Box.createVerticalStrut(10)); // Aggiunge un vuoto verticale tra le etichette
 
+                    anteprimaLabel.addMouseListener(new MouseListener() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            Pagina p = controllerPrincipale.creazioneAnteprima(proposta.getPagina(), proposta);
+
+                            // Pagina p = controller.cercaPagina(proposta.getPagina().getTitolo());     // debug
+                            PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
+                            frame.setVisible(false);
+                        }
+
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+
+                        }
+
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+
+                        }
+
+                        @Override
+                        public void mouseEntered(MouseEvent e) {
+                            anteprimaLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent e) {
+
+                        }
+                    });
 
                 }
             }
@@ -175,16 +235,12 @@ public class AreaRiservata {
 
                 for (Operazione operazione : controller.storicoOperazioniUtente) {
 
-                    JLabel label = new JLabel("Utente: " + operazione.getUtente().getUsername() + " - " + operazione.getData());
+                    JLabel label = new JLabel(operazione.getUtente().getUsername());
                     label.setOpaque(true);
                     label.setBackground(Color.WHITE);
-
-                    // Personalizzazione del bordo rotondo
-                    Border border = BorderFactory.createLineBorder(Color.lightGray, 1);
-                    label.setBorder(border);
-
-                    // Imposta i margini per spaziare il testo dal bordo
-                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+                    label.setIcon(profileImagine);
+                    label.setHorizontalTextPosition(JLabel.RIGHT);
+                    label.setIconTextGap(10);
 
                     // Imposta i margini per spaziare il testo dal bordo e aumentare lo spazio tra le etichette
                     label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(10, 20, 10, 20)));

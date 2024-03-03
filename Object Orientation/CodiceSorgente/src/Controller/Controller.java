@@ -8,6 +8,7 @@ import ImplementazionePostgresDAO.ListaPagineImplementazionePostgresDAO;
 import ImplementazionePostgresDAO.ListaUtentiImplementazionePostgresDAO;
 import Model.*;
 
+import java.sql.CallableStatement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -137,6 +138,7 @@ public class Controller {
         listaPagineDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi(), utilizzatore);
     }
 
+
     public void aggiungiUtente(String username, String email, String password, Timestamp data)
     {
         ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
@@ -202,6 +204,31 @@ public class Controller {
         ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
         return l.cercaPaginaDB(titolo);
     }
+
+
+
+
+    // da questo punto in poi ci sono le funzioni che creano un'anteprima di una proposta
+    public Pagina creazioneAnteprima(Pagina p, Operazione proposta)
+    {
+        editText(p, proposta);
+
+        return p;
+    }
+
+    public void editText(Pagina pagina, Operazione proposta)
+    {
+        if(proposta instanceof Inserimento)
+            pagina.getTestoRiferito().inserisciFrase(proposta.getFraseCoinvolta());
+        else if (proposta instanceof Modifica) {
+            pagina.getTestoRiferito().modificaFrase(proposta.getFraseCoinvolta(), ((Modifica) proposta).getFraseModificata());
+        }
+        else if (proposta instanceof Cancellazione) {
+            pagina.getTestoRiferito().cancellaFrase(proposta.getFraseCoinvolta());
+        }
+
+    }
+
 
 
 }
