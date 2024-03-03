@@ -156,6 +156,15 @@ public class Testo {
     {
         listaFrasi.add(f);
     }
+    public void modificaFrase(Frase fraseCoinvolta, Frase fraseModificata)
+    {
+        listaFrasi.remove(fraseCoinvolta);
+        listaFrasi.add(fraseModificata);
+    }
+    public void cancellaFrase(Frase f)
+    {
+        listaFrasi.remove(f);
+    }
 
     private void stampaFrasi()
     {
