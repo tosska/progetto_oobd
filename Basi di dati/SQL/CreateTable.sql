@@ -575,7 +575,7 @@ EXECUTE FUNCTION effettuaProposta();
   ---------------------------------
 */
 
-CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT DEFAULT NULL, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
+CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE

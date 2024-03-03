@@ -296,14 +296,15 @@ BEGIN
     IF(maxFrase IS NOT NULL AND maxFrase>=NEW.ordine) THEN
         
         FOR i IN REVERSE maxFrase..NEW.ordine LOOP
-
+            
             UPDATE FRASE 
             SET ordine = ordine + 1
             WHERE ordine = i AND id_pagina = NEW.id_pagina AND Riga = NEW.riga;
 
-            UPDATE OPERAZIONE
-            SET ordine = ordine + 1;
-            WHERE id_pagina = NEW.id_pagina AND riga = NEW.riga AND ordine = i;
+            UPDATE OPERAZIONE O
+            SET ordine = ordine + 1
+            FROM APPROVAZIONE A
+            WHERE O.id_operazione=A.id_operazione AND A.risposta IS NULL AND ordine = i AND id_pagina = NEW.id_pagina AND Riga = NEW.riga;
             
             
         END LOOP;
@@ -321,25 +322,6 @@ BEFORE INSERT
 ON FRASE 
 FOR EACH ROW
 EXECUTE FUNCTION ordinamentoFraseInserimento();
-
-CREATE OR REPLACE PROCEDURE aggiornamentoProposte(id_paginaF INT, rigaF INT, ordineF INT) ASC
-$$
-DECLARE
-
-BEGIN
-
-
-    FOR tupla IN (SELECT * FROM OPERAZIONE O, APPROVAZIONE A WHERE O.id_operazione = A.id_operazione 
-                 AND A.risposta IS NULL AND O.id_pagina = id_paginaF AND O.riga = rigaF AND ordine = ordineF) LOOP
-
-
-
-    END LOOP;
-
-END
-$$ LANGUAGE plpgsql;
-
-
 
 /*
     TRIGGER E FUNZIONE: GESTIONE CAMPO ORDINE (RIMOZIONE)
@@ -362,10 +344,6 @@ BEGIN
             SET ordine = ordine - 1
             WHERE ordine = i AND id_pagina = OLD.id_pagina AND Riga = OLD.riga;
 
-            UPDATE OPERAZIONE 
-            SET ordine = ordine - 1;
-            WHERE ordine = i AND id_pagina = OLD.id_pagina AND Riga = OLD.riga;
-            
         END LOOP;
     END IF;
 
@@ -602,7 +580,7 @@ EXECUTE FUNCTION effettuaProposta();
   ---------------------------------
 */
 
-CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT DEFAULT NULL, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
+CREATE OR REPLACE PROCEDURE inserisciFrase(ID_PaginaF INT, rigaF INT, ordineF INT, ContenutoF LEN_FRASE, nomeUtente USERNAME_DOMINIO)
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -864,7 +842,7 @@ BEGIN
         proposta := true;
     END IF;
  
-    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'C', proposta, rigaF, ordineF, oldFrase, null, DEFAULT, ID_PaginaF, nomeUtente);  
+    INSERT INTO OPERAZIONE VALUES(DEFAULT, 'C', proposta, rigaF, ordineF, oldFrase, null, DEFAULT, ID_PaginaF, nomeUtente);
 
 END;
 $$;
