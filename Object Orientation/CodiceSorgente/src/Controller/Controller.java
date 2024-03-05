@@ -205,14 +205,10 @@ public class Controller {
         return l.cercaPaginaDB(titolo);
     }
 
-
-
-
     // da questo punto in poi ci sono le funzioni che creano un'anteprima di una proposta
     public Pagina creazioneAnteprima(Pagina p, Operazione proposta)
     {
         editText(p, proposta);
-
         return p;
     }
 
@@ -226,6 +222,7 @@ public class Controller {
         else if (proposta instanceof Cancellazione) {
             pagina.getTestoRiferito().cancellaFrase(proposta.getFraseCoinvolta());
         }
+<<<<<<< HEAD
     }
 
 
@@ -234,6 +231,8 @@ public class Controller {
     {
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
         l.approvaPropostaDB(proposta, utilizzatore, risposta);
+=======
+>>>>>>> 98d29cb6e9deebcb98e181cdae101d2a45120cc1
     }
 
 

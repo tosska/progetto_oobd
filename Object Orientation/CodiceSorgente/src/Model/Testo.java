@@ -124,37 +124,60 @@ public class Testo {
         }
         return testo;
 
-        /*
-        String testo="";
-        Frase frasePrecedente = new Frase(1, "", 1, null);
-        int riga=1; //la riga su cui stiamo scrivendo la frase
 
-        for(Frase f: listaFrasi){
+    }
 
-            System.out.println("Frase presa:" + f.getContenuto());
-
-
-            if(riga!=f.getRiga()) {
-                testo = testo + "\n";
-                riga = f.getRiga();
-            }
-            System.out.println("Riga su cui stiamo scrivendo: " + riga);
-            testo = testo + f.getContenuto() + ". ";
-            riga = riga+getNumOccurences(f.getContenuto(), '\n');//significa che la frase si estende su più righe perchè in setTestoString abbiamo rimosso i neline ad inizio e fine frase
-
-
-
-
-        }
-
-        return testo;
-        */
-
+    public void addListaFrasiCoda(Frase f)
+    {
+        listaFrasi.add(f);
     }
 
     public void inserisciFrase(Frase f)
     {
-        listaFrasi.add(f);
+        int rigaSuccessiva = listaFrasi.getFirst().getRiga();
+        int indiceSuccessivo = 0;
+
+        while(rigaSuccessiva < f.getRiga())
+        {
+            indiceSuccessivo++;
+            rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
+        }
+
+        if(rigaSuccessiva==f.getRiga())
+        {
+            int ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
+
+            while(ordineSuccessivo < f.getOrdine() && listaFrasi.get(indiceSuccessivo).getRiga() == f.getRiga())
+            {
+                indiceSuccessivo++;
+                ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
+            }
+
+            listaFrasi.add(indiceSuccessivo, f);
+            indiceSuccessivo++;
+            rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
+            ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
+
+            if(ordineSuccessivo == f.getOrdine())
+            {
+                while(f.getRiga() == rigaSuccessiva)
+                {
+                    Frase temp = listaFrasi.get(indiceSuccessivo);
+                    temp.setOrdine(temp.getOrdine()+1);
+                    listaFrasi.set(indiceSuccessivo, temp);
+                    indiceSuccessivo++;
+
+                    rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
+                }
+            }
+        }
+        else
+        {
+            listaFrasi.add(indiceSuccessivo, f);
+        }
+
+
+
     }
     public void modificaFrase(Frase fraseCoinvolta, Frase fraseModificata)
     {
