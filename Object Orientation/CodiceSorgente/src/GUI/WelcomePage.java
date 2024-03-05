@@ -143,12 +143,24 @@ public class WelcomePage {
             }
         });
 
+
+
         profileLabel.setText(controllerPrincipale.utilizzatore.getUsername());
-        profileLabel.setBounds(580, 10, 150, 30);
         ImageIcon profileImagine = new ImageIcon(this.getClass().getResource("/icon/profile.png"));
         profileLabel.setIcon(profileImagine);
         profileLabel.setHorizontalTextPosition(JLabel.LEFT);
         profileLabel.setIconTextGap(10);
+
+        // Ottieni le dimensioni preferite della JLabel
+        Dimension labelSize = profileLabel.getPreferredSize();
+
+        // Calcola le coordinate x e y per posizionare la JLabel nell'angolo destro con una certa distanza dal bordo destro
+        int x = 700 - labelSize.width - 20; // 20 pixel di distanza dal bordo destro
+        int y = 12; // 12 pixel di distanza dal bordo superiore
+
+        // Imposta la posizione della JLabel
+        profileLabel.setBounds(x, y, labelSize.width, labelSize.height);
+
         profileLabel.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {

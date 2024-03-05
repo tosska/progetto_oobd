@@ -226,7 +226,14 @@ public class Controller {
         else if (proposta instanceof Cancellazione) {
             pagina.getTestoRiferito().cancellaFrase(proposta.getFraseCoinvolta());
         }
+    }
 
+
+
+    public void approvaProposta(Operazione proposta, Boolean risposta)
+    {
+        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        l.approvaPropostaDB(proposta, utilizzatore, risposta);
     }
 
 

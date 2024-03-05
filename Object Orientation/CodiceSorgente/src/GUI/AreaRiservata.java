@@ -4,11 +4,18 @@ import Controller.Controller;
 import Model.*;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 
 
 public class AreaRiservata {
@@ -49,7 +56,7 @@ public class AreaRiservata {
         controllerPrincipale = controller;
 
         // pannello superiore
-        topPanel.setBounds(0, 0, 800, 60);
+        topPanel.setBounds(0, 0, 1100, 60);
         topPanel.setLayout(null);
         topPanel.setBackground(new Color(47,69,92));
 
@@ -120,85 +127,132 @@ public class AreaRiservata {
             @Override
             public void mouseClicked(MouseEvent e) {
                 cardLayout.show(centralPanel, "propostePanel");
-                // Aggiunta di margini al pannello
-                propostePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Imposta i margini a 10 pixel da tutti i lati del pannello
+
+                // Creazione del modello di tabella vuoto
+                DefaultTableModel proposte = new DefaultTableModel();
+                proposte.addColumn("Utente");
+                proposte.addColumn("Tipo");
+                proposte.addColumn("Pagina");
+                proposte.addColumn("Data");
+                proposte.addColumn("Anteprima");
+                proposte.addColumn("Approva");
+                proposte.addColumn("Rifiuta");
+                // Creazione della tabella con il modello vuoto
+                JTable tabellaProp = new JTable(proposte);
+                tabellaProp.setEnabled(false); // Rende la tabella non modificabile
+
 
                 for (Operazione proposta : controller.proposteDaApprovare) {
 
-                    // Crea un Box con orientamento orizzontale
-                    Box box = Box.createHorizontalBox();
-                    box.setAlignmentX(Component.LEFT_ALIGNMENT); // Imposta l'allineamento a sinistra
-
-                    JLabel label = new JLabel(proposta.getUtente().getUsername());
-                    label.setOpaque(true);
-                    label.setBackground(Color.WHITE);
-                    label.setIcon(profileImagine);
-                    label.setHorizontalTextPosition(JLabel.RIGHT);
-                    label.setIconTextGap(10);
-
-                    JLabel anteprimaLabel = new JLabel();
-                    anteprimaLabel.setOpaque(true);
-                    anteprimaLabel.setBackground(Color.white);
-                    anteprimaLabel.setIcon(anteprimaImagine);
-
-                    JLabel approvaLabel = new JLabel();
-                    approvaLabel.setOpaque(true);
-                    approvaLabel.setBackground(Color.white);
-                    approvaLabel.setIcon(approvaImagine);
-
-                    JLabel rifiutaLabel = new JLabel();
-                    rifiutaLabel.setOpaque(true);
-                    rifiutaLabel.setBackground(Color.white);
-                    rifiutaLabel.setIcon(rifiutaImagine);
+                    // Aggiunta di una riga vuota al modello della tabella
+                    proposte.addRow(new Object[]{proposta.getUtente().getUsername(), "C",
+                            proposta.getPagina().getTitolo(), proposta.getData()});
 
 
-                    // Imposta i margini per spaziare il testo dal bordo e aumentare lo spazio tra le etichette
-                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(10, 20, 10, 20)));
-
-                    // Aggiunge i JLabel al Box
-                    box.add(label);
-                    box.add(Box.createHorizontalStrut(10)); // Aggiunge uno spazio orizzontale tra i label
-                    box.add(anteprimaLabel);
-                    box.add(Box.createHorizontalStrut(10)); // Aggiunge uno spazio orizzontale tra i label
-                    box.add(approvaLabel);
-                    box.add(Box.createHorizontalStrut(10)); // Aggiunge uno spazio orizzontale tra i label
-                    box.add(rifiutaLabel);
-
-                    propostePanel.add(box);
-                    propostePanel.add(Box.createVerticalStrut(10)); // Aggiunge un vuoto verticale tra le etichette
-
-                    anteprimaLabel.addMouseListener(new MouseListener() {
+                    // Aggiungi un MouseListener alla tabella
+                    tabellaProp.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            Pagina p = controllerPrincipale.creazioneAnteprima(proposta.getPagina(), proposta);
+                            int column = tabellaProp.columnAtPoint(e.getPoint());
 
-                            // Pagina p = controller.cercaPagina(proposta.getPagina().getTitolo());     // debug
-                            PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
-                            frame.setVisible(false);
+                            // Controlla se il clic è avvenuto nelle colonne "Anteprima" "Approva" o "Rifiuta"
+                            if (column == 4) {
+                                Pagina p = controllerPrincipale.creazioneAnteprima(proposta.getPagina(), proposta);
+                                PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
+                                frame.setVisible(false);
+                            }
+
+                            if (column == 5) {
+                                controller.approvaProposta(proposta, true);
+                                // Rimuovi la riga dalla tabella
+                                int rowToRemove = tabellaProp.rowAtPoint(e.getPoint());
+                                DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
+                                model.removeRow(rowToRemove);
+                            }
+
+                            if (column == 6) {
+                                controller.approvaProposta(proposta, false);
+                                // Rimuovi la riga dalla tabella
+                                int rowToRemove = tabellaProp.rowAtPoint(e.getPoint());
+                                DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
+                                model.removeRow(rowToRemove);
+                            }
+
                         }
 
-                        @Override
-                        public void mousePressed(MouseEvent e) {
 
-                        }
 
-                        @Override
-                        public void mouseReleased(MouseEvent e) {
-
-                        }
-
-                        @Override
-                        public void mouseEntered(MouseEvent e) {
-                            anteprimaLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        }
-
-                        @Override
-                        public void mouseExited(MouseEvent e) {
-
-                        }
                     });
 
+
                 }
+
+
+
+                // Imposta il renderer per le colonne con ImageIcon
+                tabellaProp.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
+                    private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/anteprima.png"));
+
+                    @Override
+                    public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                        JLabel label = new JLabel();
+                        label.setIcon(icon);
+                        label.setHorizontalAlignment(SwingConstants.CENTER);
+                        return label;
+                    }
+                });
+                tabellaProp.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
+                    private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/approva.png"));
+
+                    @Override
+                    public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                        JLabel label = new JLabel();
+                        label.setIcon(icon);
+                        label.setHorizontalAlignment(SwingConstants.CENTER);
+                        return label;
+                    }
+                });
+                tabellaProp.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
+                    private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/rifiuta.png"));
+
+                    @Override
+                    public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                        JLabel label = new JLabel();
+                        label.setIcon(icon);
+                        label.setHorizontalAlignment(SwingConstants.CENTER);
+                        return label;
+                    }
+                });
+
+
+
+
+
+                // Imposta il rendering delle linee verticali su nessuna
+                tabellaProp.setShowVerticalLines(false);
+
+                // Imposta l'altezza delle righe
+                tabellaProp.setRowHeight(30); // Imposta l'altezza desiderata delle righe
+
+
+                // Renderer personalizzato per l'intestazione
+                JTableHeader header = tabellaProp.getTableHeader();
+                header.setFont(new Font("Arial", Font.BOLD, 14)); // Imposta il font desiderato per l'intestazione
+                header.setForeground(new Color(47,69,92)); // Imposta il colore del testo dell'intestazione
+                header.setBackground(new Color(126,179,255)); // Imposta il colore di sfondo dell'intestazione
+                header.setPreferredSize(new Dimension(header.getWidth(), 30)); // Imposta l'altezza desiderata dell'intestazione
+                header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(47,69,92))); // Aggiunge una sottolineatura all'intestazione
+
+                // Disabilita il riordinamento delle colonne
+                header.setReorderingAllowed(false);
+
+
+                propostePanel.add(new JScrollPane(tabellaProp), BorderLayout.CENTER); // Utilizza uno JScrollPane per la visualizzazione della tabella
+
+
+
+
+
             }
 
             @Override
@@ -226,30 +280,101 @@ public class AreaRiservata {
         operazioniLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         operazioniLabel.setForeground(new Color(47,69,92));
         operazioniLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
+
+
+
         operazioniLabel.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
+
+                // Creazione del modello di tabella vuoto
+                DefaultTableModel operazioni = new DefaultTableModel();
+                operazioni.addColumn("Utente");
+                operazioni.addColumn("Tipo");
+                operazioni.addColumn("Proposta");
+                operazioni.addColumn("Pagina");
+                operazioni.addColumn("Data");
+                // Creazione della tabella con il modello vuoto
+                JTable tabellaOp = new JTable(operazioni);
+                tabellaOp.setEnabled(false); // Rende la tabella non modificabile
+
                 cardLayout.show(centralPanel, "operazioniPanel");
+
+                for (Operazione operazione : controller.storicoOperazioniUtente) {
+
+                    /*
+                    long timestamp = operazione.getData();
+
+                    // Rimuovi millisecondi e secondi dal timestamp
+                    LocalDateTime dateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(timestamp), java.time.ZoneId.systemDefault());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // Formato desiderato
+                    String formattedDateTime = dateTime.format(formatter);
+                    */
+
+                    // Aggiunta di una riga vuota al modello della tabella
+                    operazioni.addRow(new Object[]{operazione.getUtente().getUsername(), "C", operazione.getProposta(),
+                    operazione.getPagina().getTitolo(), operazione.getData()});
+
+
+
+
+                }
+
+                // Imposta il rendering delle linee verticali su nessuna
+                tabellaOp.setShowVerticalLines(false);
+
+                // Imposta l'altezza delle righe
+                tabellaOp.setRowHeight(30); // Imposta l'altezza desiderata delle righe
+
+
+                // Renderer personalizzato per l'intestazione
+                JTableHeader header = tabellaOp.getTableHeader();
+                header.setFont(new Font("Arial", Font.BOLD, 14)); // Imposta il font desiderato per l'intestazione
+                header.setForeground(new Color(47,69,92)); // Imposta il colore del testo dell'intestazione
+                header.setBackground(new Color(126,179,255)); // Imposta il colore di sfondo dell'intestazione
+                header.setPreferredSize(new Dimension(header.getWidth(), 30)); // Imposta l'altezza desiderata dell'intestazione
+                header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(47,69,92))); // Aggiunge una sottolineatura all'intestazione
+
+                // Disabilita il riordinamento delle colonne
+                header.setReorderingAllowed(false);
+
+
+                operazioniPanel.add(new JScrollPane(tabellaOp), BorderLayout.CENTER); // Utilizza uno JScrollPane per la visualizzazione della tabella
+
+                /*
                 // Aggiunta di margini al pannello
                 operazioniPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Imposta i margini a 10 pixel da tutti i lati del pannello
+
+                JLabel titolo = new JLabel("Lista Operazioni");
+                titolo.setOpaque(true);
+                titolo.setFont(new Font("Segoe UI", Font.PLAIN, 23));
+                titolo.setForeground(new Color(47,69,92));
+                titolo.setBackground(Color.white);
+                operazioniPanel.add(titolo);
+                operazioniPanel.add(Box.createVerticalStrut(10)); // Aggiunge un vuoto verticale tra le etichette
 
                 for (Operazione operazione : controller.storicoOperazioniUtente) {
 
                     JLabel label = new JLabel(operazione.getUtente().getUsername());
-                    label.setOpaque(true);
-                    label.setBackground(Color.WHITE);
                     label.setIcon(profileImagine);
                     label.setHorizontalTextPosition(JLabel.RIGHT);
                     label.setIconTextGap(10);
+                    label.setBorder(new MatteBorder(0, 0, 1, 0, Color.lightGray));
 
                     // Imposta i margini per spaziare il testo dal bordo e aumentare lo spazio tra le etichette
                     label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(10, 20, 10, 20)));
 
                     operazioniPanel.add(label);
-                    operazioniPanel.add(Box.createVerticalStrut(10)); // Aggiunge un vuoto verticale tra le etichette
+                    operazioniPanel.add(Box.createVerticalStrut(1)); // Aggiunge un vuoto verticale tra le etichette
 
 
                 }
+
+                 */
+
+
+
+
             }
 
             @Override
@@ -305,12 +430,12 @@ public class AreaRiservata {
         });
 
 
-            // pannelli centrali
-        centralPanel.setBounds(250, 60, 550, 540);
+        // pannelli centrali
+        centralPanel.setBounds(250, 60, 850, 540);
         centralPanel.setBackground(Color.white);
 
         // welcome panel
-        welcomePanel.setBounds(250, 60, 550, 540);
+        welcomePanel.setBounds(250, 60, 850, 540);
         welcomePanel.setLayout(null);
         welcomePanel.setBackground(Color.white);
 
@@ -320,17 +445,17 @@ public class AreaRiservata {
                 "Benvenuto nella tua area riservata.</html>");
 
         // proposte panel
-        propostePanel.setBounds(250, 60, 550, 540);
-        propostePanel.setLayout(new BoxLayout(propostePanel, BoxLayout.Y_AXIS));
+        propostePanel.setBounds(250, 60, 850, 540);
+        propostePanel.setLayout(new BorderLayout());
         propostePanel.setBackground(Color.white);
 
-        // proposte panel
-        operazioniPanel.setBounds(250, 60, 550, 540);
-        operazioniPanel.setLayout(new BoxLayout(operazioniPanel, BoxLayout.Y_AXIS));
+        // operazionii panel
+        operazioniPanel.setBounds(250, 60, 850, 540);
+        operazioniPanel.setLayout(new BorderLayout());
         operazioniPanel.setBackground(Color.white);
 
         // gestione profilo panel
-        gestProfiloPanel.setBounds(250, 60, 550, 540);
+        gestProfiloPanel.setBounds(250, 60, 850, 540);
         gestProfiloPanel.setLayout(null);
         gestProfiloPanel.setBackground(Color.white);
 
@@ -619,7 +744,7 @@ public class AreaRiservata {
         frame.setResizable(false);
         frame.setIconImage(logo.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(1100, 600);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

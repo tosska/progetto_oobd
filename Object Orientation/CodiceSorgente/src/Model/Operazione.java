@@ -1,6 +1,7 @@
 package Model;
 
 public class Operazione { //fare interfaccia?
+    private int id;
     private Boolean proposta;
     private Frase fraseCoinvolta;
     private String data;
@@ -16,6 +17,14 @@ public class Operazione { //fare interfaccia?
         setUtente(utente);
         setStorico(storico);
         setPagina(pagina);
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public Boolean getProposta() { return proposta; }
@@ -46,4 +55,6 @@ public class Operazione { //fare interfaccia?
     public void setFraseCoinvolta(Frase fraseCoinvolta) {
         this.fraseCoinvolta = fraseCoinvolta;
     }
+
+
 }

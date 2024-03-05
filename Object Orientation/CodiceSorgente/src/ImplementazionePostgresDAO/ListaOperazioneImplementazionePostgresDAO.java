@@ -36,6 +36,7 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
             {
                 //recupero le informazioni sull'operazione
                 ListaPagineDAO lPagina = new ListaPagineImplementazionePostgresDAO();
+                int idOperazione = rs.getInt("id_operazione");
                 Pagina pagina = lPagina.getPaginaByIdDB(rs.getInt("id_pagina")); //preleviamo la pagina che fa riferimento la proposta
                 ListaUtentiDAO lUtente= new ListaUtentiImplementazionePostgresDAO();
                 Utente generico = lUtente.getUtenteDB(rs.getString("utente")); //preleviamo l'utente che ha proposto la modifica
@@ -53,17 +54,19 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
 
                 if(rs.getString("tipo").equals("I")) {
                     operazione = new Inserimento(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione.setId(idOperazione);
 
                 }
                 else if(rs.getString("tipo").equals("M"))
                 {
                     Frase fraseModificata = new Frase(riga, ordine, rs.getString("fraseModificata"), pagina.getTestoRiferito());
                     operazione = new Modifica(proposta, fraseCoinvolta, fraseModificata, data.toString(), generico, pagina.getStorico(), pagina);
-
+                    operazione.setId(idOperazione);
                 }
                 else if(rs.getString("tipo").equals("C"))
                 {
                     operazione = new Cancellazione(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione.setId(idOperazione);
                 }
 
                 Approvazione approvazione = new Approvazione(rs.getTimestamp("dataRisposta"), null, operazione, utilizzatore);
@@ -96,6 +99,7 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
             while(rs.next())
             {
                 //recupero le informazioni sull'operazione
+                int idOperazione = rs.getInt("id_operazione");
                 ListaPagineDAO lPagina = new ListaPagineImplementazionePostgresDAO();
                 Pagina pagina = lPagina.getPaginaByIdDB(rs.getInt("id_pagina")); //preleviamo la pagina che fa riferimento la proposta
                 ListaUtentiDAO lUtente= new ListaUtentiImplementazionePostgresDAO();
@@ -114,17 +118,20 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
 
                 if(rs.getString("tipo").equals("I")) {
                     operazione = new Inserimento(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione.setId(idOperazione);
 
                 }
                 else if(rs.getString("tipo").equals("M"))
                 {
                     Frase fraseModificata = new Frase(riga, ordine, rs.getString("fraseModificata"), pagina.getTestoRiferito());
                     operazione = new Modifica(proposta, fraseCoinvolta, fraseModificata, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione.setId(idOperazione);
 
                 }
                 else if(rs.getString("tipo").equals("C"))
                 {
                     operazione = new Cancellazione(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione.setId(idOperazione);
                 }
 
 
@@ -142,6 +149,21 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
 
 
     }
+
+    public void approvaPropostaDB(Operazione proposta, Utente utilizzatore, Boolean risposta)
+    {
+        try {
+            CallableStatement cs = connection.prepareCall("CALL approvaproposta(?, ?, ?)");
+            cs.setInt(1, proposta.getId());
+            cs.setBoolean(2, risposta);
+            cs.setString(3, utilizzatore.getUsername());
+            cs.execute();
+            connection.close();
+        } catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
+        }
+    }
+
 
 
 }
