@@ -112,7 +112,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
             while(rs.next())
             {
-                t.inserisciFrase(new Frase(rs.getInt("riga"),rs.getInt("Ordine"), rs.getString("Contenuto"), t));
+                t.addListaFrasiCoda(new Frase(rs.getInt("riga"),rs.getInt("Ordine"), rs.getString("Contenuto"), t));
             }
             rs.close();
         }
