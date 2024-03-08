@@ -24,6 +24,8 @@ public class PageGUI {
 
     private  JScrollPane scrollPane;
     private JLabel titleLabel;
+
+    private JLabel autoreLabel;
     private JButton backButton;
 
     private JButton editButton;
@@ -40,9 +42,7 @@ public class PageGUI {
             pagina.getStorico().stampaOperazioni();
         }
 
-
         creationGUI();
-
         functionButton();
 
     }
@@ -82,6 +82,9 @@ public class PageGUI {
         titleLabel = new JLabel(pagina.getTitolo());
         titleLabel.setBounds(10, 10, 200, 25);
 
+        autoreLabel = new JLabel("Di " + pagina.getAutore().getUsername());
+        autoreLabel.setBounds(10, 25,  200, 25);
+
         backButton = new JButton("Back");
         backButton.setBounds(390, 10, 70, 25);
 
@@ -89,8 +92,9 @@ public class PageGUI {
         editButton.setBounds(350, 410, larghezza, 25);
 
         //frame.add(textArea);
-        frame.add(scrollPane);
         frame.add(titleLabel);
+        frame.add(autoreLabel);
+        frame.add(scrollPane);
         frame.add(backButton);
         frame.add(editButton);
         frame.setVisible(true);
@@ -117,7 +121,7 @@ public class PageGUI {
 
     private boolean controlloAutore()
     {
-        if(controllerPrincipale.utilizzatore.getUsername().equals(pagina.getAutore()))
+        if(controllerPrincipale.utilizzatore.getUsername().equals(pagina.getAutore().getUsername()))
             return true;
         else
             return false;
