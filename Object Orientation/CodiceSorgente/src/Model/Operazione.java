@@ -1,16 +1,18 @@
 package Model;
 
+import java.sql.Timestamp;
+
 public class Operazione { //fare interfaccia?
     private int id;
     private Boolean proposta;
     private Frase fraseCoinvolta;
-    private String data;
+    private Timestamp data;
     private Utente utente;
     private Approvazione approvazione;
     private Storico storico;
     private Pagina pagina;
 
-    public Operazione(Boolean proposta, Frase fraseCoinvolta, String data, Utente utente, Storico storico, Pagina pagina) {
+    public Operazione(Boolean proposta, Frase fraseCoinvolta, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
         setProposta(proposta);
         setFraseCoinvolta(fraseCoinvolta);
         setData(data);
@@ -29,8 +31,8 @@ public class Operazione { //fare interfaccia?
 
     public Boolean getProposta() { return proposta; }
     public void setProposta(Boolean proposta) { this.proposta = proposta; }
-    public String getData() { return data; }
-    public void setData(String data) { this.data = data; }
+    public Timestamp getData() { return data; }
+    public void setData(Timestamp data) { this.data = data; }
     public Utente getUtente() { return utente; }
     public void setUtente(Utente utente) { this.utente = utente; }
     public Storico getStorico() { return storico; }

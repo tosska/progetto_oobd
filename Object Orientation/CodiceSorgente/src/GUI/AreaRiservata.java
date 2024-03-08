@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
@@ -19,7 +20,6 @@ import javax.swing.table.TableCellRenderer;
 
 
 public class AreaRiservata {
-    Controller controllerPrincipale;
     JFrame frame = new JFrame();
     JPanel topPanel = new JPanel();
     JPanel menuPanel = new JPanel();
@@ -51,9 +51,7 @@ public class AreaRiservata {
     public AreaRiservata(Controller controller, JFrame frameChiamante, JLabel userLabel) {
 
         centralPanel.setLayout(cardLayout);
-
-
-        controllerPrincipale = controller;
+        frame.setTitle("Danilo Wiki: Area Riservata");
 
         // pannello superiore
         topPanel.setBounds(0, 0, 1100, 60);
@@ -128,6 +126,8 @@ public class AreaRiservata {
             public void mouseClicked(MouseEvent e) {
                 cardLayout.show(centralPanel, "propostePanel");
 
+                controller.caricaProposteDaApprovare();
+
                 // Creazione del modello di tabella vuoto
                 DefaultTableModel proposte = new DefaultTableModel();
                 proposte.addColumn("Utente");
@@ -141,51 +141,80 @@ public class AreaRiservata {
                 JTable tabellaProp = new JTable(proposte);
                 tabellaProp.setEnabled(false); // Rende la tabella non modificabile
 
+                ArrayList <Pagina> anteprime = controller.creaAnteprime();
 
-                for (Operazione proposta : controller.proposteDaApprovare) {
+                for (Pagina anteprima : anteprime) {
 
                     // Aggiunta di una riga vuota al modello della tabella
-                    proposte.addRow(new Object[]{proposta.getUtente().getUsername(), "C",
-                            proposta.getPagina().getTitolo(), proposta.getData()});
+                    proposte.addRow(new Object[]{anteprima.getAutore().getUsername(), anteprima.getTitolo(), anteprima.getDataCreazione()});
+                }
 
+                tabellaProp.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        int column = tabellaProp.columnAtPoint(e.getPoint());
+                        int row = tabellaProp.rowAtPoint(e.getPoint());
 
-                    // Aggiungi un MouseListener alla tabella
-                    tabellaProp.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            int column = tabellaProp.columnAtPoint(e.getPoint());
-
-                            // Controlla se il clic è avvenuto nelle colonne "Anteprima" "Approva" o "Rifiuta"
-                            if (column == 4) {
-                                Pagina p = controllerPrincipale.creazioneAnteprima(proposta.getPagina(), proposta);
-                                PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
-                                frame.setVisible(false);
-                            }
-
-                            if (column == 5) {
-                                controller.approvaProposta(proposta, true);
-                                // Rimuovi la riga dalla tabella
-                                int rowToRemove = tabellaProp.rowAtPoint(e.getPoint());
-                                DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
-                                model.removeRow(rowToRemove);
-                            }
-
-                            if (column == 6) {
-                                controller.approvaProposta(proposta, false);
-                                // Rimuovi la riga dalla tabella
-                                int rowToRemove = tabellaProp.rowAtPoint(e.getPoint());
-                                DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
-                                model.removeRow(rowToRemove);
-                            }
-
+                        // Controlla se il clic è avvenuto nelle colonne "Anteprima" "Approva" o "Rifiuta"
+                        if (column == 4) {
+                            PageGUI pageGUI = new PageGUI(controller, frame, anteprime.get(row));
+                            frame.setVisible(false);
                         }
 
+                        //pacchetto di proposte approvate
+                        if (column == 5) {
+                            Pagina anteprima = anteprime.get(row);
+                            String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
+                            String dataProposta;
+                            Operazione temp;
+
+                            for (int i = 0; i < controller.proposteDaApprovare.size(); i++) {
+                                temp = controller.proposteDaApprovare.get(i);
+                                dataProposta = temp.getData().toString().split("\\.")[0];
+
+                                if (dataAnteprima.equals(dataProposta) && temp.getPagina().getId() == anteprima.getId()
+                                        && anteprima.getAutore().getUsername().equals(temp.getUtente().getUsername())) {
+                                    controller.approvaProposta(temp, true);
+                                }
+
+                            }
+
+                            // Rimuovi la riga dalla tabella
+                            DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
+                            model.removeRow(row);
+
+                            JOptionPane.showMessageDialog(null, "Le proposte sono state approvate.", "Proposte approvate", JOptionPane.INFORMATION_MESSAGE);
+                        }
+
+                        //pacchetto di proposte rifiutate
+                        if (column == 6) {
+                            Pagina anteprima = anteprime.get(row);
+                            String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
+                            String dataProposta;
+                            Operazione temp;
+
+                            for (int i = 0; i < controller.proposteDaApprovare.size(); i++) {
+                                temp = controller.proposteDaApprovare.get(i);
+                                dataProposta = temp.getData().toString().split("\\.")[0];
+
+                                if (dataAnteprima.equals(dataProposta) && temp.getPagina().getId() == anteprima.getId()
+                                        && anteprima.getAutore().getUsername().equals(temp.getUtente().getUsername())) {
+                                    controller.approvaProposta(temp, false);
+                                }
+
+                            }
+
+                            // Rimuovi la riga dalla tabella
+                            DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
+                            model.removeRow(row);
+
+                            JOptionPane.showMessageDialog(null, "Le proposte sono state rifiutate.", "Proposte rifiutate", JOptionPane.INFORMATION_MESSAGE);
+
+                        }
+                    }
 
 
-                    });
-
-
-                }
+                });
 
 
 
@@ -441,7 +470,7 @@ public class AreaRiservata {
 
         welcomeLabel.setBounds(20, 10, 530, 50);
         welcomeLabel.setFont(new Font("Monospaced", Font.ITALIC, 20));
-        welcomeLabel.setText("<html>Ciao " + controllerPrincipale.utilizzatore.getUsername() + "!<br>" +
+        welcomeLabel.setText("<html>Ciao " + controller.utilizzatore.getUsername() + "!<br>" +
                 "Benvenuto nella tua area riservata.</html>");
 
         // proposte panel
@@ -462,7 +491,7 @@ public class AreaRiservata {
         datiTitleLabel.setBounds(20, 10, 300, 30);
         datiTitleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
 
-        usernameLabel.setText("<html>Username<br><b>" + controllerPrincipale.utilizzatore.getUsername() + "</b></html>");
+        usernameLabel.setText("<html>Username<br><b>" + controller.utilizzatore.getUsername() + "</b></html>");
         usernameLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         usernameLabel.setBounds(20, 50, 300, 35);
 
@@ -476,12 +505,12 @@ public class AreaRiservata {
                 newUsername = JOptionPane.showInputDialog("Inserisci un nuovo username");
                 if ((newUsername != null) && (!newUsername.equals("")))    // verifica se l'utente chiude la finestra o preme il tasto Cancella
                 {
-                    boolean result = controllerPrincipale.modificaUsername(controllerPrincipale.utilizzatore.getUsername(), newUsername);
+                    boolean result = controller.modificaUsername(controller.utilizzatore.getUsername(), newUsername);
                     if (result) {
                         JOptionPane.showMessageDialog(null, "Username modificato con successo");
-                        controllerPrincipale.utilizzatore.setUsername(newUsername);
-                        usernameLabel.setText("<html>Username<br><b>" + controllerPrincipale.utilizzatore.getUsername() + "</b></html>");
-                        userLabel.setText(controllerPrincipale.utilizzatore.getUsername()); // modifico il label nella welcomepage così al ritorno sarà già aggiornato
+                        controller.utilizzatore.setUsername(newUsername);
+                        usernameLabel.setText("<html>Username<br><b>" + controller.utilizzatore.getUsername() + "</b></html>");
+                        userLabel.setText(controller.utilizzatore.getUsername()); // modifico il label nella welcomepage così al ritorno sarà già aggiornato
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "Errore inserimento", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -510,7 +539,7 @@ public class AreaRiservata {
             }
         });
 
-        emailLabel.setText("<html>Email<br><b>" + controllerPrincipale.utilizzatore.getEmail() + "</b></html>");
+        emailLabel.setText("<html>Email<br><b>" + controller.utilizzatore.getEmail() + "</b></html>");
         emailLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         emailLabel.setBounds(20, 130, 300, 45);
 
@@ -523,11 +552,11 @@ public class AreaRiservata {
                 String newEmail;
                 newEmail = JOptionPane.showInputDialog("Inserisci una nuova email");
                 if ((newEmail != null) && (!newEmail.equals(""))) {
-                    boolean result = controllerPrincipale.modificaEmail(controllerPrincipale.utilizzatore.getEmail(), newEmail);
+                    boolean result = controller.modificaEmail(controller.utilizzatore.getEmail(), newEmail);
                     if (result) {
                         JOptionPane.showMessageDialog(null, "Email modificata con successo");
-                        controllerPrincipale.utilizzatore.setEmail(newEmail);
-                        emailLabel.setText("<html>Email<br><b>" + controllerPrincipale.utilizzatore.getEmail() + "</b></html>");
+                        controller.utilizzatore.setEmail(newEmail);
+                        emailLabel.setText("<html>Email<br><b>" + controller.utilizzatore.getEmail() + "</b></html>");
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "Errore inserimento", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -556,7 +585,7 @@ public class AreaRiservata {
             }
         });
 
-        iscrizioneLabel.setText("<html>Iscritto in data: <b>" + controllerPrincipale.utilizzatore.getDataIscrizione() + "</b></html>");
+        iscrizioneLabel.setText("<html>Iscritto in data: <b>" + controller.utilizzatore.getDataIscrizione() + "</b></html>");
         iscrizioneLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         iscrizioneLabel.setBounds(20, 215, 300, 15);
 
@@ -577,7 +606,7 @@ public class AreaRiservata {
                 String oldPassword;
                 oldPassword = JOptionPane.showInputDialog("Inserisci la password attuale");
                 if ((oldPassword != null) && (!oldPassword.equals(""))) {
-                    if (oldPassword.equals(controllerPrincipale.utilizzatore.getPassword())) {
+                    if (oldPassword.equals(controller.utilizzatore.getPassword())) {
 
                         String newPassword;
                         newPassword = JOptionPane.showInputDialog("Inserisci la nuova password");
@@ -590,9 +619,9 @@ public class AreaRiservata {
                             if ((newPasswordConf != null) && (!newPasswordConf.equals(""))) {
 
                                 if (newPassword.equals(newPasswordConf)) {
-                                    boolean result = controllerPrincipale.modificaPassword(oldPassword, newPassword);
+                                    boolean result = controller.modificaPassword(oldPassword, newPassword);
                                     if (result) {
-                                        controllerPrincipale.utilizzatore.setPassword(newPassword);
+                                        controller.utilizzatore.setPassword(newPassword);
                                         JOptionPane.showMessageDialog(null, "Password modificata con successo");
                                     } else {
                                         JOptionPane.showMessageDialog(null, "Errore inserimento", "Errore", JOptionPane.ERROR_MESSAGE);
@@ -646,18 +675,18 @@ public class AreaRiservata {
                     password = JOptionPane.showInputDialog("Inserisci la tua password");
 
                     if ((password != null) && (!password.equals(""))) {
-                        if (password.equals(controllerPrincipale.utilizzatore.getPassword())) {
+                        if (password.equals(controller.utilizzatore.getPassword())) {
                             String confPassword;
                             confPassword = JOptionPane.showInputDialog("Conferma password");
 
                             if ((confPassword != null) && (!confPassword.equals(""))) {
                                 if (password.equals(confPassword)) {
-                                    boolean result2 = controllerPrincipale.eliminaAccount(controllerPrincipale.utilizzatore.getUsername());
+                                    boolean result2 = controller.eliminaAccount(controller.utilizzatore.getUsername());
                                     if (result2) {
                                         JOptionPane.showMessageDialog(null, "Account eliminato con successo");
-                                        controllerPrincipale.utilizzatore = null;
+                                        controller.utilizzatore = null;
                                         frame.dispose();
-                                        LoginPage loginPage = new LoginPage(controllerPrincipale);
+                                        LoginPage loginPage = new LoginPage(controller);
                                     }
                                     else {
                                         JOptionPane.showMessageDialog(null, "Errore inserimento", "Errore", JOptionPane.ERROR_MESSAGE);

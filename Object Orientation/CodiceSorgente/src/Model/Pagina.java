@@ -40,7 +40,7 @@ public class Pagina {
 
     public Timestamp getDataCreazione() { return dataCreazione; }
     public void setDataCreazione() { this.dataCreazione = new Timestamp(System.currentTimeMillis()); }
-    public String getAutore() { return autore.getUsername(); }
+    public Utente getAutore() { return autore; }
     public void setAutore(Utente autore) { this.autore = autore; }
 
     public Testo getTestoRiferito() { return testoRiferito; }

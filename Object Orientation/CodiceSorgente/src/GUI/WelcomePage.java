@@ -41,6 +41,7 @@ public class WelcomePage {
         menuPanel.setBounds(0, 0, 200, 500);
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(47,69,92));
+        frame.setTitle("Danilo Wiki: Home");
 
         ImageIcon logoImagine = new ImageIcon(this.getClass().getResource("/icon/logoHome.png"));
         logoLabel.setIcon(logoImagine);

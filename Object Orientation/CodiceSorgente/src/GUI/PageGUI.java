@@ -61,7 +61,7 @@ public class PageGUI {
         }
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Page: " + pagina.getTitolo());
+        frame.setTitle(pagina.getTitolo());
         frame.setSize(500, 500);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);

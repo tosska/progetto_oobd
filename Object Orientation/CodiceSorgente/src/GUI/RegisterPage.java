@@ -42,6 +42,7 @@ public class RegisterPage {
         panel.setBackground(Color.white);
         panel.setBounds(0, 0, 750, 400);
         panel.setLayout(null);
+        frame.setTitle("Danilo Wiki: Registration");
 
         registerLabel.setBounds(50, 30, 160, 50);
         registerLabel.setForeground(new Color(47,69,92));

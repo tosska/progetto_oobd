@@ -137,7 +137,7 @@ public class Testo {
         int rigaSuccessiva = listaFrasi.getFirst().getRiga();
         int indiceSuccessivo = 0;
 
-        while(rigaSuccessiva < f.getRiga())
+        while(rigaSuccessiva < f.getRiga() && indiceSuccessivo<listaFrasi.size()-1)
         {
             indiceSuccessivo++;
             rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
@@ -173,12 +173,13 @@ public class Testo {
         }
         else
         {
-            listaFrasi.add(indiceSuccessivo, f);
+            if(rigaSuccessiva>f.getRiga())
+                listaFrasi.add(indiceSuccessivo, f);
+            else
+                listaFrasi.add(f);
         }
-
-
-
     }
+
     public void modificaFrase(Frase fraseCoinvolta, Frase fraseModificata)
     {
         listaFrasi.remove(fraseCoinvolta);

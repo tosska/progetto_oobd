@@ -21,6 +21,9 @@ public class Controller {
     public ArrayList<Operazione> proposteDaApprovare;
     public ArrayList<Operazione> storicoOperazioniUtente;
 
+
+    //creare un array pagine caricate
+
     public Controller()
     {
         ListaUtenti = new ArrayList<Utente>();
@@ -69,7 +72,7 @@ public class Controller {
 
                 if(rowNew.isEmpty())
                 {
-                    Cancellazione cancellazione = new Cancellazione(proposta,  fraseOld, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    Cancellazione cancellazione = new Cancellazione(proposta,  fraseOld, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
                     listaOperazioni.add(cancellazione);
                 }
                 else {
@@ -78,7 +81,7 @@ public class Controller {
                     rowNew.removeFirst();
 
                     if (!(contenutoOld.equals(contenutoNew))) {
-                        Modifica modifica = new Modifica(proposta, fraseOld, fraseNew, "data", utilizzatore,  paginaOriginale.getStorico(), paginaOriginale);
+                        Modifica modifica = new Modifica(proposta, fraseOld, fraseNew, new Timestamp(System.currentTimeMillis()), utilizzatore,  paginaOriginale.getStorico(), paginaOriginale);
                         listaOperazioni.add(modifica);
                     }
                 }
@@ -92,7 +95,7 @@ public class Controller {
                     String contenuto = f.getContenuto().replace("\n", "");
                     contenuto = contenuto.replace("-", "");
 
-                    Inserimento inserimento = new Inserimento(proposta,  f, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    Inserimento inserimento = new Inserimento(proposta,  f, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
                     listaOperazioni.add(inserimento);
                 }
             }
@@ -110,7 +113,7 @@ public class Controller {
                     String contenuto = frase.getContenuto().replace("\n", "");
                     contenuto = contenuto.replace("-", "");
 
-                    Cancellazione cancellazione = new Cancellazione(proposta, frase, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    Cancellazione cancellazione = new Cancellazione(proposta, frase, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
                     listaOperazioni.add(cancellazione);
 
                 }
@@ -131,7 +134,7 @@ public class Controller {
         Pagina p = new Pagina(titolo, utilizzatore, testo); //creo la pagina
 
         ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
-        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore());
+        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername());
 
         int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
@@ -206,17 +209,37 @@ public class Controller {
     }
 
 
-
-
-    // da questo punto in poi ci sono le funzioni che creano un'anteprima di una proposta
-    public Pagina creazioneAnteprima(Pagina p, Operazione proposta)
+    public ArrayList<Pagina> creaAnteprime()
     {
-        editText(p, proposta);
+        ArrayList<Pagina> anteprime = new ArrayList<>();
 
-        return p;
+        Operazione temp = proposteDaApprovare.getFirst();
+        Pagina antem = new Pagina(temp.getPagina().getId(), temp.getPagina().getTitolo(), temp.getPagina().getTestoRiferito(),  //da valutare se ha senso il costruttore
+                temp.getData(), temp.getUtente());
+
+        for(Operazione proposta : proposteDaApprovare)
+        {
+            String s1 = temp.getData().toString().split("\\.")[0];
+            String s2 = proposta.getData().toString().split("\\.")[0];
+
+            if(s1.equals(s2) && temp.getPagina().getId() == proposta.getPagina().getId() && temp.getUtente().getUsername().equals(proposta.getUtente().getUsername()))
+            {
+                inserisciProposta(antem, proposta);
+            }
+            else
+            {
+                anteprime.add(antem);
+                temp = proposta;
+                antem = new Pagina(temp.getPagina().getId(), temp.getPagina().getTitolo(), temp.getPagina().getTestoRiferito(), //da valutare se ha senso il costruttore
+                        temp.getData(), proposta.getUtente());
+
+            }
+
+        }
+
+        return anteprime;
     }
-
-    public void editText(Pagina pagina, Operazione proposta)
+    private void inserisciProposta(Pagina pagina, Operazione proposta)
     {
         if(proposta instanceof Inserimento)
             pagina.getTestoRiferito().inserisciFrase(proposta.getFraseCoinvolta());

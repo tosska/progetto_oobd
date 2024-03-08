@@ -1,9 +1,11 @@
 package Model;
 
+import java.sql.Timestamp;
+
 public class Inserimento extends Operazione {
 
 
-    public Inserimento(Boolean proposta, Frase fraseInserita, String data, Utente utente, Storico storico, Pagina pagina) {
+    public Inserimento(Boolean proposta, Frase fraseInserita, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
         super(proposta, fraseInserita, data, utente, storico, pagina);
 
     }

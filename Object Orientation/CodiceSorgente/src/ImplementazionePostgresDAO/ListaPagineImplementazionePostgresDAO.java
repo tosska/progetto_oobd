@@ -194,19 +194,19 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
                 if(rs.getString("tipo").equals("I")) {
 
-                    Inserimento inserimento = new Inserimento(proposta, fraseCoinvolta, data.toString(), utente, s, pagina);
+                    Inserimento inserimento = new Inserimento(proposta, fraseCoinvolta, data, utente, s, pagina);
                     s.addOperazione(inserimento);
                 }
                 else if(rs.getString("tipo").equals("M"))
                 {
                     Frase fraseModificata = new Frase(riga, ordine, rs.getString("fraseModificata"), pagina.getTestoRiferito());
-                    Modifica modifica = new Modifica(proposta, fraseCoinvolta, fraseModificata, data.toString(), utente, s, pagina);
+                    Modifica modifica = new Modifica(proposta, fraseCoinvolta, fraseModificata, data, utente, s, pagina);
                     s.addOperazione(modifica);
 
                 }
                 else if(rs.getString("tipo").equals("C"))
                 {
-                    Cancellazione cancellazione = new Cancellazione(proposta, fraseCoinvolta, data.toString(), utente, s, pagina);
+                    Cancellazione cancellazione = new Cancellazione(proposta, fraseCoinvolta, data, utente, s, pagina);
                     s.addOperazione(cancellazione);
                 }
             }

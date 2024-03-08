@@ -33,6 +33,7 @@ public class LoginPage {
 
         controllerPrincipale = controller;
 
+        frame.setTitle("Danilo Wiki: Login");
         leftPanel.setBackground(new Color(47,69,92));
         leftPanel.setBounds(0, 0, 400, 500);
         leftPanel.setLayout(null);
