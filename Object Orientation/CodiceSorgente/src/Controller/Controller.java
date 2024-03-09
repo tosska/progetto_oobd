@@ -21,6 +21,8 @@ public class Controller {
     public ArrayList<Operazione> proposteDaApprovare;
     public ArrayList<Operazione> storicoOperazioniUtente;
 
+    public Pagina paginaAperta;
+
 
     //creare un array pagine caricate
 
@@ -234,7 +236,11 @@ public class Controller {
                         temp.getData(), proposta.getUtente());
 
             }
+        }
 
+        if(proposteDaApprovare.size()==1)
+        {
+            anteprime.add(antem);
         }
 
         return anteprime;

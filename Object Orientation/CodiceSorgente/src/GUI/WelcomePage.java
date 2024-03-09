@@ -196,7 +196,8 @@ public class WelcomePage {
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
                     Pagina p = controllerPrincipale.cercaPagina(searchField.getText());
-                    PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
+                    controllerPrincipale.paginaAperta = p;
+                    PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
                     frame.setVisible(false);
                 }
             }

@@ -301,10 +301,10 @@ BEGIN
             SET ordine = ordine + 1
             WHERE ordine = i AND id_pagina = NEW.id_pagina AND Riga = NEW.riga;
 
-            UPDATE OPERAZIONE O
-            SET ordine = ordine + 1
-            FROM APPROVAZIONE A
-            WHERE O.id_operazione=A.id_operazione AND A.risposta IS NULL AND ordine = i AND id_pagina = NEW.id_pagina AND Riga = NEW.riga;
+            --UPDATE OPERAZIONE O
+            --SET ordine = ordine + 1
+            --FROM APPROVAZIONE A
+            --WHERE O.id_operazione=A.id_operazione AND A.risposta IS NULL AND ordine = i AND id_pagina = NEW.id_pagina AND Riga = NEW.riga;
             
             
         END LOOP;
@@ -600,48 +600,32 @@ BEGIN
     END IF;
 
     SELECT UserAutore INTO autorePagina FROM PAGINA WHERE id_pagina = ID_PaginaF;
-    
- 
-    
+
+
+    SELECT MAX(ordine) INTO maxOrdine FROM FRASE WHERE ID_Pagina = ID_PaginaF AND riga = rigaF;
+
+    -- se si tratta della prima frase sulla riga
+    IF(maxOrdine IS NULL) THEN
+        maxOrdine:=0;
+    END IF;
+        
+    /* se l'utente specifica l'ordine della frase che sta inserendo e quest'ultimo si trova nel mezzo della 
+    riga (ordineF < maxOrdine) allora l'ordine della frase è quello indicato, altrimenti l'ordine sarà il massimo +1 */
+    IF(ordineF IS NOT NULL AND maxOrdine>ordineF) THEN
+        ordineFrase := OrdineF;
+    ELSE
+        ordineFrase := maxOrdine+1;
+    END IF;
+
+       
 	-- controlla se l'utente è l'autore stesso
     IF(autorePagina = nomeUtente) THEN
         
         proposta:=false;    -- inserimento diretto (da parte dell'autore stesso)
 
-        -- prendo l'ordine massimo sulla riga coinvolta
-        SELECT MAX(ordine) INTO maxOrdine FROM FRASE WHERE ID_Pagina = ID_PaginaF AND riga = rigaF;
-
-        -- se si tratta della prima frase sulla riga
-        IF(maxOrdine IS NULL) THEN
-            maxOrdine:=0;
-        END IF;
-        
-        /* se l'utente specifica l'ordine della frase che sta inserendo e quest'ultimo si trova nel mezzo della 
-        riga (ordineF < maxOrdine) allora l'ordine della frase è quello indicato, altrimenti l'ordine sarà il massimo +1 */
-        IF(ordineF IS NOT NULL AND maxOrdine>ordineF) THEN
-            ordineFrase := OrdineF;
-        ELSE
-            ordineFrase := maxOrdine+1;
-        END IF;
-
         INSERT INTO FRASE VALUES(RigaF, ordineFrase, ID_PaginaF, ContenutoF, false);
-
     ELSE
         proposta:=true; -- altrimenti l'operazione è solo di proposta
-
-        SELECT MAX(O.ordine) INTO maxOrdine FROM OPERAZIONE O, APPROVAZIONE A WHERE O.id_operazione=A.id_operazione AND O.id_pagina= ID_PaginaF AND O.riga = rigaF AND O.utente = nomeUtente AND A.Risposta IS NULL;
-        
-        IF(maxOrdine IS NULL) THEN
-            maxOrdine:=0;
-        END IF;
-
-        IF(ordineF IS NOT NULL AND maxOrdine>ordineF) THEN
-            ordineFrase := OrdineF;
-        ELSE
-            ordineFrase := maxOrdine+1;
-        END IF;
-
-
     END IF;
 
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'I', proposta, rigaF, ordineFrase, ContenutoF, null, DEFAULT, ID_PaginaF, nomeUtente); 

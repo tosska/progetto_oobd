@@ -134,6 +134,7 @@ public class Testo {
 
     public void inserisciFrase(Frase f)
     {
+        f.setContenuto(f.getContenuto() + "##i");
         int rigaSuccessiva = listaFrasi.getFirst().getRiga();
         int indiceSuccessivo = 0;
 
@@ -146,30 +147,38 @@ public class Testo {
         if(rigaSuccessiva==f.getRiga())
         {
             int ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
+            int elementoIniziale = rigaSuccessiva;
 
-            while(ordineSuccessivo < f.getOrdine() && listaFrasi.get(indiceSuccessivo).getRiga() == f.getRiga())
+            while(ordineSuccessivo < f.getOrdine() && listaFrasi.get(indiceSuccessivo).getRiga() == f.getRiga() && indiceSuccessivo<listaFrasi.size()-1)
             {
                 indiceSuccessivo++;
                 ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
             }
 
-            listaFrasi.add(indiceSuccessivo, f);
-            indiceSuccessivo++;
-            rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
-            ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
-
-            if(ordineSuccessivo == f.getOrdine())
+            //è l'ultimo elemento
+            if(ordineSuccessivo<f.getOrdine())
+                listaFrasi.add(f);
+            else
             {
-                while(f.getRiga() == rigaSuccessiva)
+                listaFrasi.add(indiceSuccessivo, f);
+                indiceSuccessivo++;
+
+                //riordinamento
+                while(f.getRiga() == rigaSuccessiva && indiceSuccessivo < listaFrasi.size()-1)
                 {
-                    Frase temp = listaFrasi.get(indiceSuccessivo);
+                    Frase temp = listaFrasi.get(indiceSuccessivo+1);
                     temp.setOrdine(temp.getOrdine()+1);
                     listaFrasi.set(indiceSuccessivo, temp);
                     indiceSuccessivo++;
 
                     rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
                 }
+
+
             }
+
+            //rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
+            //ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
         }
         else
         {
