@@ -21,6 +21,8 @@ public class Testo {
 
     public Pagina getPaginaRiferita() { return paginaRiferita; }
     public ArrayList<Frase> getListaFrasi() { return listaFrasi; }
+
+    public void setListaFrasi(ArrayList<Frase> listaFrasi) {this.listaFrasi = listaFrasi;}
     public void setPaginaRiferita(Pagina paginaRiferita) { this.paginaRiferita = paginaRiferita; }
 
     public int getNumRighe()
@@ -132,9 +134,11 @@ public class Testo {
         listaFrasi.add(f);
     }
 
-    public void inserisciFrase(Frase f)
+    public void inserisciFrase(Frase f, Boolean anteprima)
     {
-        f.setContenuto(f.getContenuto() + "##i");
+        if(anteprima)
+            f.setContenuto(f.getContenuto() + "##i");
+
         int rigaSuccessiva = listaFrasi.getFirst().getRiga();
         int indiceSuccessivo = 0;
 
@@ -189,14 +193,48 @@ public class Testo {
         }
     }
 
-    public void modificaFrase(Frase fraseCoinvolta, Frase fraseModificata)
+    public void modificaFrase(Frase fraseCoinvolta, Frase fraseModificata, boolean anteprima)
     {
-        listaFrasi.remove(fraseCoinvolta);
-        listaFrasi.add(fraseModificata);
+        if(anteprima)
+            fraseModificata.setContenuto(fraseModificata.getContenuto() + "##m");
+
+        try {
+            int posizione = listaFrasi.indexOf(fraseCoinvolta);
+            listaFrasi.remove(fraseCoinvolta);
+            listaFrasi.add(posizione, fraseModificata);
+        }
+        catch (IndexOutOfBoundsException i)
+        {
+            System.out.println(i.getMessage());
+        }
+
     }
-    public void cancellaFrase(Frase f)
+    public void cancellaFrase(Frase f, boolean anteprima)
     {
-        listaFrasi.remove(f);
+        if(anteprima)
+            f.setContenuto(f.getContenuto() + "##c");
+
+        try {
+            int posizione = listaFrasi.indexOf(f);
+            listaFrasi.set(posizione, f);
+        }
+        catch (IndexOutOfBoundsException i)
+        {
+            System.out.println(i.getMessage());
+        }
+    }
+
+    public Frase getFrase(int riga, int ordine)
+    {
+        for(Frase f : listaFrasi)
+        {
+            if(f.getRiga() == riga && f.getOrdine() == ordine)
+            {
+                return f;
+            }
+        }
+
+        return null;
     }
 
     private void stampaFrasi()

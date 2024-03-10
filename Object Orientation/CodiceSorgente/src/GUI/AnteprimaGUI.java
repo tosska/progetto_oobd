@@ -24,6 +24,7 @@ public class AnteprimaGUI {
     private JLabel autoreLabel;
     private JButton backButton;
 
+    private JButton paginaButton;
     private Pagina pagina; //la pagina aperta
 
 
@@ -41,7 +42,7 @@ public class AnteprimaGUI {
     {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle(pagina.getTitolo());
+        frame.setTitle("Anteprima: " + pagina.getTitolo());
         frame.setSize(500, 500);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
@@ -66,6 +67,9 @@ public class AnteprimaGUI {
         backButton = new JButton("Back");
         backButton.setBounds(390, 10, 70, 25);
 
+        paginaButton = new JButton("Versione Attuale");
+        paginaButton.setBounds(330, 410, 135, 25);
+
 
         caricamentoTestoColori();
         //frame.add(textArea);
@@ -73,6 +77,7 @@ public class AnteprimaGUI {
         frame.add(autoreLabel);
         frame.add(scrollPane);
         frame.add(backButton);
+        frame.add(paginaButton);
 
 
 
@@ -92,6 +97,15 @@ public class AnteprimaGUI {
             }
         });
 
+        paginaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controllerPrincipale.paginaAperta = controllerPrincipale.getPaginaUtilizzatore(pagina.getId());
+                PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
+                frame.setVisible(false);
+            }
+        });
+
     }
 
     private void caricamentoTestoColori()
@@ -100,11 +114,12 @@ public class AnteprimaGUI {
         String testo = pagina.getTestoString();
         Style style = textArea.addStyle("ColorStyle", null);
         String[] testoDiviso = testo.split("\\.");
-        //testo
         Color c;
 
-        for (String s : testoDiviso)
+        for(int i=0; i<testoDiviso.length-1; i++)
         {
+            String s = testoDiviso[i];
+
             if(s.contains("##i"))
             {
                 c = Color.blue;
@@ -124,34 +139,12 @@ public class AnteprimaGUI {
             try {
 
                 if(c.equals(Color.black))
-                    doc.insertString(doc.getLength(), s + ". ", style);
+                    doc.insertString(doc.getLength(), s + ".", style);
                 else
-                    doc.insertString(doc.getLength(), s.split("##")[0] + ". ", style);
-
-
+                    doc.insertString(doc.getLength(), s.split("##")[0] + ".", style);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
-
-
         }
-
     }
-
-    private void appendToPane(JTextPane tp, String msg, Color c)
-    {
-        StyleContext sc = StyleContext.getDefaultStyleContext();
-        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
-
-        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
-        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
-
-        int len = tp.getDocument().getLength();
-        tp.setCaretPosition(len);
-        tp.setCharacterAttributes(aset, false);
-        tp.replaceSelection(msg);
-    }
-
-
-
 }

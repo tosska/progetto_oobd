@@ -41,7 +41,7 @@ public class Controller {
     public void caricaProposteDaApprovare()
     {
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
-        proposteDaApprovare= l.getProposteDaApprovareDB(utilizzatore);
+        proposteDaApprovare= l.getProposteDaApprovareDB(pagineCreate, utilizzatore);
     }
 
     public void caricaStoricoOperazioniUtente()
@@ -143,6 +143,19 @@ public class Controller {
         listaPagineDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi(), utilizzatore);
     }
 
+    /*restituisce la pagina con id mandato come parametro, presente nell'array list "pagineCreate" ossia le pagine
+     create dall'utilizzatore del programma */
+    public Pagina getPaginaUtilizzatore(int id)
+    {
+        for(Pagina p : pagineCreate)
+        {
+            if(p.getId() == id)
+                return p;
+        }
+
+        //forse va mandata come eccezione
+        return null;
+    }
 
     public void aggiungiUtente(String username, String email, String password, Timestamp data)
     {
@@ -216,11 +229,11 @@ public class Controller {
         ArrayList<Pagina> anteprime = new ArrayList<>();
 
         Operazione temp = proposteDaApprovare.getFirst();
-        Pagina antem = new Pagina(temp.getPagina().getId(), temp.getPagina().getTitolo(), temp.getPagina().getTestoRiferito(),  //da valutare se ha senso il costruttore
-                temp.getData(), temp.getUtente());
+        Pagina antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente());
 
         for(Operazione proposta : proposteDaApprovare)
         {
+            //togliamo dal timestamp i millisecondi
             String s1 = temp.getData().toString().split("\\.")[0];
             String s2 = proposta.getData().toString().split("\\.")[0];
 
@@ -232,28 +245,39 @@ public class Controller {
             {
                 anteprime.add(antem);
                 temp = proposta;
-                antem = new Pagina(temp.getPagina().getId(), temp.getPagina().getTitolo(), temp.getPagina().getTestoRiferito(), //da valutare se ha senso il costruttore
-                        temp.getData(), proposta.getUtente());
+                antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente());
 
             }
         }
 
-        if(proposteDaApprovare.size()==1)
-        {
+        if(!proposteDaApprovare.isEmpty())
             anteprime.add(antem);
-        }
+
 
         return anteprime;
     }
+
+    private Pagina creazioneAnteprimaPagina(Pagina p, Timestamp data, Utente utente)
+    {
+        Pagina antem = new Pagina(p.getId(), p.getTitolo(), null, //da valutare se ha senso il costruttore
+                data, utente);
+
+        Testo testoAntem = new Testo(antem);
+        testoAntem.setListaFrasi(p.getTestoRiferito().getListaFrasi());
+        antem.setTestoRiferito(testoAntem);
+
+        return antem;
+    }
+
     private void inserisciProposta(Pagina pagina, Operazione proposta)
     {
         if(proposta instanceof Inserimento)
-            pagina.getTestoRiferito().inserisciFrase(proposta.getFraseCoinvolta());
+            pagina.getTestoRiferito().inserisciFrase(proposta.getFraseCoinvolta(), true);
         else if (proposta instanceof Modifica) {
-            pagina.getTestoRiferito().modificaFrase(proposta.getFraseCoinvolta(), ((Modifica) proposta).getFraseModificata());
+            pagina.getTestoRiferito().modificaFrase(proposta.getFraseCoinvolta(), ((Modifica) proposta).getFraseModificata(), true);
         }
         else if (proposta instanceof Cancellazione) {
-            pagina.getTestoRiferito().cancellaFrase(proposta.getFraseCoinvolta());
+            pagina.getTestoRiferito().cancellaFrase(proposta.getFraseCoinvolta(), true);
         }
     }
 
