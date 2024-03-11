@@ -128,6 +128,34 @@ public class Controller {
         //paginaOriginale.getStorico().stampaOperazioni();
         ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
         l.editPageDB(paginaOriginale, listaOperazioni);
+
+        if(!proposta)
+        {
+            //recupero la pagina modificata dal db
+            Pagina paginaPostModifica = l.getPaginaByIdDB(paginaOriginale.getId());
+            aggiornaPagineCreate(paginaPostModifica);
+        }
+
+
+    }
+
+    private void aggiornaPagineCreate(Pagina pagina)
+    {
+        boolean trovato=false;
+
+        for(int i=0; i<pagineCreate.size() && !trovato; i++)
+        {
+            if(pagineCreate.get(i).getId() == pagina.getId()) {
+                pagineCreate.set(i, pagina);
+                trovato = true;
+            }
+        }
+
+        if(!trovato)
+        {
+            pagineCreate.add(pagina);
+        }
+
     }
 
 
@@ -135,12 +163,18 @@ public class Controller {
     {
         Pagina p = new Pagina(titolo, utilizzatore, testo); //creo la pagina
 
+        //aggiungo la pagina creata nell'array delle pagine create dall'utilizzatore
+        aggiornaPagineCreate(p);
+
+        //la memorizzo nel database
         ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
         listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername());
 
         int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
         listaPagineDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi(), utilizzatore);
+
+
     }
 
     /*restituisce la pagina con id mandato come parametro, presente nell'array list "pagineCreate" ossia le pagine
@@ -262,22 +296,27 @@ public class Controller {
         Pagina antem = new Pagina(p.getId(), p.getTitolo(), null, //da valutare se ha senso il costruttore
                 data, utente);
 
-        Testo testoAntem = new Testo(antem);
-        testoAntem.setListaFrasi(p.getTestoRiferito().getListaFrasi());
-        antem.setTestoRiferito(testoAntem);
+        Testo testo = p.getTestoRiferito().clonaTesto();
+        testo.setPaginaRiferita(antem);
+        antem.setTestoRiferito(testo);
 
         return antem;
     }
 
     private void inserisciProposta(Pagina pagina, Operazione proposta)
     {
-        if(proposta instanceof Inserimento)
-            pagina.getTestoRiferito().inserisciFrase(proposta.getFraseCoinvolta(), true);
+        if(proposta instanceof Inserimento) {
+            Frase frase = new Frase(proposta.getFraseCoinvolta().getRiga(), proposta.getFraseCoinvolta().getOrdine(), proposta.getFraseCoinvolta().getContenuto(), pagina.getTestoRiferito());
+            pagina.getTestoRiferito().inserisciFrase(frase, true);
+        }
         else if (proposta instanceof Modifica) {
-            pagina.getTestoRiferito().modificaFrase(proposta.getFraseCoinvolta(), ((Modifica) proposta).getFraseModificata(), true);
+            Frase frase = ((Modifica) proposta).getFraseModificata();
+            frase = new Frase(frase.getRiga(), frase.getOrdine(), frase.getContenuto(), pagina.getTestoRiferito());
+            pagina.getTestoRiferito().modificaFrase(frase, true);
         }
         else if (proposta instanceof Cancellazione) {
-            pagina.getTestoRiferito().cancellaFrase(proposta.getFraseCoinvolta(), true);
+            Frase frase = new Frase(proposta.getFraseCoinvolta().getRiga(), proposta.getFraseCoinvolta().getOrdine(), proposta.getFraseCoinvolta().getContenuto(), pagina.getTestoRiferito());
+            pagina.getTestoRiferito().cancellaFrase(frase, true);
         }
     }
 

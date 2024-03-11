@@ -3,11 +3,9 @@ package Model;
 import javax.swing.text.Utilities;
 import java.util.ArrayList;
 
-public class Testo {
+public class Testo implements Cloneable{
     private ArrayList<Frase> listaFrasi;
     private Pagina paginaRiferita;
-
-    private int numFrasi;
 
     private int dimensioneCaratteri; //da capire se cancellare o meno
 
@@ -15,9 +13,16 @@ public class Testo {
 
         setPaginaRiferita(paginaRiferita);
         listaFrasi = new ArrayList<>();
-        numFrasi=0;
         dimensioneCaratteri = 48;
     }
+
+    public Testo(Pagina paginaRiferita, ArrayList<Frase> lista)
+    {
+        setPaginaRiferita(paginaRiferita);
+        listaFrasi = lista;
+        dimensioneCaratteri = 48;
+    }
+
 
     public Pagina getPaginaRiferita() { return paginaRiferita; }
     public ArrayList<Frase> getListaFrasi() { return listaFrasi; }
@@ -108,6 +113,25 @@ public class Testo {
 
     }
 
+    public Testo clonaTesto()
+    {
+        Testo testo;
+        try {
+            testo = (Testo) super.clone();
+            testo.listaFrasi = new ArrayList<>();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+        for(Frase f : this.listaFrasi)
+        {
+            Frase clone = new Frase(f.getRiga(), f.getOrdine(), f.getContenuto(), testo);
+            testo.listaFrasi.add(clone);
+        }
+
+        return testo;
+    }
+
     public String getTestoString()
     {
         int cursoreRiga=1;
@@ -134,6 +158,7 @@ public class Testo {
         listaFrasi.add(f);
     }
 
+    //modificare forse indicando parametri di riga ordine e contenuto
     public void inserisciFrase(Frase f, Boolean anteprima)
     {
         if(anteprima)
@@ -193,35 +218,44 @@ public class Testo {
         }
     }
 
-    public void modificaFrase(Frase fraseCoinvolta, Frase fraseModificata, boolean anteprima)
+    //modificare forse indicando parametri di riga ordine e contenuto
+    public void modificaFrase(Frase fraseModificata, boolean anteprima)
     {
+        int posizione = getIndiceFrase(fraseModificata.getRiga(), fraseModificata.getOrdine());
+
         if(anteprima)
             fraseModificata.setContenuto(fraseModificata.getContenuto() + "##m");
 
-        try {
-            int posizione = listaFrasi.indexOf(fraseCoinvolta);
-            listaFrasi.remove(fraseCoinvolta);
-            listaFrasi.add(posizione, fraseModificata);
-        }
-        catch (IndexOutOfBoundsException i)
-        {
-            System.out.println(i.getMessage());
-        }
+        listaFrasi.set(posizione, fraseModificata);
+
+
 
     }
+
+    //modificare forse indicando parametri di riga ordine e contenuto
     public void cancellaFrase(Frase f, boolean anteprima)
     {
-        if(anteprima)
-            f.setContenuto(f.getContenuto() + "##c");
+        int posizione = getIndiceFrase(f.getRiga(), f.getOrdine());
 
-        try {
-            int posizione = listaFrasi.indexOf(f);
-            listaFrasi.set(posizione, f);
+        if(anteprima) {
+            Frase frase = new Frase(f.getRiga(), f.getOrdine(), f.getContenuto(), this);
+            frase.setContenuto(frase.getContenuto() + "##c");
+            listaFrasi.set(posizione, frase);
         }
-        catch (IndexOutOfBoundsException i)
+        else
+            listaFrasi.remove(posizione);
+
+    }
+
+    public int getIndiceFrase(int riga, int ordine)
+    {
+        for(int i=0; i< listaFrasi.size(); i++)
         {
-            System.out.println(i.getMessage());
+            if(listaFrasi.get(i).getRiga() == riga && listaFrasi.get(i).getOrdine() == ordine )
+                return i;
         }
+
+        return -1;
     }
 
     public Frase getFrase(int riga, int ordine)
