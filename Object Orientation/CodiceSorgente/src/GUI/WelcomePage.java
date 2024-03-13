@@ -41,6 +41,7 @@ public class WelcomePage {
         menuPanel.setBounds(0, 0, 200, 500);
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(47,69,92));
+        frame.setTitle("Danilo Wiki: Home");
 
         ImageIcon logoImagine = new ImageIcon(this.getClass().getResource("/icon/logoHome.png"));
         logoLabel.setIcon(logoImagine);
@@ -195,7 +196,8 @@ public class WelcomePage {
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
                     Pagina p = controllerPrincipale.cercaPagina(searchField.getText());
-                    PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
+                    controllerPrincipale.paginaAperta = p;
+                    PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
                     frame.setVisible(false);
                 }
             }

@@ -51,8 +51,8 @@ public class EditPage {
 
                 Testo testoModificato = new Testo(editPg);
                 testoModificato.setTestoString(textArea.getText());
-                controllerPrincipale.caricaModifichePagina(editPg, testoModificato, false); //da modificare la gestione del parametro proposta
 
+                controllerPrincipale.caricaModifichePagina(editPg, testoModificato, !checkAutore()); //da modificare la gestione del parametro proposta
 
             }
         });

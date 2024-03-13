@@ -3,11 +3,9 @@ package Model;
 import javax.swing.text.Utilities;
 import java.util.ArrayList;
 
-public class Testo {
+public class Testo implements Cloneable{
     private ArrayList<Frase> listaFrasi;
     private Pagina paginaRiferita;
-
-    private int numFrasi;
 
     private int dimensioneCaratteri; //da capire se cancellare o meno
 
@@ -15,12 +13,21 @@ public class Testo {
 
         setPaginaRiferita(paginaRiferita);
         listaFrasi = new ArrayList<>();
-        numFrasi=0;
         dimensioneCaratteri = 48;
     }
 
+    public Testo(Pagina paginaRiferita, ArrayList<Frase> lista)
+    {
+        setPaginaRiferita(paginaRiferita);
+        listaFrasi = lista;
+        dimensioneCaratteri = 48;
+    }
+
+
     public Pagina getPaginaRiferita() { return paginaRiferita; }
     public ArrayList<Frase> getListaFrasi() { return listaFrasi; }
+
+    public void setListaFrasi(ArrayList<Frase> listaFrasi) {this.listaFrasi = listaFrasi;}
     public void setPaginaRiferita(Pagina paginaRiferita) { this.paginaRiferita = paginaRiferita; }
 
     public int getNumRighe()
@@ -106,6 +113,25 @@ public class Testo {
 
     }
 
+    public Testo clonaTesto()
+    {
+        Testo testo;
+        try {
+            testo = (Testo) super.clone();
+            testo.listaFrasi = new ArrayList<>();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+
+        for(Frase f : this.listaFrasi)
+        {
+            Frase clone = new Frase(f.getRiga(), f.getOrdine(), f.getContenuto(), testo);
+            testo.listaFrasi.add(clone);
+        }
+
+        return testo;
+    }
+
     public String getTestoString()
     {
         int cursoreRiga=1;
@@ -132,12 +158,16 @@ public class Testo {
         listaFrasi.add(f);
     }
 
-    public void inserisciFrase(Frase f)
+    //modificare forse indicando parametri di riga ordine e contenuto
+    public void inserisciFrase(Frase f, Boolean anteprima)
     {
+        if(anteprima)
+            f.setContenuto(f.getContenuto() + "##i");
+
         int rigaSuccessiva = listaFrasi.getFirst().getRiga();
         int indiceSuccessivo = 0;
 
-        while(rigaSuccessiva < f.getRiga())
+        while(rigaSuccessiva < f.getRiga() && indiceSuccessivo<listaFrasi.size()-1)
         {
             indiceSuccessivo++;
             rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
@@ -146,47 +176,99 @@ public class Testo {
         if(rigaSuccessiva==f.getRiga())
         {
             int ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
+            int elementoIniziale = rigaSuccessiva;
 
-            while(ordineSuccessivo < f.getOrdine() && listaFrasi.get(indiceSuccessivo).getRiga() == f.getRiga())
+            while(ordineSuccessivo < f.getOrdine() && listaFrasi.get(indiceSuccessivo).getRiga() == f.getRiga() && indiceSuccessivo<listaFrasi.size()-1)
             {
                 indiceSuccessivo++;
                 ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
             }
 
-            listaFrasi.add(indiceSuccessivo, f);
-            indiceSuccessivo++;
-            rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
-            ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
-
-            if(ordineSuccessivo == f.getOrdine())
+            //è l'ultimo elemento
+            if(ordineSuccessivo<f.getOrdine())
+                listaFrasi.add(f);
+            else
             {
-                while(f.getRiga() == rigaSuccessiva)
+                listaFrasi.add(indiceSuccessivo, f);
+                indiceSuccessivo++;
+
+                //riordinamento
+                while(f.getRiga() == rigaSuccessiva && indiceSuccessivo < listaFrasi.size()-1)
                 {
-                    Frase temp = listaFrasi.get(indiceSuccessivo);
+                    Frase temp = listaFrasi.get(indiceSuccessivo+1);
                     temp.setOrdine(temp.getOrdine()+1);
                     listaFrasi.set(indiceSuccessivo, temp);
                     indiceSuccessivo++;
 
                     rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
                 }
+
+
             }
+
+            //rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
+            //ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
         }
         else
         {
-            listaFrasi.add(indiceSuccessivo, f);
+            if(rigaSuccessiva>f.getRiga())
+                listaFrasi.add(indiceSuccessivo, f);
+            else
+                listaFrasi.add(f);
+        }
+    }
+
+    //modificare forse indicando parametri di riga ordine e contenuto
+    public void modificaFrase(Frase fraseModificata, boolean anteprima)
+    {
+        int posizione = getIndiceFrase(fraseModificata.getRiga(), fraseModificata.getOrdine());
+
+        if(anteprima)
+            fraseModificata.setContenuto(fraseModificata.getContenuto() + "##m");
+
+        listaFrasi.set(posizione, fraseModificata);
+
+
+
+    }
+
+    //modificare forse indicando parametri di riga ordine e contenuto
+    public void cancellaFrase(Frase f, boolean anteprima)
+    {
+        int posizione = getIndiceFrase(f.getRiga(), f.getOrdine());
+
+        if(anteprima) {
+            Frase frase = new Frase(f.getRiga(), f.getOrdine(), f.getContenuto(), this);
+            frase.setContenuto(frase.getContenuto() + "##c");
+            listaFrasi.set(posizione, frase);
+        }
+        else
+            listaFrasi.remove(posizione);
+
+    }
+
+    public int getIndiceFrase(int riga, int ordine)
+    {
+        for(int i=0; i< listaFrasi.size(); i++)
+        {
+            if(listaFrasi.get(i).getRiga() == riga && listaFrasi.get(i).getOrdine() == ordine )
+                return i;
         }
 
-
-
+        return -1;
     }
-    public void modificaFrase(Frase fraseCoinvolta, Frase fraseModificata)
+
+    public Frase getFrase(int riga, int ordine)
     {
-        listaFrasi.remove(fraseCoinvolta);
-        listaFrasi.add(fraseModificata);
-    }
-    public void cancellaFrase(Frase f)
-    {
-        listaFrasi.remove(f);
+        for(Frase f : listaFrasi)
+        {
+            if(f.getRiga() == riga && f.getOrdine() == ordine)
+            {
+                return f;
+            }
+        }
+
+        return null;
     }
 
     private void stampaFrasi()

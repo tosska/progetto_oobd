@@ -3,24 +3,20 @@ package GUI;
 import Controller.Controller;
 import Model.Frase;
 import Model.Pagina;
-import Model.Storico;
 
 import javax.swing.*;
-import javax.swing.text.Utilities;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
 
-public class PageGUI {
+public class AnteprimaGUI {
 
     private JFrame frame = new JFrame();
 
     private JFrame frameChiamante;
     private Controller controllerPrincipale;
-    private JTextArea textArea;
+    private JTextPane textArea;
 
     private  JScrollPane scrollPane;
     private JLabel titleLabel;
@@ -28,19 +24,14 @@ public class PageGUI {
     private JLabel autoreLabel;
     private JButton backButton;
 
-    private JButton editButton;
+    private JButton paginaButton;
     private Pagina pagina; //la pagina aperta
 
 
-    PageGUI(Controller controller, JFrame frameChiamante) { //da decidere se mandare la pagina tramite controller o tramite oggetto a se
+    AnteprimaGUI(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
         this.frameChiamante = frameChiamante;
         pagina = controller.paginaAperta;
-
-        if(controlloAutore()) {
-            controllerPrincipale.caricaStoricoDaPagina(pagina);
-            pagina.getStorico().stampaOperazioni();
-        }
 
         creationGUI();
         functionButton();
@@ -49,30 +40,18 @@ public class PageGUI {
 
     private void creationGUI()
     {
-        String editTesto;
-        int larghezza;
-        if(controlloAutore()) {
-            editTesto = "Edit";
-            larghezza = 90;
-        }
-        else {
-            editTesto = "Propose Edit";
-            larghezza = 120;
-        }
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle(pagina.getTitolo());
+        frame.setTitle("Anteprima: " + pagina.getTitolo());
         frame.setSize(500, 500);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
 
 
-        textArea = new JTextArea();
-        textArea.setLineWrap(false);
-        textArea.setWrapStyleWord(false);
+        textArea = new JTextPane();
         textArea.setEditable(false);
         textArea.setFont(new Font("Arial", Font.PLAIN, 20));
-        textArea.setText(pagina.getTestoString());
+
 
         scrollPane = new JScrollPane(textArea);
         // scrollPane.setPreferredSize(new Dimension(450, 450));
@@ -82,22 +61,30 @@ public class PageGUI {
         titleLabel = new JLabel(pagina.getTitolo());
         titleLabel.setBounds(10, 10, 200, 25);
 
-        autoreLabel = new JLabel("Di " + pagina.getAutore().getUsername());
+        autoreLabel = new JLabel("Proposta di " + pagina.getAutore().getUsername());
         autoreLabel.setBounds(10, 25,  200, 25);
 
         backButton = new JButton("Back");
         backButton.setBounds(390, 10, 70, 25);
 
-        editButton= new JButton(editTesto);
-        editButton.setBounds(350, 410, larghezza, 25);
+        paginaButton = new JButton("Versione Attuale");
+        paginaButton.setBounds(330, 410, 135, 25);
 
+
+        caricamentoTestoColori();
         //frame.add(textArea);
         frame.add(titleLabel);
         frame.add(autoreLabel);
         frame.add(scrollPane);
         frame.add(backButton);
-        frame.add(editButton);
+        frame.add(paginaButton);
+
+
+
+
+
         frame.setVisible(true);
+
     }
 
     private void functionButton()
@@ -110,23 +97,54 @@ public class PageGUI {
             }
         });
 
-        editButton.addActionListener(new ActionListener() {
+        paginaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                controllerPrincipale.paginaAperta = controllerPrincipale.getPaginaUtilizzatore(pagina.getId());
+                PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
                 frame.setVisible(false);
-                EditPage editPage = new EditPage(controllerPrincipale, frame, pagina);
             }
         });
+
     }
 
-    private boolean controlloAutore()
+    private void caricamentoTestoColori()
     {
-        if(controllerPrincipale.utilizzatore.getUsername().equals(pagina.getAutore().getUsername()))
-            return true;
-        else
-            return false;
+        StyledDocument doc = textArea.getStyledDocument();
+        String testo = pagina.getTestoString();
+        Style style = textArea.addStyle("ColorStyle", null);
+        String[] testoDiviso = testo.split("\\.");
+        Color c;
+
+        for(int i=0; i<testoDiviso.length-1; i++)
+        {
+            String s = testoDiviso[i];
+
+            if(s.contains("##i"))
+            {
+                c = Color.blue;
+
+            } else if (s.contains("##m")) {
+                c = Color.green;
+
+            } else if (s.contains("##c")) {
+                c = Color.red;
+
+            } else {
+                c = Color.black;
+            }
+
+            StyleConstants.setForeground(style, c);
+
+            try {
+
+                if(c.equals(Color.black))
+                    doc.insertString(doc.getLength(), s + ".", style);
+                else
+                    doc.insertString(doc.getLength(), s.split("##")[0] + ".", style);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        }
     }
-
-
-
 }

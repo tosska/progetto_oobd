@@ -21,6 +21,11 @@ public class Controller {
     public ArrayList<Operazione> proposteDaApprovare;
     public ArrayList<Operazione> storicoOperazioniUtente;
 
+    public Pagina paginaAperta;
+
+
+    //creare un array pagine caricate
+
     public Controller()
     {
         ListaUtenti = new ArrayList<Utente>();
@@ -36,7 +41,7 @@ public class Controller {
     public void caricaProposteDaApprovare()
     {
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
-        proposteDaApprovare= l.getProposteDaApprovareDB(utilizzatore);
+        proposteDaApprovare= l.getProposteDaApprovareDB(pagineCreate, utilizzatore);
     }
 
     public void caricaStoricoOperazioniUtente()
@@ -69,7 +74,7 @@ public class Controller {
 
                 if(rowNew.isEmpty())
                 {
-                    Cancellazione cancellazione = new Cancellazione(proposta,  fraseOld, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    Cancellazione cancellazione = new Cancellazione(proposta,  fraseOld, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
                     listaOperazioni.add(cancellazione);
                 }
                 else {
@@ -78,7 +83,7 @@ public class Controller {
                     rowNew.removeFirst();
 
                     if (!(contenutoOld.equals(contenutoNew))) {
-                        Modifica modifica = new Modifica(proposta, fraseOld, fraseNew, "data", utilizzatore,  paginaOriginale.getStorico(), paginaOriginale);
+                        Modifica modifica = new Modifica(proposta, fraseOld, fraseNew, new Timestamp(System.currentTimeMillis()), utilizzatore,  paginaOriginale.getStorico(), paginaOriginale);
                         listaOperazioni.add(modifica);
                     }
                 }
@@ -92,7 +97,7 @@ public class Controller {
                     String contenuto = f.getContenuto().replace("\n", "");
                     contenuto = contenuto.replace("-", "");
 
-                    Inserimento inserimento = new Inserimento(proposta,  f, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    Inserimento inserimento = new Inserimento(proposta,  f, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
                     listaOperazioni.add(inserimento);
                 }
             }
@@ -110,7 +115,7 @@ public class Controller {
                     String contenuto = frase.getContenuto().replace("\n", "");
                     contenuto = contenuto.replace("-", "");
 
-                    Cancellazione cancellazione = new Cancellazione(proposta, frase, "data", utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    Cancellazione cancellazione = new Cancellazione(proposta, frase, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
                     listaOperazioni.add(cancellazione);
 
                 }
@@ -123,6 +128,34 @@ public class Controller {
         //paginaOriginale.getStorico().stampaOperazioni();
         ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
         l.editPageDB(paginaOriginale, listaOperazioni);
+
+        if(!proposta)
+        {
+            //recupero la pagina modificata dal db
+            Pagina paginaPostModifica = l.getPaginaByIdDB(paginaOriginale.getId());
+            aggiornaPagineCreate(paginaPostModifica);
+        }
+
+
+    }
+
+    private void aggiornaPagineCreate(Pagina pagina)
+    {
+        boolean trovato=false;
+
+        for(int i=0; i<pagineCreate.size() && !trovato; i++)
+        {
+            if(pagineCreate.get(i).getId() == pagina.getId()) {
+                pagineCreate.set(i, pagina);
+                trovato = true;
+            }
+        }
+
+        if(!trovato)
+        {
+            pagineCreate.add(pagina);
+        }
+
     }
 
 
@@ -130,14 +163,33 @@ public class Controller {
     {
         Pagina p = new Pagina(titolo, utilizzatore, testo); //creo la pagina
 
+        //aggiungo la pagina creata nell'array delle pagine create dall'utilizzatore
+        aggiornaPagineCreate(p);
+
+        //la memorizzo nel database
         ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
-        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore());
+        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername());
 
         int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
         listaPagineDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi(), utilizzatore);
+
+
     }
 
+    /*restituisce la pagina con id mandato come parametro, presente nell'array list "pagineCreate" ossia le pagine
+     create dall'utilizzatore del programma */
+    public Pagina getPaginaUtilizzatore(int id)
+    {
+        for(Pagina p : pagineCreate)
+        {
+            if(p.getId() == id)
+                return p;
+        }
+
+        //forse va mandata come eccezione
+        return null;
+    }
 
     public void aggiungiUtente(String username, String email, String password, Timestamp data)
     {
@@ -206,25 +258,65 @@ public class Controller {
     }
 
 
-
-
-    // da questo punto in poi ci sono le funzioni che creano un'anteprima di una proposta
-    public Pagina creazioneAnteprima(Pagina p, Operazione proposta)
+    public ArrayList<Pagina> creaAnteprime()
     {
-        editText(p, proposta);
+        ArrayList<Pagina> anteprime = new ArrayList<>();
 
-        return p;
+        Operazione temp = proposteDaApprovare.getFirst();
+        Pagina antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente());
+
+        for(Operazione proposta : proposteDaApprovare)
+        {
+            //togliamo dal timestamp i millisecondi
+            String s1 = temp.getData().toString().split("\\.")[0];
+            String s2 = proposta.getData().toString().split("\\.")[0];
+
+            if(s1.equals(s2) && temp.getPagina().getId() == proposta.getPagina().getId() && temp.getUtente().getUsername().equals(proposta.getUtente().getUsername()))
+            {
+                inserisciProposta(antem, proposta);
+            }
+            else
+            {
+                anteprime.add(antem);
+                temp = proposta;
+                antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente());
+
+            }
+        }
+
+        if(!proposteDaApprovare.isEmpty())
+            anteprime.add(antem);
+
+
+        return anteprime;
     }
 
-    public void editText(Pagina pagina, Operazione proposta)
+    private Pagina creazioneAnteprimaPagina(Pagina p, Timestamp data, Utente utente)
     {
-        if(proposta instanceof Inserimento)
-            pagina.getTestoRiferito().inserisciFrase(proposta.getFraseCoinvolta());
+        Pagina antem = new Pagina(p.getId(), p.getTitolo(), null, //da valutare se ha senso il costruttore
+                data, utente);
+
+        Testo testo = p.getTestoRiferito().clonaTesto();
+        testo.setPaginaRiferita(antem);
+        antem.setTestoRiferito(testo);
+
+        return antem;
+    }
+
+    private void inserisciProposta(Pagina pagina, Operazione proposta)
+    {
+        if(proposta instanceof Inserimento) {
+            Frase frase = new Frase(proposta.getFraseCoinvolta().getRiga(), proposta.getFraseCoinvolta().getOrdine(), proposta.getFraseCoinvolta().getContenuto(), pagina.getTestoRiferito());
+            pagina.getTestoRiferito().inserisciFrase(frase, true);
+        }
         else if (proposta instanceof Modifica) {
-            pagina.getTestoRiferito().modificaFrase(proposta.getFraseCoinvolta(), ((Modifica) proposta).getFraseModificata());
+            Frase frase = ((Modifica) proposta).getFraseModificata();
+            frase = new Frase(frase.getRiga(), frase.getOrdine(), frase.getContenuto(), pagina.getTestoRiferito());
+            pagina.getTestoRiferito().modificaFrase(frase, true);
         }
         else if (proposta instanceof Cancellazione) {
-            pagina.getTestoRiferito().cancellaFrase(proposta.getFraseCoinvolta());
+            Frase frase = new Frase(proposta.getFraseCoinvolta().getRiga(), proposta.getFraseCoinvolta().getOrdine(), proposta.getFraseCoinvolta().getContenuto(), pagina.getTestoRiferito());
+            pagina.getTestoRiferito().cancellaFrase(frase, true);
         }
     }
 

@@ -1,11 +1,12 @@
 package Model;
 
+import java.sql.Timestamp;
+
 public class Cancellazione extends Operazione {
 
 
-    public Cancellazione(Boolean proposta, Frase fraseEliminata, String data, Utente utente, Storico storico, Pagina pagina) {
+    public Cancellazione(Boolean proposta, Frase fraseEliminata, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
         super(proposta, fraseEliminata, data, utente, storico, pagina);
-
     }
 
     @Override

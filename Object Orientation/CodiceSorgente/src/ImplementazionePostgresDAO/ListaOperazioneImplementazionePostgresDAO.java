@@ -4,6 +4,7 @@ import DAO.ListaOperazioneDAO;
 import DAO.ListaPagineDAO;
 import DAO.ListaUtentiDAO;
 import Database.ConnessioneDatabase;
+import GUI.PageGUI;
 import Model.*;
 
 import java.sql.*;
@@ -21,7 +22,7 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
         }
     }
 
-    public ArrayList<Operazione> getProposteDaApprovareDB(Utente utilizzatore)
+    public ArrayList<Operazione> getProposteDaApprovareDB(ArrayList<Pagina> pagineUtilizzatore, Utente utilizzatore)
     {
 
         ArrayList<Operazione> proposte = new ArrayList<>();
@@ -29,7 +30,7 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
         try {
             PreparedStatement ps = connection.prepareStatement(
                     "SELECT O.*, A.data AS dataRisposta, A.risposta FROM OPERAZIONE O, APPROVAZIONE A WHERE O.id_operazione=A.id_operazione AND A.risposta IS NULL " +
-                            "AND A.autore=" + "'" + utilizzatore.getUsername() + "'" + "ORDER BY O.data DESC");
+                            "AND A.autore=" + "'" + utilizzatore.getUsername() + "'" + "ORDER BY O.data DESC, O.id_pagina ASC");
             ResultSet rs = ps.executeQuery();
 
             while(rs.next())
@@ -37,35 +38,48 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
                 //recupero le informazioni sull'operazione
                 ListaPagineDAO lPagina = new ListaPagineImplementazionePostgresDAO();
                 int idOperazione = rs.getInt("id_operazione");
-                Pagina pagina = lPagina.getPaginaByIdDB(rs.getInt("id_pagina")); //preleviamo la pagina che fa riferimento la proposta
+                int idPagina = rs.getInt("id_pagina"); //preleviamo la pagina che fa riferimento la proposta
                 ListaUtentiDAO lUtente= new ListaUtentiImplementazionePostgresDAO();
                 Utente generico = lUtente.getUtenteDB(rs.getString("utente")); //preleviamo l'utente che ha proposto la modifica
                 Timestamp data = rs.getTimestamp("data");
                 Boolean proposta = rs.getBoolean("proposta");
                 Operazione operazione = null;
 
+                //recupero la pagina in cui avviene l'operazione, già precedentemente caricata dal db
+                Pagina pagina=null;
+                boolean trovato=false;
+                for(int i=0; i<pagineUtilizzatore.size() && !trovato; i++)
+                {
+                    pagina = pagineUtilizzatore.get(i);
+
+                    if(pagina.getId() == idPagina)
+                        trovato=true;
+                }
+
                 //recupero le informazioni sulla frase coinvolta nell'operazione
                 int riga = rs.getInt("riga");
                 int ordine = rs.getInt("ordine");
                 String contenuto = rs.getString("fraseCoinvolta");
-                Frase fraseCoinvolta = new Frase(riga, ordine, contenuto, pagina.getTestoRiferito());
+                Frase fraseCoinvolta;
 
+                if((fraseCoinvolta = pagina.getTestoRiferito().getFrase(riga, ordine)) == null)
+                    fraseCoinvolta = new Frase(riga, ordine, contenuto, pagina.getTestoRiferito());
 
 
                 if(rs.getString("tipo").equals("I")) {
-                    operazione = new Inserimento(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione = new Inserimento(proposta, fraseCoinvolta, data, generico, pagina.getStorico(), pagina);
                     operazione.setId(idOperazione);
 
                 }
                 else if(rs.getString("tipo").equals("M"))
                 {
                     Frase fraseModificata = new Frase(riga, ordine, rs.getString("fraseModificata"), pagina.getTestoRiferito());
-                    operazione = new Modifica(proposta, fraseCoinvolta, fraseModificata, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione = new Modifica(proposta, fraseCoinvolta, fraseModificata, data, generico, pagina.getStorico(), pagina);
                     operazione.setId(idOperazione);
                 }
                 else if(rs.getString("tipo").equals("C"))
                 {
-                    operazione = new Cancellazione(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione = new Cancellazione(proposta, fraseCoinvolta, data, generico, pagina.getStorico(), pagina);
                     operazione.setId(idOperazione);
                 }
 
@@ -117,20 +131,20 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
 
 
                 if(rs.getString("tipo").equals("I")) {
-                    operazione = new Inserimento(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione = new Inserimento(proposta, fraseCoinvolta, data, generico, pagina.getStorico(), pagina);
                     operazione.setId(idOperazione);
 
                 }
                 else if(rs.getString("tipo").equals("M"))
                 {
                     Frase fraseModificata = new Frase(riga, ordine, rs.getString("fraseModificata"), pagina.getTestoRiferito());
-                    operazione = new Modifica(proposta, fraseCoinvolta, fraseModificata, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione = new Modifica(proposta, fraseCoinvolta, fraseModificata, data, generico, pagina.getStorico(), pagina);
                     operazione.setId(idOperazione);
 
                 }
                 else if(rs.getString("tipo").equals("C"))
                 {
-                    operazione = new Cancellazione(proposta, fraseCoinvolta, data.toString(), generico, pagina.getStorico(), pagina);
+                    operazione = new Cancellazione(proposta, fraseCoinvolta, data, generico, pagina.getStorico(), pagina);
                     operazione.setId(idOperazione);
                 }
 

@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
@@ -19,7 +20,6 @@ import javax.swing.table.TableCellRenderer;
 
 
 public class AreaRiservata {
-    Controller controllerPrincipale;
     JFrame frame = new JFrame();
     JPanel topPanel = new JPanel();
     JPanel menuPanel = new JPanel();
@@ -48,12 +48,13 @@ public class AreaRiservata {
     JPanel propostePanel = new JPanel();
     JPanel operazioniPanel = new JPanel();
 
+    Controller controller;
+
     public AreaRiservata(Controller controller, JFrame frameChiamante, JLabel userLabel) {
 
         centralPanel.setLayout(cardLayout);
-
-
-        controllerPrincipale = controller;
+        frame.setTitle("Danilo Wiki: Area Riservata");
+        this.controller = controller;
 
         // pannello superiore
         topPanel.setBounds(0, 0, 1100, 60);
@@ -115,166 +116,7 @@ public class AreaRiservata {
             }
         });
 
-        proposteLabel.setBounds(0, 60, 230, 30);
-        proposteLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        proposteLabel.setForeground(new Color(47,69,92));
-        proposteLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
-        ImageIcon profileImagine = new ImageIcon(this.getClass().getResource("/icon/profile.png"));
-        ImageIcon anteprimaImagine = new ImageIcon(this.getClass().getResource("/icon/anteprima.png"));
-        ImageIcon approvaImagine = new ImageIcon(this.getClass().getResource("/icon/approva.png"));
-        ImageIcon rifiutaImagine = new ImageIcon(this.getClass().getResource("/icon/rifiuta.png"));
-        proposteLabel.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                cardLayout.show(centralPanel, "propostePanel");
-
-                // Creazione del modello di tabella vuoto
-                DefaultTableModel proposte = new DefaultTableModel();
-                proposte.addColumn("Utente");
-                proposte.addColumn("Tipo");
-                proposte.addColumn("Pagina");
-                proposte.addColumn("Data");
-                proposte.addColumn("Anteprima");
-                proposte.addColumn("Approva");
-                proposte.addColumn("Rifiuta");
-                // Creazione della tabella con il modello vuoto
-                JTable tabellaProp = new JTable(proposte);
-                tabellaProp.setEnabled(false); // Rende la tabella non modificabile
-
-
-                for (Operazione proposta : controller.proposteDaApprovare) {
-
-                    // Aggiunta di una riga vuota al modello della tabella
-                    proposte.addRow(new Object[]{proposta.getUtente().getUsername(), "C",
-                            proposta.getPagina().getTitolo(), proposta.getData()});
-
-
-                    // Aggiungi un MouseListener alla tabella
-                    tabellaProp.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            int column = tabellaProp.columnAtPoint(e.getPoint());
-
-                            // Controlla se il clic è avvenuto nelle colonne "Anteprima" "Approva" o "Rifiuta"
-                            if (column == 4) {
-                                Pagina p = controllerPrincipale.creazioneAnteprima(proposta.getPagina(), proposta);
-                                PageGUI pageGUI = new PageGUI(controllerPrincipale, frame, p);
-                                frame.setVisible(false);
-                            }
-
-                            if (column == 5) {
-                                controller.approvaProposta(proposta, true);
-                                // Rimuovi la riga dalla tabella
-                                int rowToRemove = tabellaProp.rowAtPoint(e.getPoint());
-                                DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
-                                model.removeRow(rowToRemove);
-                            }
-
-                            if (column == 6) {
-                                controller.approvaProposta(proposta, false);
-                                // Rimuovi la riga dalla tabella
-                                int rowToRemove = tabellaProp.rowAtPoint(e.getPoint());
-                                DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
-                                model.removeRow(rowToRemove);
-                            }
-
-                        }
-
-
-
-                    });
-
-
-                }
-
-
-
-                // Imposta il renderer per le colonne con ImageIcon
-                tabellaProp.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
-                    private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/anteprima.png"));
-
-                    @Override
-                    public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                        JLabel label = new JLabel();
-                        label.setIcon(icon);
-                        label.setHorizontalAlignment(SwingConstants.CENTER);
-                        return label;
-                    }
-                });
-                tabellaProp.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
-                    private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/approva.png"));
-
-                    @Override
-                    public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                        JLabel label = new JLabel();
-                        label.setIcon(icon);
-                        label.setHorizontalAlignment(SwingConstants.CENTER);
-                        return label;
-                    }
-                });
-                tabellaProp.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
-                    private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/rifiuta.png"));
-
-                    @Override
-                    public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                        JLabel label = new JLabel();
-                        label.setIcon(icon);
-                        label.setHorizontalAlignment(SwingConstants.CENTER);
-                        return label;
-                    }
-                });
-
-
-
-
-
-                // Imposta il rendering delle linee verticali su nessuna
-                tabellaProp.setShowVerticalLines(false);
-
-                // Imposta l'altezza delle righe
-                tabellaProp.setRowHeight(30); // Imposta l'altezza desiderata delle righe
-
-
-                // Renderer personalizzato per l'intestazione
-                JTableHeader header = tabellaProp.getTableHeader();
-                header.setFont(new Font("Arial", Font.BOLD, 14)); // Imposta il font desiderato per l'intestazione
-                header.setForeground(new Color(47,69,92)); // Imposta il colore del testo dell'intestazione
-                header.setBackground(new Color(126,179,255)); // Imposta il colore di sfondo dell'intestazione
-                header.setPreferredSize(new Dimension(header.getWidth(), 30)); // Imposta l'altezza desiderata dell'intestazione
-                header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(47,69,92))); // Aggiunge una sottolineatura all'intestazione
-
-                // Disabilita il riordinamento delle colonne
-                header.setReorderingAllowed(false);
-
-
-                propostePanel.add(new JScrollPane(tabellaProp), BorderLayout.CENTER); // Utilizza uno JScrollPane per la visualizzazione della tabella
-
-
-
-
-
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                proposteLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
+        areaProposte();
 
         operazioniLabel.setBounds(0, 90, 230, 30);
         operazioniLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -441,7 +283,7 @@ public class AreaRiservata {
 
         welcomeLabel.setBounds(20, 10, 530, 50);
         welcomeLabel.setFont(new Font("Monospaced", Font.ITALIC, 20));
-        welcomeLabel.setText("<html>Ciao " + controllerPrincipale.utilizzatore.getUsername() + "!<br>" +
+        welcomeLabel.setText("<html>Ciao " + controller.utilizzatore.getUsername() + "!<br>" +
                 "Benvenuto nella tua area riservata.</html>");
 
         // proposte panel
@@ -462,7 +304,7 @@ public class AreaRiservata {
         datiTitleLabel.setBounds(20, 10, 300, 30);
         datiTitleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
 
-        usernameLabel.setText("<html>Username<br><b>" + controllerPrincipale.utilizzatore.getUsername() + "</b></html>");
+        usernameLabel.setText("<html>Username<br><b>" + controller.utilizzatore.getUsername() + "</b></html>");
         usernameLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         usernameLabel.setBounds(20, 50, 300, 35);
 
@@ -476,12 +318,12 @@ public class AreaRiservata {
                 newUsername = JOptionPane.showInputDialog("Inserisci un nuovo username");
                 if ((newUsername != null) && (!newUsername.equals("")))    // verifica se l'utente chiude la finestra o preme il tasto Cancella
                 {
-                    boolean result = controllerPrincipale.modificaUsername(controllerPrincipale.utilizzatore.getUsername(), newUsername);
+                    boolean result = controller.modificaUsername(controller.utilizzatore.getUsername(), newUsername);
                     if (result) {
                         JOptionPane.showMessageDialog(null, "Username modificato con successo");
-                        controllerPrincipale.utilizzatore.setUsername(newUsername);
-                        usernameLabel.setText("<html>Username<br><b>" + controllerPrincipale.utilizzatore.getUsername() + "</b></html>");
-                        userLabel.setText(controllerPrincipale.utilizzatore.getUsername()); // modifico il label nella welcomepage così al ritorno sarà già aggiornato
+                        controller.utilizzatore.setUsername(newUsername);
+                        usernameLabel.setText("<html>Username<br><b>" + controller.utilizzatore.getUsername() + "</b></html>");
+                        userLabel.setText(controller.utilizzatore.getUsername()); // modifico il label nella welcomepage così al ritorno sarà già aggiornato
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "Errore inserimento", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -510,7 +352,7 @@ public class AreaRiservata {
             }
         });
 
-        emailLabel.setText("<html>Email<br><b>" + controllerPrincipale.utilizzatore.getEmail() + "</b></html>");
+        emailLabel.setText("<html>Email<br><b>" + controller.utilizzatore.getEmail() + "</b></html>");
         emailLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         emailLabel.setBounds(20, 130, 300, 45);
 
@@ -523,11 +365,11 @@ public class AreaRiservata {
                 String newEmail;
                 newEmail = JOptionPane.showInputDialog("Inserisci una nuova email");
                 if ((newEmail != null) && (!newEmail.equals(""))) {
-                    boolean result = controllerPrincipale.modificaEmail(controllerPrincipale.utilizzatore.getEmail(), newEmail);
+                    boolean result = controller.modificaEmail(controller.utilizzatore.getEmail(), newEmail);
                     if (result) {
                         JOptionPane.showMessageDialog(null, "Email modificata con successo");
-                        controllerPrincipale.utilizzatore.setEmail(newEmail);
-                        emailLabel.setText("<html>Email<br><b>" + controllerPrincipale.utilizzatore.getEmail() + "</b></html>");
+                        controller.utilizzatore.setEmail(newEmail);
+                        emailLabel.setText("<html>Email<br><b>" + controller.utilizzatore.getEmail() + "</b></html>");
                     }
                     else {
                         JOptionPane.showMessageDialog(null, "Errore inserimento", "Alert", JOptionPane.ERROR_MESSAGE);
@@ -556,7 +398,7 @@ public class AreaRiservata {
             }
         });
 
-        iscrizioneLabel.setText("<html>Iscritto in data: <b>" + controllerPrincipale.utilizzatore.getDataIscrizione() + "</b></html>");
+        iscrizioneLabel.setText("<html>Iscritto in data: <b>" + controller.utilizzatore.getDataIscrizione() + "</b></html>");
         iscrizioneLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         iscrizioneLabel.setBounds(20, 215, 300, 15);
 
@@ -577,7 +419,7 @@ public class AreaRiservata {
                 String oldPassword;
                 oldPassword = JOptionPane.showInputDialog("Inserisci la password attuale");
                 if ((oldPassword != null) && (!oldPassword.equals(""))) {
-                    if (oldPassword.equals(controllerPrincipale.utilizzatore.getPassword())) {
+                    if (oldPassword.equals(controller.utilizzatore.getPassword())) {
 
                         String newPassword;
                         newPassword = JOptionPane.showInputDialog("Inserisci la nuova password");
@@ -590,9 +432,9 @@ public class AreaRiservata {
                             if ((newPasswordConf != null) && (!newPasswordConf.equals(""))) {
 
                                 if (newPassword.equals(newPasswordConf)) {
-                                    boolean result = controllerPrincipale.modificaPassword(oldPassword, newPassword);
+                                    boolean result = controller.modificaPassword(oldPassword, newPassword);
                                     if (result) {
-                                        controllerPrincipale.utilizzatore.setPassword(newPassword);
+                                        controller.utilizzatore.setPassword(newPassword);
                                         JOptionPane.showMessageDialog(null, "Password modificata con successo");
                                     } else {
                                         JOptionPane.showMessageDialog(null, "Errore inserimento", "Errore", JOptionPane.ERROR_MESSAGE);
@@ -646,18 +488,18 @@ public class AreaRiservata {
                     password = JOptionPane.showInputDialog("Inserisci la tua password");
 
                     if ((password != null) && (!password.equals(""))) {
-                        if (password.equals(controllerPrincipale.utilizzatore.getPassword())) {
+                        if (password.equals(controller.utilizzatore.getPassword())) {
                             String confPassword;
                             confPassword = JOptionPane.showInputDialog("Conferma password");
 
                             if ((confPassword != null) && (!confPassword.equals(""))) {
                                 if (password.equals(confPassword)) {
-                                    boolean result2 = controllerPrincipale.eliminaAccount(controllerPrincipale.utilizzatore.getUsername());
+                                    boolean result2 = controller.eliminaAccount(controller.utilizzatore.getUsername());
                                     if (result2) {
                                         JOptionPane.showMessageDialog(null, "Account eliminato con successo");
-                                        controllerPrincipale.utilizzatore = null;
+                                        controller.utilizzatore = null;
                                         frame.dispose();
-                                        LoginPage loginPage = new LoginPage(controllerPrincipale);
+                                        LoginPage loginPage = new LoginPage(controller);
                                     }
                                     else {
                                         JOptionPane.showMessageDialog(null, "Errore inserimento", "Errore", JOptionPane.ERROR_MESSAGE);
@@ -748,5 +590,204 @@ public class AreaRiservata {
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+
+    public void areaProposte()
+    {
+        proposteLabel.setBounds(0, 60, 230, 30);
+        proposteLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        proposteLabel.setForeground(new Color(47,69,92));
+        proposteLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
+        ImageIcon profileImagine = new ImageIcon(this.getClass().getResource("/icon/profile.png"));
+        ImageIcon anteprimaImagine = new ImageIcon(this.getClass().getResource("/icon/anteprima.png"));
+        ImageIcon approvaImagine = new ImageIcon(this.getClass().getResource("/icon/approva.png"));
+        ImageIcon rifiutaImagine = new ImageIcon(this.getClass().getResource("/icon/rifiuta.png"));
+        JLabel vuotoLabel = new JLabel("Non vi sono proposte da approvare");
+
+
+        proposteLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                cardLayout.show(centralPanel, "propostePanel");
+
+                controller.caricaProposteDaApprovare();
+
+                if(!controller.proposteDaApprovare.isEmpty())
+                {
+                    // Creazione del modello di tabella vuoto
+                    DefaultTableModel proposte = new DefaultTableModel();
+                    proposte.addColumn("Utente");
+                    proposte.addColumn("Tipo");
+                    proposte.addColumn("Pagina");
+                    proposte.addColumn("Data");
+                    proposte.addColumn("Anteprima");
+                    proposte.addColumn("Approva");
+                    proposte.addColumn("Rifiuta");
+                    // Creazione della tabella con il modello vuoto
+                    JTable tabellaProp = new JTable(proposte);
+                    tabellaProp.setEnabled(false); // Rende la tabella non modificabile
+
+                    ArrayList <Pagina> anteprime = controller.creaAnteprime();
+
+                    for (Pagina anteprima : anteprime) {
+
+                        // Aggiunta di una riga vuota al modello della tabella
+                        proposte.addRow(new Object[]{anteprima.getAutore().getUsername(), anteprima.getTitolo(), anteprima.getDataCreazione()});
+                    }
+
+                    tabellaProp.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            int column = tabellaProp.columnAtPoint(e.getPoint());
+                            int row = tabellaProp.rowAtPoint(e.getPoint());
+
+                            // Controlla se il clic è avvenuto nelle colonne "Anteprima" "Approva" o "Rifiuta"
+                            if (column == 4) {
+                                controller.paginaAperta = anteprime.get(row);
+                                AnteprimaGUI anteprimaGUI = new AnteprimaGUI(controller, frame);
+                                frame.setVisible(false);
+                            }
+
+                            //pacchetto di proposte approvate
+                            if (column == 5) {
+                                Pagina anteprima = anteprime.get(row);
+                                String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
+                                String dataProposta;
+                                Operazione temp;
+
+                                for (int i = 0; i < controller.proposteDaApprovare.size(); i++) {
+                                    temp = controller.proposteDaApprovare.get(i);
+                                    dataProposta = temp.getData().toString().split("\\.")[0];
+
+                                    if (dataAnteprima.equals(dataProposta) && temp.getPagina().getId() == anteprima.getId()
+                                            && anteprima.getAutore().getUsername().equals(temp.getUtente().getUsername())) {
+                                        controller.approvaProposta(temp, true);
+                                    }
+
+                                }
+
+                                // Rimuovi la riga dalla tabella
+                                DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
+                                model.removeRow(row);
+
+                                JOptionPane.showMessageDialog(null, "Le proposte sono state approvate.", "Proposte approvate", JOptionPane.INFORMATION_MESSAGE);
+                            }
+
+                            //pacchetto di proposte rifiutate
+                            if (column == 6) {
+                                Pagina anteprima = anteprime.get(row);
+                                String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
+                                String dataProposta;
+                                Operazione temp;
+
+                                for (int i = 0; i < controller.proposteDaApprovare.size(); i++) {
+                                    temp = controller.proposteDaApprovare.get(i);
+                                    dataProposta = temp.getData().toString().split("\\.")[0];
+
+                                    if (dataAnteprima.equals(dataProposta) && temp.getPagina().getId() == anteprima.getId()
+                                            && anteprima.getAutore().getUsername().equals(temp.getUtente().getUsername())) {
+                                        controller.approvaProposta(temp, false);
+                                    }
+
+                                }
+
+                                // Rimuovi la riga dalla tabella
+                                DefaultTableModel model = (DefaultTableModel) tabellaProp.getModel();
+                                model.removeRow(row);
+
+                                JOptionPane.showMessageDialog(null, "Le proposte sono state rifiutate.", "Proposte rifiutate", JOptionPane.INFORMATION_MESSAGE);
+
+                            }
+                        }
+
+
+                    });
+
+
+
+                    // Imposta il renderer per le colonne con ImageIcon
+                    tabellaProp.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
+                        private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/anteprima.png"));
+
+                        @Override
+                        public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                            JLabel label = new JLabel();
+                            label.setIcon(icon);
+                            label.setHorizontalAlignment(SwingConstants.CENTER);
+                            return label;
+                        }
+                    });
+                    tabellaProp.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
+                        private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/approva.png"));
+
+                        @Override
+                        public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                            JLabel label = new JLabel();
+                            label.setIcon(icon);
+                            label.setHorizontalAlignment(SwingConstants.CENTER);
+                            return label;
+                        }
+                    });
+                    tabellaProp.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
+                        private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/rifiuta.png"));
+
+                        @Override
+                        public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                            JLabel label = new JLabel();
+                            label.setIcon(icon);
+                            label.setHorizontalAlignment(SwingConstants.CENTER);
+                            return label;
+                        }
+                    });
+
+                    // Imposta il rendering delle linee verticali su nessuna
+                    tabellaProp.setShowVerticalLines(false);
+
+                    // Imposta l'altezza delle righe
+                    tabellaProp.setRowHeight(30); // Imposta l'altezza desiderata delle righe
+
+
+                    // Renderer personalizzato per l'intestazione
+                    JTableHeader header = tabellaProp.getTableHeader();
+                    header.setFont(new Font("Arial", Font.BOLD, 14)); // Imposta il font desiderato per l'intestazione
+                    header.setForeground(new Color(47,69,92)); // Imposta il colore del testo dell'intestazione
+                    header.setBackground(new Color(126,179,255)); // Imposta il colore di sfondo dell'intestazione
+                    header.setPreferredSize(new Dimension(header.getWidth(), 30)); // Imposta l'altezza desiderata dell'intestazione
+                    header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(47,69,92))); // Aggiunge una sottolineatura all'intestazione
+
+                    // Disabilita il riordinamento delle colonne
+                    header.setReorderingAllowed(false);
+
+
+                    propostePanel.add(new JScrollPane(tabellaProp), BorderLayout.CENTER); // Utilizza uno JScrollPane per la visualizzazione della tabella
+
+                }
+                else
+                {
+                    propostePanel.add(vuotoLabel);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                proposteLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
     }
 }
