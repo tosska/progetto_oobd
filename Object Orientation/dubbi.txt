@@ -1,7 +1,8 @@
 dubbi da risolvere
-- quando apriamo una pagina nella gui, mando l'oggetto pagina esterno al controller (va messo dentro il controller?)
+
+(risolto)- quando apriamo una pagina nella gui, mando l'oggetto pagina esterno al controller (va messo dentro il controller?)
 - problema new line dentro le frasi: risoluzione con la considerazioni di nuove frasi quando c'è il new line
 - gestione interruzione riga
-- problema ordine quando si fanno più proposte di inserimento
+(risolto) - problema ordine quando si fanno più proposte di inserimento
 - forse sarebbe meglio che l'utilizzatore modifichi direttamente le pagine create caricate nel momento dell'apertura
   del programma e poi nella chiusura, queste vengono caricate sul db

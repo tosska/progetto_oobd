@@ -40,6 +40,9 @@ public class Controller {
 
     public void caricaProposteDaApprovare()
     {
+        if(proposteDaApprovare!=null && !proposteDaApprovare.isEmpty())
+            proposteDaApprovare.clear();
+
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
         proposteDaApprovare= l.getProposteDaApprovareDB(pagineCreate, utilizzatore);
     }
