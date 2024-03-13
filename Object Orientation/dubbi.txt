@@ -5,3 +5,4 @@ dubbi da risolvere
 - problema ordine quando si fanno più proposte di inserimento
 - forse sarebbe meglio che l'utilizzatore modifichi direttamente le pagine create caricate nel momento dell'apertura
   del programma e poi nella chiusura, queste vengono caricate sul db
+- anche
