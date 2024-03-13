@@ -5,4 +5,7 @@
 - approvazioni
 - funzionamento collegamenti
 - gestione temi
-
+- aggiungere il punto alla fine di una frase nel database
+- problema new line dentro le frasi: risoluzione con la considerazioni di nuove frasi quando c'è il new line
+- gestione interruzione riga
+- cancellazione array list pagine create
