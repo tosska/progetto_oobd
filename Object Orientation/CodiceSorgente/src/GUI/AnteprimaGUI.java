@@ -120,31 +120,60 @@ public class AnteprimaGUI {
         {
             String s = testoDiviso[i];
 
-            if(s.contains("##i"))
+            String[] frasiNewLine = s.split("\n");
+
+            if(frasiNewLine.length==1)
             {
-                c = Color.blue;
-
-            } else if (s.contains("##m")) {
-                c = Color.green;
-
-            } else if (s.contains("##c")) {
-                c = Color.red;
-
-            } else {
-                c = Color.black;
+                frasiNewLine[0] = s;
             }
 
-            StyleConstants.setForeground(style, c);
+            for(int j=0; j<frasiNewLine.length; j++)
+            {
+                String fraseNewLine = frasiNewLine[j];
+                String punto="";
 
-            try {
+                c = attribuzioneColore(fraseNewLine);
 
-                if(c.equals(Color.black))
-                    doc.insertString(doc.getLength(), s + ".", style);
-                else
-                    doc.insertString(doc.getLength(), s.split("##")[0] + ".", style);
-            } catch (BadLocationException e) {
-                e.printStackTrace();
+                StyleConstants.setForeground(style, c);
+
+                if(j==frasiNewLine.length-1)
+                    punto = ".";
+
+                try {
+
+                    if(c.equals(Color.black))
+                        doc.insertString(doc.getLength(), s + punto, style);
+                    else
+                        doc.insertString(doc.getLength(), s.split("##")[0] + punto , style);
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+
+
+
+
             }
         }
+    }
+
+    public Color attribuzioneColore(String s)
+    {
+        Color c;
+
+        if(s.contains("##i"))
+        {
+            c = Color.blue;
+
+        } else if (s.contains("##m")) {
+            c = Color.green;
+
+        } else if (s.contains("##c")) {
+            c = Color.red;
+
+        } else {
+            c = Color.black;
+        }
+
+        return c;
     }
 }

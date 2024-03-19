@@ -59,4 +59,9 @@ public class Pagina {
     {
         testoRiferito.setTestoString(testo);
     }
+
+    public void setLunghezzaRiga(int n)
+    {
+        testoRiferito.setLunghezzaRiga(n);
+    }
 }

@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.ImageObserver;
+import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
 
 public class PageGUI {
@@ -20,7 +22,7 @@ public class PageGUI {
 
     private JFrame frameChiamante;
     private Controller controllerPrincipale;
-    private JTextArea textArea;
+    private JTextPane textPane;
 
     private  JScrollPane scrollPane;
     private JLabel titleLabel;
@@ -67,17 +69,19 @@ public class PageGUI {
         frame.setLocationRelativeTo(null);
 
 
-        textArea = new JTextArea();
-        textArea.setLineWrap(false);
-        textArea.setWrapStyleWord(false);
-        textArea.setEditable(false);
-        textArea.setFont(new Font("Arial", Font.PLAIN, 20));
-        textArea.setText(pagina.getTestoString());
+        textPane = new JTextPane();
+        textPane.setEditable(false);
+        textPane.setFont(new Font("Arial", Font.PLAIN, 20));
+        textPane.setBounds(10, 50, 460, 350);
+        textPane.setText(pagina.getTestoString());
 
-        scrollPane = new JScrollPane(textArea);
+/*
+        scrollPane = new JScrollPane(textPane);
         // scrollPane.setPreferredSize(new Dimension(450, 450));
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBounds(10, 50, 460, 350);
+
+ */
 
         titleLabel = new JLabel(pagina.getTitolo());
         titleLabel.setBounds(10, 10, 200, 25);
@@ -94,7 +98,7 @@ public class PageGUI {
         //frame.add(textArea);
         frame.add(titleLabel);
         frame.add(autoreLabel);
-        frame.add(scrollPane);
+        frame.add(textPane);
         frame.add(backButton);
         frame.add(editButton);
         frame.setVisible(true);

@@ -90,7 +90,6 @@ public class Controller {
                         listaOperazioni.add(modifica);
                     }
                 }
-
             }
 
             if(!rowNew.isEmpty())
@@ -265,6 +264,7 @@ public class Controller {
     {
         ArrayList<Pagina> anteprime = new ArrayList<>();
 
+
         Operazione temp = proposteDaApprovare.getFirst();
         Pagina antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente());
 
@@ -289,6 +289,9 @@ public class Controller {
 
         if(!proposteDaApprovare.isEmpty())
             anteprime.add(antem);
+
+
+
 
 
         return anteprime;
