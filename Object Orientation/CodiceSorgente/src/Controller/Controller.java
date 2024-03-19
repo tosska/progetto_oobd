@@ -159,16 +159,16 @@ public class Controller {
     }
 
 
-    public void creazionePagina(String titolo, String testo)
+    public void creazionePagina(String titolo, String testo, String tema)
     {
-        Pagina p = new Pagina(titolo, utilizzatore, testo); //creo la pagina
+        Pagina p = new Pagina(titolo, utilizzatore, testo, tema); //creo la pagina
 
         //aggiungo la pagina creata nell'array delle pagine create dall'utilizzatore
         aggiornaPagineCreate(p);
 
         //la memorizzo nel database
         ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
-        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername());
+        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername(), p.getTema());
 
         int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
@@ -189,6 +189,21 @@ public class Controller {
 
         //forse va mandata come eccezione
         return null;
+    }
+
+    public void creaTema(String tema)
+    {
+        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        l.addTemaDB(tema);   // scrive sul DB
+    }
+
+    public ArrayList<String> generaListaTemi()
+    {
+        ArrayList<String> listaTemi = new ArrayList<>();
+        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        listaTemi = l.raccogliTemi();   // scrive sul DB
+
+        return listaTemi;
     }
 
     public void aggiungiUtente(String username, String email, String password, Timestamp data)
@@ -263,7 +278,7 @@ public class Controller {
         ArrayList<Pagina> anteprime = new ArrayList<>();
 
         Operazione temp = proposteDaApprovare.getFirst();
-        Pagina antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente());
+        Pagina antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente(), temp.getPagina().getTema());
 
         for(Operazione proposta : proposteDaApprovare)
         {
@@ -279,7 +294,7 @@ public class Controller {
             {
                 anteprime.add(antem);
                 temp = proposta;
-                antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente());
+                antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente(), temp.getPagina().getTema());
 
             }
         }
@@ -291,10 +306,10 @@ public class Controller {
         return anteprime;
     }
 
-    private Pagina creazioneAnteprimaPagina(Pagina p, Timestamp data, Utente utente)
+    private Pagina creazioneAnteprimaPagina(Pagina p, Timestamp data, Utente utente, String tema)
     {
         Pagina antem = new Pagina(p.getId(), p.getTitolo(), null, //da valutare se ha senso il costruttore
-                data, utente);
+                data, utente, p.getTema());
 
         Testo testo = p.getTestoRiferito().clonaTesto();
         testo.setPaginaRiferita(antem);

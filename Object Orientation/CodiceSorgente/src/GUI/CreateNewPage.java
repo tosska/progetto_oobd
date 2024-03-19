@@ -8,6 +8,7 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class CreateNewPage{
     private JFrame frame = new JFrame();
@@ -44,6 +45,21 @@ public class CreateNewPage{
         submitButton = new JButton("Submit");
         submitButton.setBounds(380, 415, 80, 25);
 
+        // Creazione di un menu a tendina
+        JComboBox<String> dropdownMenu = new JComboBox<>();
+        ArrayList<String> listaTemi;
+        listaTemi = controllerPrincipale.generaListaTemi();
+
+        // Ciclo for-each per scorrere l'ArrayList
+        for (String tema : listaTemi) {
+            dropdownMenu.addItem(tema);
+        }
+
+
+        dropdownMenu.setBounds(270, 10, 100, 25);
+
+
+
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -58,7 +74,11 @@ public class CreateNewPage{
             public void actionPerformed(ActionEvent e) {
                 String title = titleField.getText();
                 String text = textArea.getText();
-                controllerPrincipale.creazionePagina(title, text);
+
+
+                String tema = (String) dropdownMenu.getSelectedItem();
+
+                controllerPrincipale.creazionePagina(title, text, tema);
 
                 frame.dispose();
                 frameChiamante.setVisible(true);
@@ -70,6 +90,7 @@ public class CreateNewPage{
         frame.add(titleField);
         frame.add(backButton);
         frame.add(submitButton);
+        frame.add(dropdownMenu);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Create new page");

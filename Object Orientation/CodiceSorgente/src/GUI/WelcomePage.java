@@ -17,7 +17,8 @@ public class WelcomePage {
     private JPanel menuPanel = new JPanel();
     private JLabel logoLabel = new JLabel();
     private JLabel logoutLabel = new JLabel("Log out");
-    private JLabel createLabel = new JLabel("Create a new page");
+    private JLabel createPageLabel = new JLabel("Create a new page");
+    private JLabel createThemeLabel = new JLabel("Create a new theme");
 
 
     private JPanel panelWhite = new JPanel();
@@ -80,12 +81,12 @@ public class WelcomePage {
             }
         });
 
-        ImageIcon createImagine = new ImageIcon(this.getClass().getResource("/icon/create.png"));
-        createLabel.setIcon(createImagine);
-        createLabel.setBounds(15, 150, 250, 70);
-        createLabel.setIconTextGap(15);
-        createLabel.setForeground(Color.white);
-        createLabel.addMouseListener(new MouseListener() {
+        ImageIcon createPageImagine = new ImageIcon(this.getClass().getResource("/icon/createPage.png"));
+        createPageLabel.setIcon(createPageImagine);
+        createPageLabel.setBounds(15, 150, 250, 50);
+        createPageLabel.setIconTextGap(15);
+        createPageLabel.setForeground(Color.white);
+        createPageLabel.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
@@ -104,7 +105,47 @@ public class WelcomePage {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                createLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                createPageLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+
+        ImageIcon createThemeImagine = new ImageIcon(this.getClass().getResource("/icon/createTheme.png"));
+        createThemeLabel.setIcon(createThemeImagine);
+        createThemeLabel.setBounds(15, 210, 250, 50);
+        createThemeLabel.setIconTextGap(15);
+        createThemeLabel.setForeground(Color.white);
+        createThemeLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                String tema = JOptionPane.showInputDialog(null, "Inserisci un tema:", "Input", JOptionPane.QUESTION_MESSAGE);
+
+                // Controllo se l'utente ha premuto "Annulla" o ha lasciato vuoto il campo
+                if (tema == null || tema.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Nessun tema inserito.", "Messaggio", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Hai inserito il tema: " + tema, "Tema inserito", JOptionPane.INFORMATION_MESSAGE);
+                    controllerPrincipale.creaTema(tema);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                createThemeLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
@@ -237,7 +278,8 @@ public class WelcomePage {
 
         menuPanel.add(logoLabel);
         menuPanel.add(logoutLabel);
-        menuPanel.add(createLabel);
+        menuPanel.add(createPageLabel);
+        menuPanel.add(createThemeLabel);
 
         panelWhite.add(searchField);
         panelWhite.add(searchLabel);

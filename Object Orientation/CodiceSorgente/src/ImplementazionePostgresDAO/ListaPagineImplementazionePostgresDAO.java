@@ -30,7 +30,8 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
             rs.next();
             ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
-            pagina = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")));
+            pagina = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")),
+                    rs.getString("tema"));
             pagina.setTestoRiferito(getTestoDB(pagina));
 
             rs.close();
@@ -44,16 +45,51 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
     }
 
     @Override
-    public void addPaginaDB(String titolo, Timestamp data, String autore) {
+    public void addPaginaDB(String titolo, Timestamp data, String autore, String tema) {
         try {
             PreparedStatement addPaginaPS = connection.prepareStatement("INSERT INTO pagina VALUES"
-                    + "(default,'"+titolo+"',1, '"+data+"', '"+autore+"')");
+                    + "(default,'"+titolo+"','"+tema+"', '"+data+"', '"+autore+"')");
             addPaginaPS.executeUpdate();
             // connection.close();
         } catch (Exception e) {
             System.out.println("Errore: " + e.getMessage());
         }
 
+    }
+
+    public void addTemaDB(String tema) {
+        try {
+            PreparedStatement addTemaPS = connection.prepareStatement("INSERT INTO tema VALUES"
+            + "(default, '"+tema+"')");
+            addTemaPS.executeUpdate();
+            connection.close();
+        } catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
+        }
+    }
+
+    public ArrayList<String> raccogliTemi()
+    {
+        ArrayList<String> listaTemi = new ArrayList<>();
+
+        try {
+            // Esecuzione della query per ottenere i temi
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT nome FROM tema");
+
+            // Aggiunta dei temi al menu a tendina
+            while (resultSet.next()) {
+                listaTemi.add(resultSet.getString("nome"));
+            }
+
+            resultSet.close();
+
+        } catch (Exception e){
+            System.out.println("Errore: " + e.getMessage());
+        }
+
+
+        return listaTemi;
     }
 
     @Override
@@ -134,7 +170,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
             while(rs.next())
             {
-                Pagina p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("dataCreazione"), utilizzatore);
+                Pagina p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("dataCreazione"), utilizzatore, rs.getString("tema"));
                 p.setTestoRiferito(getTestoDB(p)); //mando l'id della pagina e l'oggetto pagina
                 lista.add(p);
             }
@@ -158,7 +194,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
             ResultSet rs = ps.executeQuery();
             rs.next();//da capire se è possibile fare meglio
             ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
-            p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")));
+            p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")), rs.getString("tema"));
             p.setTestoRiferito(getTestoDB(p));
             rs.close();
             ps.close();
