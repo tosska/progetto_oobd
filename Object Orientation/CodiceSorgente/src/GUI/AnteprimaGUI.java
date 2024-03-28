@@ -162,18 +162,13 @@ public class AnteprimaGUI {
         Color c;
 
         if(s.contains("##i"))
-        {
             c = Color.blue;
-
-        } else if (s.contains("##m")) {
+        else if (s.contains("##m"))
             c = Color.green;
-
-        } else if (s.contains("##c")) {
+        else if (s.contains("##c"))
             c = Color.red;
-
-        } else {
+        else
             c = Color.black;
-        }
 
         return c;
     }
