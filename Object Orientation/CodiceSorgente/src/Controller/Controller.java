@@ -40,6 +40,9 @@ public class Controller {
 
     public void caricaProposteDaApprovare()
     {
+        if(proposteDaApprovare!=null && !proposteDaApprovare.isEmpty())
+            proposteDaApprovare.clear();
+
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
         proposteDaApprovare= l.getProposteDaApprovareDB(pagineCreate, utilizzatore);
     }
@@ -87,7 +90,6 @@ public class Controller {
                         listaOperazioni.add(modifica);
                     }
                 }
-
             }
 
             if(!rowNew.isEmpty())
@@ -277,6 +279,7 @@ public class Controller {
     {
         ArrayList<Pagina> anteprime = new ArrayList<>();
 
+
         Operazione temp = proposteDaApprovare.getFirst();
         Pagina antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente(), temp.getPagina().getTema());
 
@@ -301,6 +304,9 @@ public class Controller {
 
         if(!proposteDaApprovare.isEmpty())
             anteprime.add(antem);
+
+
+
 
 
         return anteprime;
@@ -335,13 +341,12 @@ public class Controller {
         }
     }
 
-
-
     public void approvaProposta(Operazione proposta, Boolean risposta)
     {
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
         l.approvaPropostaDB(proposta, utilizzatore, risposta);
     }
+
 
 
 

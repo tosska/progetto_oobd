@@ -31,7 +31,6 @@ public class EditPage {
         editPg = pagina;
 
         creationGUI();
-
         functionButton();
     }
 
@@ -70,7 +69,8 @@ public class EditPage {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         //textArea.setFont(new Font("Arial", Font.PLAIN, 20));
-        String testo = editPg.getTestoString().replace("-\n", "");
+        Testo testo = editPg.getTestoRiferito().clonaTesto();
+
         textArea.setText(testo);
         textArea.setFont(new Font("Arial", Font.PLAIN, 20));
 

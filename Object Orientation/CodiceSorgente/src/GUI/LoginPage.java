@@ -3,10 +3,7 @@ package GUI;
 import Controller.Controller;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 
 public class LoginPage {
 
@@ -119,11 +116,40 @@ public class LoginPage {
         loginButton.setForeground(Color.white);
         loginButton.setFocusable(false);
 
-        //usernameField.setText("lorenzo");
-        //passwordField.setText("Password123@");
 
-        usernameField.setText("gianna_bianchi");
-        passwordField.setText("GiannaBianchi!456");
+
+
+        //DA CANCELLARE, UTILE PER UN VELOCE TESTING
+        usernameField.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode()==KeyEvent.VK_Z)
+                {
+                    usernameField.setText("gianna_bianchi");
+                    passwordField.setText("GiannaBianchi!456");
+                }
+
+                if(e.getKeyCode()==KeyEvent.VK_X)
+                {
+                    usernameField.setText("cristina_rizzo");
+                    passwordField.setText("RizzoPass456@");
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+
+        });
+
+
 
         loginButton.addActionListener(new ActionListener() {
             @Override

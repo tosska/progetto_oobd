@@ -618,7 +618,6 @@ public class AreaRiservata {
                     // Creazione del modello di tabella vuoto
                     DefaultTableModel proposte = new DefaultTableModel();
                     proposte.addColumn("Utente");
-                    proposte.addColumn("Tipo");
                     proposte.addColumn("Pagina");
                     proposte.addColumn("Data");
                     proposte.addColumn("Anteprima");
@@ -643,14 +642,14 @@ public class AreaRiservata {
                             int row = tabellaProp.rowAtPoint(e.getPoint());
 
                             // Controlla se il clic è avvenuto nelle colonne "Anteprima" "Approva" o "Rifiuta"
-                            if (column == 4) {
+                            if (column == 3) {
                                 controller.paginaAperta = anteprime.get(row);
                                 AnteprimaGUI anteprimaGUI = new AnteprimaGUI(controller, frame);
                                 frame.setVisible(false);
                             }
 
                             //pacchetto di proposte approvate
-                            if (column == 5) {
+                            if (column == 4) {
                                 Pagina anteprima = anteprime.get(row);
                                 String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
                                 String dataProposta;
@@ -675,7 +674,7 @@ public class AreaRiservata {
                             }
 
                             //pacchetto di proposte rifiutate
-                            if (column == 6) {
+                            if (column == 5) {
                                 Pagina anteprima = anteprime.get(row);
                                 String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
                                 String dataProposta;
@@ -707,7 +706,7 @@ public class AreaRiservata {
 
 
                     // Imposta il renderer per le colonne con ImageIcon
-                    tabellaProp.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
+                    tabellaProp.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
                         private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/anteprima.png"));
 
                         @Override
@@ -718,7 +717,7 @@ public class AreaRiservata {
                             return label;
                         }
                     });
-                    tabellaProp.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
+                    tabellaProp.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
                         private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/approva.png"));
 
                         @Override
@@ -729,7 +728,7 @@ public class AreaRiservata {
                             return label;
                         }
                     });
-                    tabellaProp.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
+                    tabellaProp.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
                         private ImageIcon icon = new ImageIcon(getClass().getResource("/icon/rifiuta.png"));
 
                         @Override

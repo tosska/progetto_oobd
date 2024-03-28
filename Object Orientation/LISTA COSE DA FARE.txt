@@ -1,11 +1,13 @@
-- DATE IN TIMESTAMP
-- gestione lettura frasi
-- gestione delle modifiche dei testi (inserimento, modifica, cancellazione)
-- proposte
-- approvazioni
+(fatto)- DATE IN TIMESTAMP
+(fatto)- gestione lettura frasi
+(va migliorato) - gestione delle modifiche dei testi (inserimento, modifica, cancellazione)
+(fatto) - proposte
+(fatto) - approvazioni
 - funzionamento collegamenti
 - gestione temi
 - aggiungere il punto alla fine di una frase nel database
-- problema new line dentro le frasi: risoluzione con la considerazioni di nuove frasi quando c'è il new line
+(fatto) - problema new line dentro le frasi: risoluzione con la considerazioni di nuove frasi quando c'è il new line
 - gestione interruzione riga
 - cancellazione array list pagine create
+(va migliorato) - cattura submit istante
+(va migliorato) - inserisci frase in un testo

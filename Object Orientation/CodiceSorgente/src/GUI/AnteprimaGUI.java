@@ -9,6 +9,8 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AnteprimaGUI {
 
@@ -120,31 +122,54 @@ public class AnteprimaGUI {
         {
             String s = testoDiviso[i];
 
-            if(s.contains("##i"))
+            ArrayList<String> frasiNewLine = new ArrayList<>(Arrays.stream(s.split("\n")).toList());
+
+            if(frasiNewLine.get(0).equals(" "))
+                frasiNewLine.remove(0);
+
+
+            for(int j=0; j<frasiNewLine.size(); j++)
             {
-                c = Color.blue;
+                String fraseNewLine = frasiNewLine.get(j);
+                String punto="";
 
-            } else if (s.contains("##m")) {
-                c = Color.green;
+                c = attribuzioneColore(fraseNewLine);
 
-            } else if (s.contains("##c")) {
-                c = Color.red;
+                StyleConstants.setForeground(style, c);
 
-            } else {
-                c = Color.black;
-            }
+                if(j==frasiNewLine.size()-1)
+                    punto = ".";
 
-            StyleConstants.setForeground(style, c);
+                try {
 
-            try {
+                    if(c.equals(Color.black))
+                        doc.insertString(doc.getLength(), s + punto, style);
+                    else
+                        doc.insertString(doc.getLength(), s.split("##")[0] + punto , style);
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
 
-                if(c.equals(Color.black))
-                    doc.insertString(doc.getLength(), s + ".", style);
-                else
-                    doc.insertString(doc.getLength(), s.split("##")[0] + ".", style);
-            } catch (BadLocationException e) {
-                e.printStackTrace();
+
+
+
             }
         }
+    }
+
+    public Color attribuzioneColore(String s)
+    {
+        Color c;
+
+        if(s.contains("##i"))
+            c = Color.blue;
+        else if (s.contains("##m"))
+            c = Color.green;
+        else if (s.contains("##c"))
+            c = Color.red;
+        else
+            c = Color.black;
+
+        return c;
     }
 }

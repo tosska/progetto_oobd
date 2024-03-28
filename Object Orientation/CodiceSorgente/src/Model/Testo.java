@@ -6,23 +6,16 @@ import java.util.ArrayList;
 public class Testo implements Cloneable{
     private ArrayList<Frase> listaFrasi;
     private Pagina paginaRiferita;
+    private int lunghezzaRiga; //da capire se cancellare o meno
 
-    private int dimensioneCaratteri; //da capire se cancellare o meno
+    private String font; //da valutare l'idea
 
     public Testo(Pagina paginaRiferita) {
 
         setPaginaRiferita(paginaRiferita);
         listaFrasi = new ArrayList<>();
-        dimensioneCaratteri = 48;
+        lunghezzaRiga = 50;
     }
-
-    public Testo(Pagina paginaRiferita, ArrayList<Frase> lista)
-    {
-        setPaginaRiferita(paginaRiferita);
-        listaFrasi = lista;
-        dimensioneCaratteri = 48;
-    }
-
 
     public Pagina getPaginaRiferita() { return paginaRiferita; }
     public ArrayList<Frase> getListaFrasi() { return listaFrasi; }
@@ -67,50 +60,60 @@ public class Testo implements Cloneable{
             {
                 String frasePulita;
                 ordine++;
-
                 f = cancellaSpazi(f); // cancello gli spazi ad inizio e fine frase
-                frasePulita = f.replace("\n", "");
+                //frasePulita = f.replace("\n", "");
 
                 try {
-
-                    //if(f.charAt(0)=='\n')
-                    //frasePulita = frasePulita.substring(1);
-
                     while(f.charAt(0) == '\n') //se ad inizio frase vi è un new line incremento il valore di riga
                     {
                         riga++;
                         ordine=1;
                         f = f.substring(1); //li tolgo perchè non le devo più contare per far incrementare riga
                     }
-
-                    //if(f.charAt(f.length()-1)=='\n')
-                    //frasePulita = f.substring(0, f.length()-1);
-
-
                 }
                 catch (Exception eg){
                     System.out.println(eg.getMessage());
                 }
 
-                Frase frase = new Frase(riga, ordine, frasePulita, this);
-                listaFrasi.add(frase);
+                String[] frasiNewLine = f.split("\n");
+
+                if(frasiNewLine.length==1) {
+                    Frase frase = new Frase(riga, ordine, f + ".", this);
+                    listaFrasi.add(frase);
+                }
+                else {
+                    for(int i=0; i<frasiNewLine.length; i++)
+                    {
+                        String contenutoFrase = frasiNewLine[i];
+
+                        if(!isStringaVuota(contenutoFrase))
+                        {
+                            if(i==frasiNewLine.length-1)
+                                contenutoFrase += ". ";
+
+                            Frase frase = new Frase(riga, ordine, contenutoFrase, this);
+                            listaFrasi.add(frase);
+
+                            if(i<frasiNewLine.length-1)
+                                riga++;
+
+                        }
+                    }
+
+                    ordine=0;
+                }
 
 
+                /*
                 int occurences = getNumOccurences(f, '\n'); //conto quante righe si estende la frase considerata
                 if(occurences > 0) {
                     riga = riga + occurences;
-
                     ordine = 0;
                 }
-
-                System.out.println("Ho come newline: " + occurences);
+                */
 
             }
-
-            stampaFrasi();
-            }
-
-
+        }
     }
 
     public Testo clonaTesto()
@@ -145,7 +148,7 @@ public class Testo implements Cloneable{
                 cursoreRiga++;
             }
 
-            testo = testo + f.getContenuto() + ". ";
+            testo = testo + f.getContenuto() + " ";
 
         }
         return testo;
@@ -162,30 +165,38 @@ public class Testo implements Cloneable{
     public void inserisciFrase(Frase f, Boolean anteprima)
     {
         if(anteprima)
-            f.setContenuto(f.getContenuto() + "##i");
+        {
+            if(f.getContenuto().contains("."))
+                f.setContenuto(f.getContenuto().substring(0, f.getContenuto().length()-1) + "##i.");
+            else
+                f.setContenuto(f.getContenuto() + "##i");
+        }
 
         int rigaSuccessiva = listaFrasi.getFirst().getRiga();
         int indiceSuccessivo = 0;
 
+        //posiziniamoci sull'indice dove è presente la prima frase che ha la riga >= alla riga dove stiamo inserendo la frase
         while(rigaSuccessiva < f.getRiga() && indiceSuccessivo<listaFrasi.size()-1)
         {
             indiceSuccessivo++;
             rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
         }
 
+        //esistono altre frasi sulla riga dove stiamo inserendo
         if(rigaSuccessiva==f.getRiga())
         {
             int ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
             int elementoIniziale = rigaSuccessiva;
 
-            while(ordineSuccessivo < f.getOrdine() && listaFrasi.get(indiceSuccessivo).getRiga() == f.getRiga() && indiceSuccessivo<listaFrasi.size()-1)
+            //posizioniamoci sulla prima frase che ha ordine maggiore di quello di inserimento
+            while(ordineSuccessivo < f.getOrdine() && rigaSuccessiva == f.getRiga() && indiceSuccessivo<listaFrasi.size()-1)
             {
                 indiceSuccessivo++;
                 ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
+                rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
             }
 
-            //è l'ultimo elemento
-            if(ordineSuccessivo<f.getOrdine())
+            if(indiceSuccessivo==listaFrasi.size()-1)
                 listaFrasi.add(f);
             else
             {
@@ -195,7 +206,7 @@ public class Testo implements Cloneable{
                 //riordinamento
                 while(f.getRiga() == rigaSuccessiva && indiceSuccessivo < listaFrasi.size()-1)
                 {
-                    Frase temp = listaFrasi.get(indiceSuccessivo+1);
+                    Frase temp = listaFrasi.get(indiceSuccessivo);
                     temp.setOrdine(temp.getOrdine()+1);
                     listaFrasi.set(indiceSuccessivo, temp);
                     indiceSuccessivo++;
@@ -205,15 +216,13 @@ public class Testo implements Cloneable{
 
 
             }
-
-            //rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
-            //ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
         }
-        else
+        else //non esistono altre frasi sulla riga (è quindi la prima frase)
         {
+            //è primo nella riga ed esistono altre frasi nel testo
             if(rigaSuccessiva>f.getRiga())
                 listaFrasi.add(indiceSuccessivo, f);
-            else
+            else //è il primo della riga ed è anche la prima frase del testo
                 listaFrasi.add(f);
         }
     }
@@ -224,7 +233,13 @@ public class Testo implements Cloneable{
         int posizione = getIndiceFrase(fraseModificata.getRiga(), fraseModificata.getOrdine());
 
         if(anteprima)
-            fraseModificata.setContenuto(fraseModificata.getContenuto() + "##m");
+        {
+            if(fraseModificata.getContenuto().contains("."))
+                fraseModificata.setContenuto(fraseModificata.getContenuto().substring(0, fraseModificata.getContenuto().length()-1) + "##m.");
+            else
+                fraseModificata.setContenuto(fraseModificata.getContenuto() + "##m");
+        }
+
 
         listaFrasi.set(posizione, fraseModificata);
 
@@ -239,7 +254,11 @@ public class Testo implements Cloneable{
 
         if(anteprima) {
             Frase frase = new Frase(f.getRiga(), f.getOrdine(), f.getContenuto(), this);
-            frase.setContenuto(frase.getContenuto() + "##c");
+
+            if(frase.getContenuto().contains("."))
+                frase.setContenuto(frase.getContenuto().substring(0, frase.getContenuto().length()-1) + "##c.");
+            else
+                frase.setContenuto(frase.getContenuto() + "##c");
             listaFrasi.set(posizione, frase);
         }
         else
@@ -304,19 +323,22 @@ public class Testo implements Cloneable{
         String[] splitLine = testo.split("\\n");
         String textFormatted="";
         String aCapo;
+        int posizioneNewLine ;
 
         for(String line : splitLine)
         {
-            while(line.length() > dimensioneCaratteri-1)
+            while(line.length() > lunghezzaRiga-1)
             {
-                if(line.charAt(dimensioneCaratteri-1)!=' ' && line.charAt(dimensioneCaratteri-1)!='\n' && line.charAt(dimensioneCaratteri-1)!='.')
-                    aCapo = "-\n";
-                else
-                    aCapo = "\n";
+                posizioneNewLine = lunghezzaRiga;
 
+                if(line.charAt(lunghezzaRiga-1)!=' ' && line.charAt(lunghezzaRiga-1)!='\n' && line.charAt(lunghezzaRiga-1)!='.') {
 
-                textFormatted = textFormatted + line.substring(0, dimensioneCaratteri) + aCapo;
-                line = line.substring(dimensioneCaratteri, line.length());
+                    while(line.charAt(posizioneNewLine-1) != ' ')
+                        posizioneNewLine--;
+
+                }
+                textFormatted = textFormatted + line.substring(0, posizioneNewLine) + "\n";
+                line = line.substring(posizioneNewLine, line.length());
             }
 
             textFormatted = textFormatted + line + "\n";
@@ -353,5 +375,13 @@ public class Testo implements Cloneable{
 
 
         return str;
+    }
+
+    public int getLunghezzaRiga() {
+        return lunghezzaRiga;
+    }
+
+    public void setLunghezzaRiga(int lunghezzaRiga) {
+        this.lunghezzaRiga = lunghezzaRiga;
     }
 }

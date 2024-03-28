@@ -68,4 +68,8 @@ public class Pagina {
         return tema;
     }
 
+    public void setLunghezzaRiga(int n)
+    {
+        testoRiferito.setLunghezzaRiga(n);
+    }
 }
