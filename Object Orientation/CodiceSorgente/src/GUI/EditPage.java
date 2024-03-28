@@ -71,7 +71,7 @@ public class EditPage {
         //textArea.setFont(new Font("Arial", Font.PLAIN, 20));
         Testo testo = editPg.getTestoRiferito().clonaTesto();
 
-        textArea.setText(testo);
+        textArea.setText(editPg.getTestoRiferito().getTestoString());
         textArea.setFont(new Font("Arial", Font.PLAIN, 20));
 
         scrollPane = new JScrollPane(textArea);
