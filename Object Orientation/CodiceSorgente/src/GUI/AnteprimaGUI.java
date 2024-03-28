@@ -9,6 +9,8 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AnteprimaGUI {
 
@@ -120,23 +122,22 @@ public class AnteprimaGUI {
         {
             String s = testoDiviso[i];
 
-            String[] frasiNewLine = s.split("\n");
+            ArrayList<String> frasiNewLine = new ArrayList<>(Arrays.stream(s.split("\n")).toList());
 
-            if(frasiNewLine.length==1)
-            {
-                frasiNewLine[0] = s;
-            }
+            if(frasiNewLine.get(0).equals(" "))
+                frasiNewLine.remove(0);
 
-            for(int j=0; j<frasiNewLine.length; j++)
+
+            for(int j=0; j<frasiNewLine.size(); j++)
             {
-                String fraseNewLine = frasiNewLine[j];
+                String fraseNewLine = frasiNewLine.get(j);
                 String punto="";
 
                 c = attribuzioneColore(fraseNewLine);
 
                 StyleConstants.setForeground(style, c);
 
-                if(j==frasiNewLine.length-1)
+                if(j==frasiNewLine.size()-1)
                     punto = ".";
 
                 try {

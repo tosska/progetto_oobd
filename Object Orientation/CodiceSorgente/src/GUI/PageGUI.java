@@ -19,7 +19,6 @@ import java.util.ArrayList;
 public class PageGUI {
 
     private JFrame frame = new JFrame();
-
     private JFrame frameChiamante;
     private Controller controllerPrincipale;
     private JTextPane textPane;
@@ -46,6 +45,7 @@ public class PageGUI {
 
         creationGUI();
         functionButton();
+        
 
     }
 

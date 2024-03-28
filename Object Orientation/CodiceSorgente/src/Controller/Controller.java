@@ -326,13 +326,12 @@ public class Controller {
         }
     }
 
-
-
     public void approvaProposta(Operazione proposta, Boolean risposta)
     {
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
         l.approvaPropostaDB(proposta, utilizzatore, risposta);
     }
+
 
 
 

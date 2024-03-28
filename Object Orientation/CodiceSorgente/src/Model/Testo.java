@@ -14,7 +14,7 @@ public class Testo implements Cloneable{
 
         setPaginaRiferita(paginaRiferita);
         listaFrasi = new ArrayList<>();
-        lunghezzaRiga = 48;
+        lunghezzaRiga = 50;
     }
 
     public Pagina getPaginaRiferita() { return paginaRiferita; }
@@ -255,10 +255,10 @@ public class Testo implements Cloneable{
         if(anteprima) {
             Frase frase = new Frase(f.getRiga(), f.getOrdine(), f.getContenuto(), this);
 
-            if(f.getContenuto().contains("."))
-                f.setContenuto(f.getContenuto().substring(0, f.getContenuto().length()-1) + "##c.");
+            if(frase.getContenuto().contains("."))
+                frase.setContenuto(frase.getContenuto().substring(0, frase.getContenuto().length()-1) + "##c.");
             else
-                f.setContenuto(f.getContenuto() + "##c");
+                frase.setContenuto(frase.getContenuto() + "##c");
             listaFrasi.set(posizione, frase);
         }
         else
@@ -323,19 +323,22 @@ public class Testo implements Cloneable{
         String[] splitLine = testo.split("\\n");
         String textFormatted="";
         String aCapo;
+        int posizioneNewLine ;
 
         for(String line : splitLine)
         {
             while(line.length() > lunghezzaRiga-1)
             {
-                if(line.charAt(lunghezzaRiga-1)!=' ' && line.charAt(lunghezzaRiga-1)!='\n' && line.charAt(lunghezzaRiga-1)!='.')
-                    aCapo = "-\n";
-                else
-                    aCapo = "\n";
+                posizioneNewLine = lunghezzaRiga;
 
+                if(line.charAt(lunghezzaRiga-1)!=' ' && line.charAt(lunghezzaRiga-1)!='\n' && line.charAt(lunghezzaRiga-1)!='.') {
 
-                textFormatted = textFormatted + line.substring(0, lunghezzaRiga) + aCapo;
-                line = line.substring(lunghezzaRiga, line.length());
+                    while(line.charAt(posizioneNewLine-1) != ' ')
+                        posizioneNewLine--;
+
+                }
+                textFormatted = textFormatted + line.substring(0, posizioneNewLine) + "\n";
+                line = line.substring(posizioneNewLine, line.length());
             }
 
             textFormatted = textFormatted + line + "\n";
