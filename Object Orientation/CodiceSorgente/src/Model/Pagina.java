@@ -6,23 +6,24 @@ public class Pagina {
 
     private int id;
     private String titolo;
-    private String tema; //da implementare sia da codice che da UML
+    private Tema tema; //da implementare sia da codice che da UML
     private Timestamp dataCreazione;
     private Utente autore;
     private Testo testoRiferito;
     private Storico storico;
 
-    public Pagina(String titolo, Utente autore, String testo, String tema) { //creazione di un oggetto Pagina mandando testo di tipo String
+    public Pagina(String titolo, Utente autore, String testo, Tema tema) { //creazione di un oggetto Pagina mandando testo di tipo String
                                                                 // costruttore da chiamare quando viene creata una pagina;
         setTitolo(titolo);
         setDataCreazione();
         setAutore(autore);
         testoRiferito = new Testo(this);
         storico = new Storico(this);
+        setTema(tema);
         setTestoString(testo);
     }
 
-    public Pagina(int id, String titolo, Testo testo, Timestamp dataCreazione, Utente autore, String tema ) { //creazione di un oggetto Pagina mandando testo di tipo Testo
+    public Pagina(int id, String titolo, Testo testo, Timestamp dataCreazione, Utente autore, Tema tema ) { //creazione di un oggetto Pagina mandando testo di tipo Testo
                                                                                                 // costruttore da chiamare quando viene recuperata una pagina dal DB
         this.id = id;
         setTitolo(titolo);
@@ -30,6 +31,7 @@ public class Pagina {
         this.dataCreazione = dataCreazione;
         setAutore(autore);
         testoRiferito = testo;
+        setTema(tema);
         // storico = new Storico(this);
 
         System.out.println(autore.getUsername());
@@ -60,9 +62,9 @@ public class Pagina {
         testoRiferito.setTestoString(testo);
     }
 
-    public void setTema(String tema) {this.tema = tema;}
+    public void setTema(Tema tema) {this.tema = tema;}
 
-    public String getTema() {
+    public Tema getTema() {
         return tema;
     }
 

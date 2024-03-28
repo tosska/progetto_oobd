@@ -30,8 +30,11 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
             rs.next();
             ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+
+            Tema tema = getTemaDB(rs.getInt("tema"));    // vado a recuperare il tema
+
             pagina = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")),
-                    rs.getString("tema"));
+                    tema);
             pagina.setTestoRiferito(getTestoDB(pagina));
 
             rs.close();
@@ -45,10 +48,10 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
     }
 
     @Override
-    public void addPaginaDB(String titolo, Timestamp data, String autore, String tema) {
+    public void addPaginaDB(String titolo, Timestamp data, String autore, int idTema) {
         try {
             PreparedStatement addPaginaPS = connection.prepareStatement("INSERT INTO pagina VALUES"
-                    + "(default,'"+titolo+"','"+tema+"', '"+data+"', '"+autore+"')");
+                    + "(default,'"+titolo+"','"+idTema+"', '"+data+"', '"+autore+"')");
             addPaginaPS.executeUpdate();
             // connection.close();
         } catch (Exception e) {
@@ -68,18 +71,19 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
         }
     }
 
-    public ArrayList<String> raccogliTemi()
+    public ArrayList<Tema> raccogliTemi()
     {
-        ArrayList<String> listaTemi = new ArrayList<>();
+        ArrayList<Tema> listaTemi = new ArrayList<>();
 
         try {
             // Esecuzione della query per ottenere i temi
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT nome FROM tema");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM tema");
 
             // Aggiunta dei temi al menu a tendina
             while (resultSet.next()) {
-                listaTemi.add(resultSet.getString("nome"));
+                Tema attuale = new Tema(resultSet.getInt("idTema"), resultSet.getString("nome"));
+                listaTemi.add(attuale);
             }
 
             resultSet.close();
@@ -91,6 +95,8 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
         return listaTemi;
     }
+
+
 
     @Override
     public int recuperaIdPagina() {
@@ -170,7 +176,9 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
             while(rs.next())
             {
-                Pagina p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("dataCreazione"), utilizzatore, rs.getString("tema"));
+                Tema tema = getTemaDB(rs.getInt("tema"));
+
+                Pagina p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("dataCreazione"), utilizzatore, tema);
                 p.setTestoRiferito(getTestoDB(p)); //mando l'id della pagina e l'oggetto pagina
                 lista.add(p);
             }
@@ -194,7 +202,10 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
             ResultSet rs = ps.executeQuery();
             rs.next();//da capire se è possibile fare meglio
             ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
-            p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")), rs.getString("tema"));
+
+            Tema tema = getTemaDB(rs.getInt("tema"));
+
+            p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")), tema);
             p.setTestoRiferito(getTestoDB(p));
             rs.close();
             ps.close();
@@ -205,6 +216,28 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
         }
 
         return p;
+    }
+
+    public Tema getTemaDB(int idTema)
+    {
+        Tema tema = null;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM TEMA WHERE idTema = " + "'" + idTema + "'");
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+
+            tema = new Tema(rs.getInt("idTema"), rs.getString("nome"));
+
+            rs.close();
+            ps.close();
+
+        }
+        catch (Exception e) {
+            System.out.println("Errore: " + e.getMessage());
+        }
+
+        return tema;
     }
 
     public Storico getStoricoDB(Pagina pagina)

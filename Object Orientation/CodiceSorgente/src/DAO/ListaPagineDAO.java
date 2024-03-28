@@ -6,9 +6,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public interface ListaPagineDAO {
-    public void addPaginaDB(String titolo, Timestamp data, String autore, String tema);
+    public void addPaginaDB(String titolo, Timestamp data, String autore, int idTema);
     public void addTemaDB(String tema);
-    public ArrayList<String> raccogliTemi();
+    public ArrayList<Tema> raccogliTemi();
     public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi, Utente utilizzatore);
 
     public void addFraseDB(Pagina pagina, Inserimento inserimento);

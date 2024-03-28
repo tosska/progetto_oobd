@@ -159,7 +159,7 @@ public class Controller {
     }
 
 
-    public void creazionePagina(String titolo, String testo, String tema)
+    public void creazionePagina(String titolo, String testo, Tema tema)
     {
         Pagina p = new Pagina(titolo, utilizzatore, testo, tema); //creo la pagina
 
@@ -168,7 +168,7 @@ public class Controller {
 
         //la memorizzo nel database
         ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
-        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername(), p.getTema());
+        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername(), tema.getIdTema());
 
         int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
@@ -197,9 +197,9 @@ public class Controller {
         l.addTemaDB(tema);   // scrive sul DB
     }
 
-    public ArrayList<String> generaListaTemi()
+    public ArrayList<Tema> generaListaTemi()
     {
-        ArrayList<String> listaTemi = new ArrayList<>();
+        ArrayList<Tema> listaTemi;
         ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
         listaTemi = l.raccogliTemi();   // scrive sul DB
 
@@ -306,7 +306,7 @@ public class Controller {
         return anteprime;
     }
 
-    private Pagina creazioneAnteprimaPagina(Pagina p, Timestamp data, Utente utente, String tema)
+    private Pagina creazioneAnteprimaPagina(Pagina p, Timestamp data, Utente utente, Tema tema)
     {
         Pagina antem = new Pagina(p.getId(), p.getTitolo(), null, //da valutare se ha senso il costruttore
                 data, utente, p.getTema());

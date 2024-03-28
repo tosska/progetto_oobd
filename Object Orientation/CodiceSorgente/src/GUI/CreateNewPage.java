@@ -1,6 +1,7 @@
 package GUI;
 
 import Controller.Controller;
+import Model.Tema;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -47,12 +48,12 @@ public class CreateNewPage{
 
         // Creazione di un menu a tendina
         JComboBox<String> dropdownMenu = new JComboBox<>();
-        ArrayList<String> listaTemi;
+        ArrayList<Tema> listaTemi;
         listaTemi = controllerPrincipale.generaListaTemi();
 
         // Ciclo for-each per scorrere l'ArrayList
-        for (String tema : listaTemi) {
-            dropdownMenu.addItem(tema);
+        for (Tema tema : listaTemi) {
+            dropdownMenu.addItem(tema.getNome());
         }
 
 
@@ -75,8 +76,10 @@ public class CreateNewPage{
                 String title = titleField.getText();
                 String text = textArea.getText();
 
+                // Ottenimento dell'indice della voce selezionata
+                int selectedIndex = dropdownMenu.getSelectedIndex();
 
-                String tema = (String) dropdownMenu.getSelectedItem();
+                Tema tema = listaTemi.get(selectedIndex);
 
                 controllerPrincipale.creazionePagina(title, text, tema);
 
