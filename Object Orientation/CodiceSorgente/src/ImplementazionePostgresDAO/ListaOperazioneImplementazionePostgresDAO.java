@@ -164,6 +164,8 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
 
     }
 
+
+
     public void approvaPropostaDB(Operazione proposta, Utente utilizzatore, Boolean risposta)
     {
         try {

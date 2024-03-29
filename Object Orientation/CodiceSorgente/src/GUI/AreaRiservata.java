@@ -295,6 +295,11 @@ public class AreaRiservata {
                             // Controlla se il clic è avvenuto nelle colonne "Storico"
                             if (column == 3) {
                                 frame.setVisible(false);
+
+                                controller.paginaAperta = controller.pagineCreate.get(row);
+                                controller.caricaStoricoDaPagina(controller.paginaAperta);
+
+                                StoricoGUI storicoGUI = new StoricoGUI(frame, controller);
                             }
 
                         }
@@ -778,7 +783,7 @@ public class AreaRiservata {
                                 frame.setVisible(false);
                             }
 
-                            //pacchetto di proposte approvate
+                            // pacchetto di proposte approvate
                             if (column == 4) {
                                 Pagina anteprima = anteprime.get(row);
                                 String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
