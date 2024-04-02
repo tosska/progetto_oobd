@@ -5,7 +5,7 @@ import Model.Pagina;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
-import javax.swing.text.Utilities;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -134,6 +134,13 @@ public class PageGUI {
         editButton.setForeground(Color.white);
         editButton.setFocusable(false);
 
+        linkButton = new JButton("Manage Links");
+        linkButton.setBounds(220, 10, 120, 35);
+        linkButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        linkButton.setBackground(new Color(47,69,92));
+        linkButton.setForeground(Color.white);
+        linkButton.setFocusable(false);
+
 
         titlePanel.add(titleLabel);
 
@@ -142,6 +149,8 @@ public class PageGUI {
 
         bottomPanel.add(backButton);
         bottomPanel.add(editButton);
+        bottomPanel.add(linkButton);
+
 
         frame.add(titlePanel);
         frame.add(centralPanel);

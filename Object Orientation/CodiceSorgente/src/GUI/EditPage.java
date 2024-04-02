@@ -7,11 +7,12 @@ import Model.Testo;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class EditPage {
@@ -34,9 +35,8 @@ public class EditPage {
     private JPanel centralPanel = new JPanel();
     private JLabel chooseTheme = new JLabel("Choose Theme:");
     private JPanel bottomPanel = new JPanel();
-    private Pagina editPg; //la pagina che verrà poi modificata
 
-    EditPage(Controller controller, JFrame frameChiamante, Pagina pagina) {
+    EditPage(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
         this.frameChiamante = frameChiamante;
         String userID = controllerPrincipale.utilizzatore.getUsername();
@@ -141,32 +141,31 @@ public class EditPage {
 
 
     private void creationGUI() {
-        textArea = new JTextArea();
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
+        textPane = new JTextPane();
+
         //textArea.setBackground(new Color(196, 220, 235));
-        textArea.setFont(new Font("Arial", Font.PLAIN, 20));
-        textArea.setForeground(Color.GRAY);
-        textArea.setText("Write something...");
-        textArea.addFocusListener(new FocusListener() {
+        textPane.setFont(new Font("Arial", Font.PLAIN, 20));
+        textPane.setForeground(Color.GRAY);
+        textPane.setText("Write something...");
+        textPane.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (textArea.getText().equals("Write something...")) {
-                    textArea.setText("");
-                    textArea.setForeground(Color.BLACK);
+                if (textPane.getText().equals("Write something...")) {
+                    textPane.setText("");
+                    textPane.setForeground(Color.BLACK);
                 }
             }
 
             @Override
             public void focusLost(FocusEvent e) {
-                if (textArea.getText().isEmpty()) {
-                    textArea.setForeground(Color.GRAY);
-                    textArea.setText("Write something...");
+                if (textPane.getText().isEmpty()) {
+                    textPane.setForeground(Color.GRAY);
+                    textPane.setText("Write something...");
                 }
             }
         });
 
-        scrollPane = new JScrollPane(textArea);
+        scrollPane = new JScrollPane(textPane);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBounds(10, 10, 350, 350);
 
@@ -290,7 +289,7 @@ public class EditPage {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String title = titleField.getText();
-                String text = textArea.getText();
+                String text = textPane.getText();
 
                 // Ottenimento dell'indice della voce selezionata
                 int selectedIndex = dropdownMenu.getSelectedIndex();
@@ -323,7 +322,7 @@ public class EditPage {
 
 
         ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
-        frame.setTitle("Edit page: " + editPg.getTitolo());
+        frame.setTitle("Edit page: " + controllerPrincipale.paginaAperta.getTitolo());
         frame.setResizable(false);
         frame.setIconImage(logo.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
