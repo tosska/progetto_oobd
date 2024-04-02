@@ -11,6 +11,11 @@ public class Inserimento extends Operazione {
     }
 
 
+    public String getTipo()
+    {
+        return "Inserimento";
+    }
+
     @Override
     public void stampa() //debug
     {

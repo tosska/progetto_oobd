@@ -1,8 +1,6 @@
 package GUI;
 
 import Controller.Controller;
-import Model.Frase;
-import Model.Pagina;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -27,13 +25,11 @@ public class AnteprimaGUI {
     private JButton backButton;
 
     private JButton paginaButton;
-    private Pagina pagina; //la pagina aperta
 
 
     AnteprimaGUI(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
         this.frameChiamante = frameChiamante;
-        pagina = controller.paginaAperta;
 
         creationGUI();
         functionButton();
@@ -44,7 +40,7 @@ public class AnteprimaGUI {
     {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Anteprima: " + pagina.getTitolo());
+        frame.setTitle("Anteprima: " + controllerPrincipale.paginaAperta.getTitolo());
         frame.setSize(500, 500);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
@@ -60,10 +56,10 @@ public class AnteprimaGUI {
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBounds(10, 50, 460, 350);
 
-        titleLabel = new JLabel(pagina.getTitolo());
+        titleLabel = new JLabel(controllerPrincipale.paginaAperta.getTitolo());
         titleLabel.setBounds(10, 10, 200, 25);
 
-        autoreLabel = new JLabel("Proposta di " + pagina.getAutore().getUsername());
+        autoreLabel = new JLabel("Proposta di " + controllerPrincipale.paginaAperta.getAutore().getUsername());
         autoreLabel.setBounds(10, 25,  200, 25);
 
         backButton = new JButton("Back");
@@ -102,7 +98,7 @@ public class AnteprimaGUI {
         paginaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controllerPrincipale.paginaAperta = controllerPrincipale.getPaginaUtilizzatore(pagina.getId());
+                controllerPrincipale.paginaAperta = controllerPrincipale.getPaginaUtilizzatore(controllerPrincipale.paginaAperta.getId());
                 PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
                 frame.setVisible(false);
             }
@@ -113,7 +109,7 @@ public class AnteprimaGUI {
     private void caricamentoTestoColori()
     {
         StyledDocument doc = textArea.getStyledDocument();
-        String testo = pagina.getTestoString();
+        String testo = controllerPrincipale.paginaAperta.getTestoString();
         Style style = textArea.addStyle("ColorStyle", null);
         String[] testoDiviso = testo.split("\\.");
         Color c;

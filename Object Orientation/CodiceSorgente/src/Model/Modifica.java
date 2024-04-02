@@ -12,6 +12,11 @@ public class Modifica extends Operazione {
     }
 
 
+    public String getTipo()
+    {
+        return "Modifica";
+    }
+
     public Frase getFraseModificata() { return fraseModificata; }
     public void setFraseModificata(Frase fraseModificata) { this.fraseModificata = fraseModificata; }
 

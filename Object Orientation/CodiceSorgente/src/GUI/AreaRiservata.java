@@ -1,12 +1,12 @@
 package GUI;
 
 import Controller.Controller;
-import Model.*;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -145,23 +145,15 @@ public class AreaRiservata {
 
                 cardLayout.show(centralPanel, "operazioniPanel");
 
-                for (Operazione operazione : controller.storicoOperazioniUtente) {
+                for (int i = 0; i < controller.storicoOperazioniUtente.size(); i++)
+                {
+                    String username = controller.storicoOperazioniUtente.get(i).getUtente().getUsername();
+                    String tipo = controller.storicoOperazioniUtente.get(i).getTipo();
+                    Boolean proposta = controller.storicoOperazioniUtente.get(i).getProposta();
+                    String pagina = controller.storicoOperazioniUtente.get(i).getPagina().getTitolo();
+                    Timestamp data = controller.storicoOperazioniUtente.get(i).getData();
 
-                    /*
-                    long timestamp = operazione.getData();
-
-                    // Rimuovi millisecondi e secondi dal timestamp
-                    LocalDateTime dateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(timestamp), java.time.ZoneId.systemDefault());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // Formato desiderato
-                    String formattedDateTime = dateTime.format(formatter);
-                    */
-
-                    // Aggiunta di una riga vuota al modello della tabella
-                    operazioni.addRow(new Object[]{operazione.getUtente().getUsername(), "C", operazione.getProposta(),
-                    operazione.getPagina().getTitolo(), operazione.getData()});
-
-
-
+                    operazioni.addRow(new Object[]{username, tipo, proposta, pagina, data});
 
                 }
 
@@ -185,40 +177,6 @@ public class AreaRiservata {
 
 
                 operazioniPanel.add(new JScrollPane(tabellaOp), BorderLayout.CENTER); // Utilizza uno JScrollPane per la visualizzazione della tabella
-
-                /*
-                // Aggiunta di margini al pannello
-                operazioniPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Imposta i margini a 10 pixel da tutti i lati del pannello
-
-                JLabel titolo = new JLabel("Lista Operazioni");
-                titolo.setOpaque(true);
-                titolo.setFont(new Font("Segoe UI", Font.PLAIN, 23));
-                titolo.setForeground(new Color(47,69,92));
-                titolo.setBackground(Color.white);
-                operazioniPanel.add(titolo);
-                operazioniPanel.add(Box.createVerticalStrut(10)); // Aggiunge un vuoto verticale tra le etichette
-
-                for (Operazione operazione : controller.storicoOperazioniUtente) {
-
-                    JLabel label = new JLabel(operazione.getUtente().getUsername());
-                    label.setIcon(profileImagine);
-                    label.setHorizontalTextPosition(JLabel.RIGHT);
-                    label.setIconTextGap(10);
-                    label.setBorder(new MatteBorder(0, 0, 1, 0, Color.lightGray));
-
-                    // Imposta i margini per spaziare il testo dal bordo e aumentare lo spazio tra le etichette
-                    label.setBorder(BorderFactory.createCompoundBorder(label.getBorder(), BorderFactory.createEmptyBorder(10, 20, 10, 20)));
-
-                    operazioniPanel.add(label);
-                    operazioniPanel.add(Box.createVerticalStrut(1)); // Aggiunge un vuoto verticale tra le etichette
-
-
-                }
-
-                 */
-
-
-
 
             }
 
@@ -267,24 +225,16 @@ public class AreaRiservata {
 
                     cardLayout.show(centralPanel, "storicoPanel");
 
-                    for (Pagina pagina : controller.pagineCreate) {
+                    for (int i = 0; i < controller.pagineCreate.size(); i++)
+                    {
+                        String pagina = controller.pagineCreate.get(i).getTitolo();
+                        String tema = controller.pagineCreate.get(i).getTema().getNome();
+                        Timestamp data = controller.pagineCreate.get(i).getDataCreazione();
 
-                    /*
-                    long timestamp = operazione.getData();
-
-                    // Rimuovi millisecondi e secondi dal timestamp
-                    LocalDateTime dateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(timestamp), java.time.ZoneId.systemDefault());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // Formato desiderato
-                    String formattedDateTime = dateTime.format(formatter);
-                    */
-
-                        // Aggiunta di una riga vuota al modello della tabella
-                        pagineCreate.addRow(new Object[]{pagina.getTitolo(), pagina.getTema().getNome(), pagina.getDataCreazione()});
-
-
-
-
+                        pagineCreate.addRow(new Object[]{pagina, tema, data});
                     }
+
+
 
                     tabellaPag.addMouseListener(new MouseAdapter() {
                         @Override
@@ -762,12 +712,15 @@ public class AreaRiservata {
                     JTable tabellaProp = new JTable(proposte);
                     tabellaProp.setEnabled(false); // Rende la tabella non modificabile
 
-                    ArrayList <Pagina> anteprime = controller.creaAnteprime();
-
-                    for (Pagina anteprima : anteprime) {
+                    controller.creaAnteprime();
+                    for (int i = 0; i < controller.anteprime.size(); i++)
+                    {
+                        String username = controller.anteprime.get(i).getAutore().getUsername();
+                        String titolo = controller.anteprime.get(i).getTitolo();
+                        Timestamp data = controller.anteprime.get(i).getDataCreazione();
 
                         // Aggiunta di una riga vuota al modello della tabella
-                        proposte.addRow(new Object[]{anteprima.getAutore().getUsername(), anteprima.getTitolo(), anteprima.getDataCreazione()});
+                        proposte.addRow(new Object[]{username, titolo, data});
                     }
 
                     tabellaProp.addMouseListener(new MouseAdapter() {
@@ -778,25 +731,19 @@ public class AreaRiservata {
 
                             // Controlla se il clic è avvenuto nelle colonne "Anteprima" "Approva" o "Rifiuta"
                             if (column == 3) {
-                                controller.paginaAperta = anteprime.get(row);
+                                controller.paginaAperta = controller.anteprime.get(row);
                                 AnteprimaGUI anteprimaGUI = new AnteprimaGUI(controller, frame);
                                 frame.setVisible(false);
                             }
 
                             // pacchetto di proposte approvate
                             if (column == 4) {
-                                Pagina anteprima = anteprime.get(row);
-                                String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
-                                String dataProposta;
-                                Operazione temp;
 
                                 for (int i = 0; i < controller.proposteDaApprovare.size(); i++) {
-                                    temp = controller.proposteDaApprovare.get(i);
-                                    dataProposta = temp.getData().toString().split("\\.")[0];
 
-                                    if (temp.getPagina().getId() == anteprima.getId()
-                                            && anteprima.getAutore().getUsername().equals(temp.getUtente().getUsername())) {
-                                        controller.approvaProposta(temp, true);
+                                    if (controller.proposteDaApprovare.get(i).getPagina().getId() == controller.anteprime.get(row).getId()
+                                            && controller.anteprime.get(row).getAutore().getUsername().equals(controller.proposteDaApprovare.get(i).getUtente().getUsername())) {
+                                        controller.approvaProposta(controller.proposteDaApprovare.get(i), true);
                                     }
 
                                 }
@@ -810,18 +757,11 @@ public class AreaRiservata {
 
                             //pacchetto di proposte rifiutate
                             if (column == 5) {
-                                Pagina anteprima = anteprime.get(row);
-                                String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];
-                                String dataProposta;
-                                Operazione temp;
-
                                 for (int i = 0; i < controller.proposteDaApprovare.size(); i++) {
-                                    temp = controller.proposteDaApprovare.get(i);
-                                    dataProposta = temp.getData().toString().split("\\.")[0];
 
-                                    if (dataAnteprima.equals(dataProposta) && temp.getPagina().getId() == anteprima.getId()
-                                            && anteprima.getAutore().getUsername().equals(temp.getUtente().getUsername())) {
-                                        controller.approvaProposta(temp, false);
+                                    if (controller.proposteDaApprovare.get(i).getPagina().getId() == controller.anteprime.get(row).getId()
+                                            && controller.anteprime.get(row).getAutore().getUsername().equals(controller.proposteDaApprovare.get(i).getUtente().getUsername())) {
+                                        controller.approvaProposta(controller.proposteDaApprovare.get(i), false);
                                     }
 
                                 }

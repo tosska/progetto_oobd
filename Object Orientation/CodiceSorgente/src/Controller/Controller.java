@@ -16,18 +16,15 @@ public class Controller {
     public ArrayList<Utente> ListaUtenti;
     public Utente utilizzatore;
     public ArrayList<Pagina> pagineCreate;
-
     public ArrayList<Operazione> proposteDaApprovare;
     public ArrayList<Operazione> storicoOperazioniUtente;
-
     public Pagina paginaAperta;
     public Pagina paginaPrecedente;
-
     public Frase fraseSelezionata;
+    public ArrayList<Pagina> anteprime;
 
 
     //creare un array pagine caricate
-
     public Controller()
     {
         ListaUtenti = new ArrayList<Utente>();
@@ -219,10 +216,6 @@ public class Controller {
 
     }
 
-    public void creazioneStorico()
-    {
-
-    }
 
     /*restituisce la pagina con id mandato come parametro, presente nell'array list "pagineCreate" ossia le pagine
      create dall'utilizzatore del programma */
@@ -326,7 +319,7 @@ public class Controller {
     }
 
 
-    public ArrayList<Pagina> creaAnteprime()
+    public void creaAnteprime()
     {
         ArrayList<Pagina> anteprime = new ArrayList<>();
 
@@ -357,7 +350,7 @@ public class Controller {
 
 
 
-        return anteprime;
+        this.anteprime = anteprime;
     }
 
     private Pagina creazioneAnteprimaPagina(Pagina p, Timestamp data, Utente utente, Tema tema)

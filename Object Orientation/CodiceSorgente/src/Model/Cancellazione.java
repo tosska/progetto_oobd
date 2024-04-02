@@ -9,6 +9,11 @@ public class Cancellazione extends Operazione {
         super(proposta, fraseEliminata, data, utente, storico, pagina);
     }
 
+    public String getTipo()
+    {
+        return "Cancellazione";
+    }
+
     @Override
     public void stampa() //debug
     {
