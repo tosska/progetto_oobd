@@ -571,8 +571,22 @@ WHEN (NEW.Risposta = TRUE)
 EXECUTE FUNCTION effettuaProposta();
 
 
+CREATE OR REPLACE FUNCTION setFalseLink() RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE FRASE
+    SET collegamento=FALSE
+    WHERE id_pagina = OLD.id_pagina AND riga= OLD.rigafrase AND ordine=OLD.ordinefrase;
 
+    RETURN OLD;
+END
+$$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE TRIGGER setFalseLinkTrigger
+AFTER DELETE 
+ON COLLEGAMENTO 
+FOR EACH ROW
+EXECUTE FUNCTION setFalseLink();
 
 /*
   ---------------------------------
@@ -626,6 +640,7 @@ BEGIN
         INSERT INTO FRASE VALUES(RigaF, ordineFrase, ID_PaginaF, ContenutoF, false);
     ELSE
         proposta:=true; -- altrimenti l'operazione è solo di proposta
+        ordineFrase := OrdineF;
     END IF;
 
     INSERT INTO OPERAZIONE VALUES(DEFAULT, 'I', proposta, rigaF, ordineFrase, ContenutoF, null, DEFAULT, ID_PaginaF, nomeUtente); 

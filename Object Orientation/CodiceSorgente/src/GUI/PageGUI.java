@@ -1,20 +1,12 @@
 package GUI;
 
 import Controller.Controller;
-import Model.Frase;
 import Model.Pagina;
-import Model.Storico;
 
 import javax.swing.*;
-import javax.swing.text.Utilities;
+import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.ImageObserver;
-import java.text.AttributedCharacterIterator;
-import java.util.ArrayList;
+import java.awt.event.*;
 
 public class PageGUI {
 
@@ -30,6 +22,7 @@ public class PageGUI {
     private JButton backButton;
 
     private JButton editButton;
+    private JButton linkButton;
     private Pagina pagina; //la pagina aperta
 
 
@@ -38,22 +31,50 @@ public class PageGUI {
         this.frameChiamante = frameChiamante;
         pagina = controller.paginaAperta;
 
-        if(controlloAutore()) {
+        if(controllerPrincipale.checkAutore()) {
             controllerPrincipale.caricaStoricoDaPagina(pagina);
             pagina.getStorico().stampaOperazioni();
         }
 
         creationGUI();
         functionButton();
-        
+        stampaTesto();
 
+    }
+
+    private void stampaTesto() {
+        Document doc = textPane.getDocument();
+        Style collegamento = textPane.addStyle("ColorStyle", null);
+        StyleConstants.setUnderline(collegamento, true);
+        StyleConstants.setForeground(collegamento, Color.BLUE);
+        Style attuale;
+
+        for(String f : controllerPrincipale.getFrasiPaginaAperta())
+        {
+            try {
+
+                if (f.contains("##l")) {
+                    attuale = collegamento;
+                    f = f.replace("##l", "");
+                }
+                else
+                    attuale = null;
+
+                doc.insertString(doc.getLength(), f, attuale);
+            }
+            catch (BadLocationException e)
+            {
+                System.out.println(e.getMessage());
+            }
+
+        }
     }
 
     private void creationGUI()
     {
         String editTesto;
         int larghezza;
-        if(controlloAutore()) {
+        if(controllerPrincipale.checkAutore()) {
             editTesto = "Edit";
             larghezza = 90;
         }
@@ -71,9 +92,10 @@ public class PageGUI {
 
         textPane = new JTextPane();
         textPane.setEditable(false);
-        textPane.setFont(new Font("Arial", Font.PLAIN, 20));
         textPane.setBounds(10, 50, 460, 350);
-        textPane.setText(pagina.getTestoString());
+        textPane.setFont(new Font("Arial", Font.PLAIN, 20));
+
+
 
 /*
         scrollPane = new JScrollPane(textPane);
@@ -95,11 +117,15 @@ public class PageGUI {
         editButton= new JButton(editTesto);
         editButton.setBounds(350, 410, larghezza, 25);
 
+        linkButton= new JButton("Manage links");
+        linkButton.setBounds(25, 410, 115, 25);
+
         //frame.add(textArea);
         frame.add(titleLabel);
         frame.add(autoreLabel);
         frame.add(textPane);
         frame.add(backButton);
+        frame.add(linkButton);
         frame.add(editButton);
         frame.setVisible(true);
     }
@@ -110,6 +136,8 @@ public class PageGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
+                controllerPrincipale.paginaAperta = controllerPrincipale.paginaPrecedente;
+                controllerPrincipale.paginaPrecedente=null;
                 frameChiamante.setVisible(true);
             }
         });
@@ -118,18 +146,34 @@ public class PageGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.setVisible(false);
-                EditPage editPage = new EditPage(controllerPrincipale, frame, pagina);
+                EditPage editPage = new EditPage(controllerPrincipale, frame);
+            }
+        });
+
+        linkButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.setVisible(false);
+                LinkGUI linkGUI = new LinkGUI(controllerPrincipale, frame);
+            }
+        });
+
+        textPane.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                super.mouseClicked(e);
+                controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()));
+
+                if (controllerPrincipale.PhraseIsLink()) {
+                    controllerPrincipale.attivazioneCollegamento();
+                    frame.setVisible(false);
+                    PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
+                }
             }
         });
     }
 
-    private boolean controlloAutore()
-    {
-        if(controllerPrincipale.utilizzatore.getUsername().equals(pagina.getAutore().getUsername()))
-            return true;
-        else
-            return false;
-    }
 
 
 

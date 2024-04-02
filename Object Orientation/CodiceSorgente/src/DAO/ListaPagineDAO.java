@@ -29,4 +29,8 @@ public interface ListaPagineDAO {
     //public ArrayList<Operazione> getProposteDaApprovareDB(Utente utilizzatore);
 
     public Pagina getPaginaByIdDB(int idPagina);
+
+    public void insertLinkDB(Pagina pagina, int riga, int ordine, Pagina paginaCollegamento, Utente utente);
+
+    public void removeLinkDB(Pagina pagina, int riga, int ordine, Utente utente);
 }

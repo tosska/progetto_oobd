@@ -4,10 +4,15 @@
 (fatto) - proposte
 (fatto) - approvazioni
 - funzionamento collegamenti
-- gestione temi
+(fatto) - gestione temi
 - aggiungere il punto alla fine di una frase nel database
 (fatto) - problema new line dentro le frasi: risoluzione con la considerazioni di nuove frasi quando c'è il new line
-- gestione interruzione riga
+(fatto) - gestione interruzione riga
 - cancellazione array list pagine create
+- Aggiungere gui storico alla pagina quando si è autore.
+
+
+
+Cose da migliorare:
 (va migliorato) - cattura submit istante
 (va migliorato) - inserisci frase in un testo

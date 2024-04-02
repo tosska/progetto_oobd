@@ -8,7 +8,6 @@ import ImplementazionePostgresDAO.ListaPagineImplementazionePostgresDAO;
 import ImplementazionePostgresDAO.ListaUtentiImplementazionePostgresDAO;
 import Model.*;
 
-import java.sql.CallableStatement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -22,6 +21,9 @@ public class Controller {
     public ArrayList<Operazione> storicoOperazioniUtente;
 
     public Pagina paginaAperta;
+    public Pagina paginaPrecedente;
+
+    public Frase fraseSelezionata;
 
 
     //creare un array pagine caricate
@@ -29,6 +31,14 @@ public class Controller {
     public Controller()
     {
         ListaUtenti = new ArrayList<Utente>();
+    }
+
+    public boolean checkAutore()
+    {
+        if(utilizzatore.getUsername().equals(paginaAperta.getAutore().getUsername()))
+            return true;
+        else
+            return false;
     }
 
     public void caricaPagineCreate()
@@ -50,7 +60,7 @@ public class Controller {
     public void caricaStoricoOperazioniUtente()
     {
         ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
-        storicoOperazioniUtente = l.getOperazioniDB(utilizzatore);
+        storicoOperazioniUtente = l.getOperazioniDB(utilizzatore, 1);
     }
 
     public void caricaStoricoDaPagina(Pagina pagina)
@@ -58,6 +68,36 @@ public class Controller {
         ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
         Storico s = l.getStoricoDB(pagina);
         pagina.setStorico(s);
+    }
+
+    public Testo getTestoConProposte()
+    {
+
+        ArrayList<Operazione> listaProposte = getProposteUtenteUP(paginaAperta, utilizzatore);
+
+        if(listaProposte==null)
+            return null;
+
+        Testo clone = paginaAperta.getTestoRiferito().clonaTesto();
+
+        for(Operazione op : listaProposte)
+        {
+            Frase frase = new Frase(op.getFraseCoinvolta().getRiga(), op.getFraseCoinvolta().getOrdine(), op.getFraseCoinvolta().getContenuto(), clone);
+
+            // e se mandassimo riga, ordine e contenuto senza creare l'oggetto Frase?
+            if(op instanceof Inserimento)
+                clone.inserisciFrase(frase, false);
+            else if (op instanceof Modifica) {
+                frase.setContenuto(((Modifica) op).getFraseModificata().getContenuto());
+                clone.modificaFrase(frase, false);
+            } else if (op instanceof Cancellazione) {
+                clone.cancellaFrase(frase, false);
+
+            }
+        }
+
+        return clone;
+
     }
 
     public void caricaModifichePagina(Pagina paginaOriginale, Testo testoModificato, Boolean proposta)
@@ -274,6 +314,12 @@ public class Controller {
         return l.cercaPaginaDB(titolo);
     }
 
+    public Pagina searchPageById(int id)
+    {
+        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        return l.getPaginaByIdDB(id);
+    }
+
 
     public ArrayList<Pagina> creaAnteprime()
     {
@@ -285,11 +331,8 @@ public class Controller {
 
         for(Operazione proposta : proposteDaApprovare)
         {
-            //togliamo dal timestamp i millisecondi
-            String s1 = temp.getData().toString().split("\\.")[0];
-            String s2 = proposta.getData().toString().split("\\.")[0];
 
-            if(s1.equals(s2) && temp.getPagina().getId() == proposta.getPagina().getId() && temp.getUtente().getUsername().equals(proposta.getUtente().getUsername()))
+            if(temp.getPagina().getId() == proposta.getPagina().getId() && temp.getUtente().getUsername().equals(proposta.getUtente().getUsername()))
             {
                 inserisciProposta(antem, proposta);
             }
@@ -347,7 +390,114 @@ public class Controller {
         l.approvaPropostaDB(proposta, utilizzatore, risposta);
     }
 
+    public ArrayList<Operazione> getProposteUtenteUP(Pagina pagina, Utente utente)
+    {
+        ArrayList<Operazione> listaProposte;
 
+        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        listaProposte = l.getProposteUP_DB(pagina, utente);
+
+        return listaProposte;
+    }
+
+    public int getNumOccurences(String line, char occurence)
+    {
+        int num=0;
+
+        for(int i=0; i<line.length(); i++)
+        {
+            if(line.charAt(i) == occurence)
+                num++;
+        }
+
+        return num;
+    }
+
+    public void insertLink(Pagina pagina, int riga, int ordine, Pagina paginaLink, Utente utente)
+    {
+        ListaPagineDAO l= new ListaPagineImplementazionePostgresDAO();
+        l.insertLinkDB(pagina, riga, ordine, paginaLink, utente);
+    }
+
+    public void removeLink(Pagina pagina, int riga, int ordine, Utente utente)  {
+
+        ListaPagineDAO l= new ListaPagineImplementazionePostgresDAO();
+        l.removeLinkDB(pagina, riga, ordine, utente);
+    }
+
+    public void selezionaFrase(int posizione)
+    {
+        int riga=0;
+        int ordine=0;
+        String testo = paginaAperta.getTestoString();
+        System.out.println(posizione);
+
+        if(testo.charAt(posizione)!='\n')
+        {
+            int index1 = testo.indexOf(".", posizione);
+            int index2 = testo.indexOf("\n", posizione);
+            String subTesto;
+
+            if(index1<index2 || index2==-1)
+                subTesto= testo.substring(0,index1);
+            else
+                subTesto= testo.substring(0,index2);
+
+            riga = getNumOccurences(subTesto, '\n')+1;
+            String[] testoDiviso = subTesto.split("\n");
+            String rigaSelezionata = testoDiviso[testoDiviso.length-1];
+            ordine = getNumOccurences(rigaSelezionata, '.')+1;
+        }
+
+        if(riga!=0 && ordine!=0)
+        {
+            fraseSelezionata = paginaAperta.getTestoRiferito().getFrase(riga, ordine);
+        }
+        else
+            fraseSelezionata = null;
+
+    }
+
+    public boolean PhraseIsLink()
+    {
+        //forse il controllo va fatto con il polimorfismo: fare un metodo isLink in frase che viene poi sovrascritto in collegamento
+        if(fraseSelezionata instanceof Collegamento)
+            return true;
+
+        return false;
+    }
+
+    public boolean PhraseIsSelected()
+    {
+        return fraseSelezionata != null;
+    }
+
+    public int getRowSelectedPhrase()
+    {
+        return fraseSelezionata.getRiga();
+    }
+
+    public int getOrderSelectedPhrase()
+    {
+        return fraseSelezionata.getOrdine();
+    }
+
+    //da vedere meglio
+    public void attivazioneCollegamento()  {
+        if(fraseSelezionata instanceof Collegamento)
+        {
+            paginaPrecedente = paginaAperta;
+            paginaAperta = ((Collegamento) fraseSelezionata).getPaginaCollegata();
+        }
+
+    }
+
+
+
+    public ArrayList<String> getFrasiPaginaAperta()
+    {
+        return paginaAperta.getTestoRiferito().getFrasiString();
+    }
 
 
 }

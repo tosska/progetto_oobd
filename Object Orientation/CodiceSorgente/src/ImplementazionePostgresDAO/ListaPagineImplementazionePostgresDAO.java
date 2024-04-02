@@ -126,7 +126,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
         {
             try {
                 System.out.println("Sono arrivato");
-                CallableStatement cs = connection.prepareCall("CALL inserisciFrase(?, ?, null, ?, ?)");
+                CallableStatement cs = connection.prepareCall("CALL inserisciFrase(?, ?, null, ?, ?)"); //forse è meglio chiamare il metodo inserisciFraseDB
                 cs.setInt(1, idPagina);
                 cs.setInt(2, f.getRiga());
                 cs.setString(3, f.getContenuto());
@@ -154,7 +154,18 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
             while(rs.next())
             {
-                t.addListaFrasiCoda(new Frase(rs.getInt("riga"),rs.getInt("Ordine"), rs.getString("Contenuto"), t));
+                int riga = rs.getInt("riga");
+                int ordine = rs.getInt("ordine");
+                String contenuto = rs.getString("contenuto");
+
+
+                if(!rs.getBoolean("collegamento"))
+                    t.addListaFrasiCoda(new Frase(riga, ordine, contenuto, t));
+                else {
+                    int idCollegamento = getIdCollegamentoDB(p.getId(), riga, ordine);
+                    Pagina paginaCollegamento = getPaginaByIdDB(idCollegamento);
+                    t.addListaFrasiCoda(new Collegamento(riga, ordine, contenuto, t, paginaCollegamento));
+                }
             }
             rs.close();
         }
@@ -165,6 +176,28 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
 
         return t;
+    }
+
+    public int getIdCollegamentoDB(int id_pagina, int riga, int ordine)
+    {
+        int idCollegamento=-1;
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT id_paginacollegata FROM COLLEGAMENTO WHERE id_Pagina="+id_pagina+ " AND rigafrase="+ riga + " AND ordinefrase=" + ordine);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+
+            idCollegamento = rs.getInt(1);
+
+            rs.close();
+            ps.close();
+            return idCollegamento;
+        }
+        catch (Exception e) //fare exception not found
+        {
+            System.out.println("Errore: " + e.getMessage());
+        }
+
+        return idCollegamento;
     }
 
     public ArrayList<Pagina> getPagineCreateDB(Utente utilizzatore) { //da migliorare chiamando getPaginaByID
@@ -322,7 +355,6 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
     public void addFraseDB(Pagina pagina, Inserimento inserimento)
     {
-        String comandoSql;
         Frase fraseCoinvolta = inserimento.getFraseCoinvolta();
         try {
 
@@ -343,7 +375,6 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
     }
     public void removeFraseDB(Pagina pagina, Cancellazione cancellazione)
     {
-        String comandoSql;
         Frase fraseCoinvolta = cancellazione.getFraseCoinvolta();
         try {
 
@@ -364,7 +395,6 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
     }
     public void editFraseDB(Pagina pagina, Modifica modifica)
     {
-        String comandoSql;
         Frase fraseModificata = modifica.getFraseModificata();
 
         try {
@@ -375,6 +405,44 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
             cs.setInt(3, fraseModificata.getOrdine());
             cs.setString(4, fraseModificata.getContenuto());
             cs.setString(5, modifica.getUtente().getUsername());
+            cs.execute();
+
+        }
+        catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+        }
+    }
+
+    public void insertLinkDB(Pagina pagina, int riga, int ordine, Pagina paginaCollegamento, Utente utente)
+    {
+
+        try {
+
+            CallableStatement cs = connection.prepareCall("CALL inserisciCollegamento(?, ?, ?, ?, ?)");
+            cs.setInt(1, pagina.getId());
+            cs.setInt(2, riga);
+            cs.setInt(3, ordine);
+            cs.setInt(4, paginaCollegamento.getId());
+            cs.setString(5, utente.getUsername());
+            cs.execute();
+
+        }
+        catch (Exception e)
+        {
+            System.out.println("Errore: " + e.getMessage());
+        }
+    }
+
+    public void removeLinkDB(Pagina pagina, int riga, int ordine, Utente utente)
+    {
+        try {
+
+            CallableStatement cs = connection.prepareCall("CALL rimuoviCollegamento(?, ?, ?, ?)");
+            cs.setInt(1, pagina.getId());
+            cs.setInt(2, riga);
+            cs.setInt(3, ordine);
+            cs.setString(4, utente.getUsername());
             cs.execute();
 
         }

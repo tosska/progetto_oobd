@@ -124,9 +124,8 @@ public class AnteprimaGUI {
 
             ArrayList<String> frasiNewLine = new ArrayList<>(Arrays.stream(s.split("\n")).toList());
 
-            if(frasiNewLine.get(0).equals(" "))
-                frasiNewLine.remove(0);
-
+            frasiNewLine.remove("");
+            frasiNewLine.remove(" ");
 
             for(int j=0; j<frasiNewLine.size(); j++)
             {

@@ -102,16 +102,6 @@ public class Testo implements Cloneable{
 
                     ordine=0;
                 }
-
-
-                /*
-                int occurences = getNumOccurences(f, '\n'); //conto quante righe si estende la frase considerata
-                if(occurences > 0) {
-                    riga = riga + occurences;
-                    ordine = 0;
-                }
-                */
-
             }
         }
     }
@@ -154,6 +144,27 @@ public class Testo implements Cloneable{
         return testo;
 
 
+    }
+
+    public ArrayList<String> getFrasiString()
+    {
+        int cursoreRiga=1;
+        ArrayList<String> frasi = new ArrayList<>();
+
+        for(Frase f : listaFrasi)
+        {
+            while(cursoreRiga<f.getRiga())
+            {
+                frasi.add("\n");
+                cursoreRiga++;
+            }
+
+            if(f instanceof Collegamento)
+                frasi.add(f.getContenuto() + "##l ");
+            else
+                frasi.add(f.getContenuto() + " ");
+        }
+        return frasi;
     }
 
     public void addListaFrasiCoda(Frase f)
@@ -239,12 +250,7 @@ public class Testo implements Cloneable{
             else
                 fraseModificata.setContenuto(fraseModificata.getContenuto() + "##m");
         }
-
-
         listaFrasi.set(posizione, fraseModificata);
-
-
-
     }
 
     //modificare forse indicando parametri di riga ordine e contenuto
@@ -290,11 +296,6 @@ public class Testo implements Cloneable{
         return null;
     }
 
-    private void stampaFrasi()
-    {
-        for(Frase f : listaFrasi)
-            f.stampa();
-    }
 //controllo se una stringa ha solo caratteri speciali come " " o "\n"
     private boolean isStringaVuota(String s)
     {
@@ -304,18 +305,6 @@ public class Testo implements Cloneable{
         return s.isEmpty();
     }
 
-    private int getNumOccurences(String line, char occurence)
-    {
-        int num=0;
-
-        for(int i=0; i<line.length(); i++)
-        {
-            if(line.charAt(i) == occurence)
-                num++;
-        }
-
-        return num;
-    }
 
     private String formattaTesto(String testo)
     {
@@ -331,12 +320,12 @@ public class Testo implements Cloneable{
             {
                 posizioneNewLine = lunghezzaRiga;
 
-                if(line.charAt(lunghezzaRiga-1)!=' ' && line.charAt(lunghezzaRiga-1)!='\n' && line.charAt(lunghezzaRiga-1)!='.') {
-
+                if(line.charAt(lunghezzaRiga-1)!=' ' && line.charAt(lunghezzaRiga-1)!='\n' && line.charAt(lunghezzaRiga-1)!='.' && line.contains(" ")) {
                     while(line.charAt(posizioneNewLine-1) != ' ')
                         posizioneNewLine--;
-
                 }
+
+
                 textFormatted = textFormatted + line.substring(0, posizioneNewLine) + "\n";
                 line = line.substring(posizioneNewLine, line.length());
             }
@@ -383,5 +372,19 @@ public class Testo implements Cloneable{
 
     public void setLunghezzaRiga(int lunghezzaRiga) {
         this.lunghezzaRiga = lunghezzaRiga;
+    }
+
+    public Testo getTestoSelezionabile()
+    {
+        Testo t = clonaTesto();
+
+        for(int i=0; i<t.listaFrasi.size(); i++)
+        {
+            Frase f = t.listaFrasi.get(i);
+            f.setContenuto("\u21921;2\u2192" + f.getContenuto());
+            t.listaFrasi.set(i, f);
+        }
+
+        return t;
     }
 }

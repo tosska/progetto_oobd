@@ -659,7 +659,7 @@ public class AreaRiservata {
                                     temp = controller.proposteDaApprovare.get(i);
                                     dataProposta = temp.getData().toString().split("\\.")[0];
 
-                                    if (dataAnteprima.equals(dataProposta) && temp.getPagina().getId() == anteprima.getId()
+                                    if (temp.getPagina().getId() == anteprima.getId()
                                             && anteprima.getAutore().getUsername().equals(temp.getUtente().getUsername())) {
                                         controller.approvaProposta(temp, true);
                                     }
