@@ -42,11 +42,14 @@ public class AreaRiservata {
     JLabel welcomeLabel = new JLabel();
     JLabel proposteLabel = new JLabel("  Proposte di modifica");
     JLabel operazioniLabel = new JLabel("  Operazioni effettuate");
+    JLabel storicoLabel = new JLabel("  Storico pagine");
     JLabel esciLabel = new JLabel("  Esci");
     CardLayout cardLayout = new CardLayout();
     JPanel welcomePanel = new JPanel();
     JPanel propostePanel = new JPanel();
     JPanel operazioniPanel = new JPanel();
+    JPanel storicoPanel = new JPanel();
+    JLabel nessunaPaginaLabel = new JLabel("Non hai creato nessuna pagina");
 
     Controller controller;
 
@@ -75,7 +78,7 @@ public class AreaRiservata {
         menuPanel.setBackground(new Color(244, 244, 244));
         menuPanel.setBorder(new MatteBorder(0,0,0,2, Color.GRAY));
 
-        profilePanel.setBounds(10, 10, 230, 150);
+        profilePanel.setBounds(10, 10, 230, 180);
         profilePanel.setLayout(null);
         profilePanel.setBackground(new Color(222, 222, 222));
 
@@ -240,7 +243,137 @@ public class AreaRiservata {
             }
         });
 
-        esciLabel.setBounds(0, 120, 230, 30);
+
+
+        storicoLabel.setBounds(0, 120, 230, 30);
+        storicoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        storicoLabel.setForeground(new Color(47,69,92));
+        storicoLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
+        storicoLabel.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                if(!controller.pagineCreate.isEmpty())
+                {
+                    // Creazione del modello di tabella vuoto
+                    DefaultTableModel pagineCreate = new DefaultTableModel();
+                    pagineCreate.addColumn("Titolo");
+                    pagineCreate.addColumn("Tema");
+                    pagineCreate.addColumn("Data");
+                    pagineCreate.addColumn("Storico");
+                    // Creazione della tabella con il modello vuoto
+                    JTable tabellaPag = new JTable(pagineCreate);
+                    tabellaPag.setEnabled(false); // Rende la tabella non modificabile
+
+                    cardLayout.show(centralPanel, "storicoPanel");
+
+                    for (Pagina pagina : controller.pagineCreate) {
+
+                    /*
+                    long timestamp = operazione.getData();
+
+                    // Rimuovi millisecondi e secondi dal timestamp
+                    LocalDateTime dateTime = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(timestamp), java.time.ZoneId.systemDefault());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // Formato desiderato
+                    String formattedDateTime = dateTime.format(formatter);
+                    */
+
+                        // Aggiunta di una riga vuota al modello della tabella
+                        pagineCreate.addRow(new Object[]{pagina.getTitolo(), pagina.getTema().getNome(), pagina.getDataCreazione()});
+
+
+
+
+                    }
+
+                    tabellaPag.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            int column = tabellaPag.columnAtPoint(e.getPoint());
+                            int row = tabellaPag.rowAtPoint(e.getPoint());
+
+                            // Controlla se il clic è avvenuto nelle colonne "Storico"
+                            if (column == 3) {
+                                frame.setVisible(false);
+
+                                controller.paginaAperta = controller.pagineCreate.get(row);
+                                controller.caricaStoricoDaPagina(controller.paginaAperta);
+
+                                StoricoGUI storicoGUI = new StoricoGUI(frame, controller);
+                            }
+
+                        }
+
+                    });
+
+
+
+                    // Imposta il renderer per le colonne con ImageIcon
+                    tabellaPag.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
+                        private ImageIcon storicoImagine = new ImageIcon(this.getClass().getResource("/icon/storico.png"));
+
+                        @Override
+                        public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                            JLabel label = new JLabel();
+                            label.setIcon(storicoImagine);
+                            label.setHorizontalAlignment(SwingConstants.CENTER);
+                            return label;
+                        }
+                    });
+
+
+
+
+                    // Imposta il rendering delle linee verticali su nessuna
+                    tabellaPag.setShowVerticalLines(false);
+
+                    // Imposta l'altezza delle righe
+                    tabellaPag.setRowHeight(30); // Imposta l'altezza desiderata delle righe
+
+
+                    // Renderer personalizzato per l'intestazione
+                    JTableHeader header = tabellaPag.getTableHeader();
+                    header.setFont(new Font("Arial", Font.BOLD, 14)); // Imposta il font desiderato per l'intestazione
+                    header.setForeground(new Color(47,69,92)); // Imposta il colore del testo dell'intestazione
+                    header.setBackground(new Color(126,179,255)); // Imposta il colore di sfondo dell'intestazione
+                    header.setPreferredSize(new Dimension(header.getWidth(), 30)); // Imposta l'altezza desiderata dell'intestazione
+                    header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(47,69,92))); // Aggiunge una sottolineatura all'intestazione
+
+                    // Disabilita il riordinamento delle colonne
+                    header.setReorderingAllowed(false);
+
+
+                    storicoPanel.add(new JScrollPane(tabellaPag), BorderLayout.CENTER); // Utilizza uno JScrollPane per la visualizzazione della tabella
+
+                } else {
+                    storicoPanel.add(nessunaPaginaLabel);
+                }
+
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                storicoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+
+        esciLabel.setBounds(0, 150, 230, 30);
         esciLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         esciLabel.setForeground(new Color(47,69,92));
         esciLabel.addMouseListener(new MouseListener() {
@@ -555,6 +688,7 @@ public class AreaRiservata {
         profilePanel.add(gestProfiloLabel);
         profilePanel.add(proposteLabel);
         profilePanel.add(operazioniLabel);
+        profilePanel.add(storicoLabel);
         profilePanel.add(esciLabel);
 
         welcomePanel.add(welcomeLabel);
@@ -574,6 +708,7 @@ public class AreaRiservata {
         centralPanel.add(gestProfiloPanel, "gestProfiloPanel");
         centralPanel.add(propostePanel, "propostePanel");
         centralPanel.add(operazioniPanel, "operazioniPanel");
+        centralPanel.add(storicoPanel, "storicoPanel");
 
 
 
@@ -648,7 +783,7 @@ public class AreaRiservata {
                                 frame.setVisible(false);
                             }
 
-                            //pacchetto di proposte approvate
+                            // pacchetto di proposte approvate
                             if (column == 4) {
                                 Pagina anteprima = anteprime.get(row);
                                 String dataAnteprima = anteprima.getDataCreazione().toString().split("\\.")[0];

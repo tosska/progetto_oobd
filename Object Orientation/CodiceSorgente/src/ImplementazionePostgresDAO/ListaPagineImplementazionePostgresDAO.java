@@ -278,7 +278,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
         Storico s = new Storico(pagina);
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM OPERAZIONE WHERE id_pagina=" + pagina.getId());
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM storicopagine WHERE id_pagina=" + pagina.getId());
             ResultSet rs = ps.executeQuery();
 
             while(rs.next())

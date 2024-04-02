@@ -219,6 +219,11 @@ public class Controller {
 
     }
 
+    public void creazioneStorico()
+    {
+
+    }
+
     /*restituisce la pagina con id mandato come parametro, presente nell'array list "pagineCreate" ossia le pagine
      create dall'utilizzatore del programma */
     public Pagina getPaginaUtilizzatore(int id)
