@@ -170,13 +170,14 @@ public class EditPage {
         //textArea.setBackground(new Color(196, 220, 235));
         textPane.setFont(new Font("Arial", Font.PLAIN, 20));
         textPane.setEditable(false);
+        textPane.setBounds(10, 50, 460, 350);
 
         scrollPane = new JScrollPane(textPane);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setBounds(10, 10, 350, 350);
+        scrollPane.setBounds(10, 10, 460, 350);
 
         removeButton = new JButton("Remove");
-        removeButton.setBounds(385, 325, 120, 35);
+        removeButton.setBounds(495, 325, 120, 35);
         removeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         removeButton.setBackground(new Color(47,69,92));
         removeButton.setForeground(Color.white);
@@ -184,7 +185,7 @@ public class EditPage {
         removeButton.setEnabled(false);
 
         insertButton = new JButton("Insert");
-        insertButton.setBounds(385, 285, 120, 35);
+        insertButton.setBounds(495, 285, 120, 35);
         insertButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         insertButton.setBackground(new Color(47,69,92));
         insertButton.setForeground(Color.white);
@@ -192,7 +193,7 @@ public class EditPage {
         insertButton.setEnabled(false);
 
         editButton = new JButton("Edit");
-        editButton.setBounds(385, 245, 120, 35);
+        editButton.setBounds(495, 245, 120, 35);
         editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         editButton.setBackground(new Color(47,69,92));
         editButton.setForeground(Color.white);
@@ -201,7 +202,7 @@ public class EditPage {
 
         centralPanel.setLayout(null);
         centralPanel.setBackground(new Color(194, 232, 255));
-        centralPanel.setBounds(0, 50, 550, 370);
+        centralPanel.setBounds(0, 50, 650, 370);
         MatteBorder borderCentral = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(116,150,196));
         centralPanel.setBorder(borderCentral);
 
@@ -215,7 +216,7 @@ public class EditPage {
 
         titlePanel.setLayout(null);
         titlePanel.setBackground(new Color(139, 183, 240));
-        titlePanel.setBounds(0,0, 550, 50);
+        titlePanel.setBounds(0,0, 650, 50);
         MatteBorder borderTitle = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(72,122,181));
         titlePanel.setBorder(borderTitle);
         //titlePanel.add(titleLabel);
@@ -223,7 +224,7 @@ public class EditPage {
 
         bottomPanel.setLayout(null);
         bottomPanel.setBackground(new Color(139, 183, 240));
-        bottomPanel.setBounds(0,420, 550, 90);
+        bottomPanel.setBounds(0,420, 650, 90);
 
         backButton = new JButton("Back");
         backButton.setBounds(10, 10, 70, 35);
@@ -250,8 +251,8 @@ public class EditPage {
         }
 
 
-        dropdownMenu.setBounds(370, 30, 150, 25);
-        chooseTheme.setBounds(370, 10, 100, 25);
+        dropdownMenu.setBounds(480, 30, 150, 25);
+        chooseTheme.setBounds(480, 10, 100, 25);
         chooseTheme.setFont(new Font("Roboto", Font.BOLD, 13));
         chooseTheme.setForeground(new Color(47,69,92));
 
@@ -308,7 +309,7 @@ public class EditPage {
         frame.setResizable(false);
         frame.setIconImage(logo.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(550, 510);
+        frame.setSize(650, 510);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);

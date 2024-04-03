@@ -9,7 +9,7 @@ public class ConnessioneDatabase {
     private static ConnessioneDatabase instance;
     public Connection connection = null;
     private String nome = "postgres";
-    private String password = "caruso";
+    private String password = "password";
     private String url = "jdbc:postgresql://localhost:5432/WikiDB";
     private String driver = "org.postgresql.Driver";
 
