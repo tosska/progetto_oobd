@@ -64,8 +64,12 @@ public class EditPage {
             try {
 
                 Style colore = attribuzioneColore(f);
+                f = f.replace("##i", "");
+                f= f.replace("##m", "");
+                f= f.replace("##c", "");
+                f= f.replace("##l", "");
 
-                doc.insertString(doc.getLength(),f.split("##")[0] , colore);
+                doc.insertString(doc.getLength(), f, colore);
             }
             catch (BadLocationException e)
             {

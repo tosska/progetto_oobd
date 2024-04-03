@@ -143,12 +143,14 @@ public class Testo implements Cloneable{
                 cursoreRiga++;
             }
 
-            testo = testo + f.getContenuto() + " ";
+            if(f instanceof Collegamento)
+                testo = testo + f.getContenuto().replace(".", "") + "##l. ";
+            else
+                testo = testo + f.getContenuto();
 
         }
+
         return testo;
-
-
     }
 
     public ArrayList<String> getFrasiString()
@@ -164,8 +166,9 @@ public class Testo implements Cloneable{
                 cursoreRiga++;
             }
 
-            if(f instanceof Collegamento)
-                frasi.add(f.getContenuto() + "##l ");
+            if(f instanceof Collegamento) {
+                frasi.add(f.getContenuto().replace(".", "") + "##l. ");
+            }
             else
                 frasi.add(f.getContenuto() + " ");
         }
