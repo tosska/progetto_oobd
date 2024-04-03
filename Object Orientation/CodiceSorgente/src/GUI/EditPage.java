@@ -105,7 +105,7 @@ public class EditPage {
 
                 super.mouseClicked(e);
                 controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()), true);
-                System.out.println(controllerPrincipale.fraseSelezionata);
+                System.out.println(controllerPrincipale.fraseSelezionata.getRiga() +";"+ controllerPrincipale.fraseSelezionata.getOrdine());
 
                 if(controllerPrincipale.PhraseIsSelected())
                 {

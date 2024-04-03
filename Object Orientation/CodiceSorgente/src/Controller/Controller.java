@@ -452,13 +452,15 @@ public class Controller {
         int riga=0;
         int ordine=0;
         String testo;
+        Pagina versionePagina;
 
         if(!anteprima)
-            testo = paginaAperta.getTestoString();
+            versionePagina = paginaAperta;
         else{
-            testo = anteprimaModifica.getTestoString();
+            versionePagina = anteprimaModifica;
         }
 
+        testo = versionePagina.getTestoString();
         System.out.println(posizione);
 
         if(testo.charAt(posizione)!='\n')
@@ -480,7 +482,7 @@ public class Controller {
 
         if(riga!=0 && ordine!=0)
         {
-            fraseSelezionata = paginaAperta.getTestoRiferito().getFrase(riga, ordine);
+            fraseSelezionata = versionePagina.getTestoRiferito().getFrase(riga, ordine);
         }
         else
             fraseSelezionata = null;
