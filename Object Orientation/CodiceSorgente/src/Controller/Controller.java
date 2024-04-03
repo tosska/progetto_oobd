@@ -23,6 +23,10 @@ public class Controller {
     public Frase fraseSelezionata;
     public ArrayList<Pagina> anteprime;
 
+    public ArrayList<Operazione> operazioniModifica;
+
+    public Pagina anteprimaModifica;
+
 
     //creare un array pagine caricate
     public Controller()
@@ -95,6 +99,26 @@ public class Controller {
 
         return clone;
 
+    }
+
+    public void caricamentoAnteprimaModifica()
+    {
+        anteprimaModifica = creazioneAnteprimaPagina(paginaAperta, paginaAperta.getDataCreazione(), paginaAperta.getAutore(), paginaAperta.getTema());
+        operazioniModifica = new ArrayList<>();
+    }
+
+    public void inserisciFrasePostCreazione(String frase, int riga, int ordine)
+    {
+        Boolean proposta = !checkAutore();
+        Frase fraseI = new Frase(riga, ordine, frase, anteprimaModifica.getTestoRiferito());
+
+
+        anteprimaModifica.getTestoRiferito().inserisciFrase(fraseI, true);
+        anteprimaModifica.getTestoRiferito().aggiorna();
+
+        //storico deve essere opzionale ? quindi non va messa nel costruttore?
+        Inserimento inserimento = new Inserimento(proposta, fraseI, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaAperta.getStorico(), paginaAperta);
+        operazioniModifica.add(inserimento);
     }
 
     public void caricaModifichePagina(Pagina paginaOriginale, Testo testoModificato, Boolean proposta)
@@ -423,11 +447,18 @@ public class Controller {
         l.removeLinkDB(pagina, riga, ordine, utente);
     }
 
-    public void selezionaFrase(int posizione)
+    public void selezionaFrase(int posizione, boolean anteprima)
     {
         int riga=0;
         int ordine=0;
-        String testo = paginaAperta.getTestoString();
+        String testo;
+
+        if(!anteprima)
+            testo = paginaAperta.getTestoString();
+        else{
+            testo = anteprimaModifica.getTestoString();
+        }
+
         System.out.println(posizione);
 
         if(testo.charAt(posizione)!='\n')
@@ -459,10 +490,7 @@ public class Controller {
     public boolean PhraseIsLink()
     {
         //forse il controllo va fatto con il polimorfismo: fare un metodo isLink in frase che viene poi sovrascritto in collegamento
-        if(fraseSelezionata instanceof Collegamento)
-            return true;
-
-        return false;
+        return fraseSelezionata instanceof Collegamento;
     }
 
     public boolean PhraseIsSelected()

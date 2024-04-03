@@ -127,7 +127,7 @@ public class LinkGUI {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()));
+                controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()), false);
 
                 if(controllerPrincipale.PhraseIsSelected())
                 {

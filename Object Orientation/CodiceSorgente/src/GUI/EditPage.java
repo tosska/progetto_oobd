@@ -1,9 +1,7 @@
 package GUI;
 
 import Controller.Controller;
-import Model.Pagina;
 import Model.Tema;
-import Model.Testo;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -40,6 +38,7 @@ public class EditPage {
         controllerPrincipale = controller;
         this.frameChiamante = frameChiamante;
         String userID = controllerPrincipale.utilizzatore.getUsername();
+        controllerPrincipale.caricamentoAnteprimaModifica();
 
         creationGUI();
         functionButton();
@@ -57,24 +56,16 @@ public class EditPage {
 
     private void stampaTesto()
     {
+        textPane.setText("");
         Document doc = textPane.getDocument();
-        Style collegamento = textPane.addStyle("ColorStyle", null);
-        StyleConstants.setUnderline(collegamento, true);
-        StyleConstants.setForeground(collegamento, Color.BLUE);
-        Style attuale;
 
-        for(String f : controllerPrincipale.getFrasiPaginaAperta())
+        for(String f : controllerPrincipale.anteprimaModifica.getTestoRiferito().getFrasiString())
         {
             try {
 
-                if (f.contains("##l")) {
-                    attuale = collegamento;
-                    f = f.replace("##l", "");
-                }
-                else
-                    attuale = null;
+                Style colore = attribuzioneColore(f);
 
-                doc.insertString(doc.getLength(), f, attuale);
+                doc.insertString(doc.getLength(),f.split("##")[0] , colore);
             }
             catch (BadLocationException e)
             {
@@ -103,18 +94,47 @@ public class EditPage {
             }
         });
 
+        //quando clicco sul testo
         textPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
 
                 super.mouseClicked(e);
-                controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()));
+                controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()), true);
+                System.out.println(controllerPrincipale.fraseSelezionata);
+
+                if(controllerPrincipale.PhraseIsSelected())
+                {
+                    insertButton.setEnabled(true);
+                    editButton.setEnabled(true);
+                    removeButton.setEnabled(true);
+                }
+                else
+                {
+                    insertButton.setEnabled(false);
+                    editButton.setEnabled(false);
+                    removeButton.setEnabled(false);
+                }
+
+
             }
         });
 
         insertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                JTextArea textArea = new JTextArea(10, 30);
+                int option= JOptionPane.showOptionDialog(null, textArea, "Inserisci la frase:",
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+
+                if(option == JOptionPane.OK_OPTION)
+                {
+                    String frase = textArea.getText();
+                    controllerPrincipale.inserisciFrasePostCreazione(frase, controllerPrincipale.fraseSelezionata.getRiga(), controllerPrincipale.fraseSelezionata.getOrdine());
+                    stampaTesto();
+                }
+
 
             }
         });
@@ -130,6 +150,8 @@ public class EditPage {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+
+
             }
         });
 
@@ -138,32 +160,12 @@ public class EditPage {
 
     }
 
-
-
     private void creationGUI() {
         textPane = new JTextPane();
 
         //textArea.setBackground(new Color(196, 220, 235));
         textPane.setFont(new Font("Arial", Font.PLAIN, 20));
-        textPane.setForeground(Color.GRAY);
-        textPane.setText("Write something...");
-        textPane.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (textPane.getText().equals("Write something...")) {
-                    textPane.setText("");
-                    textPane.setForeground(Color.BLACK);
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (textPane.getText().isEmpty()) {
-                    textPane.setForeground(Color.GRAY);
-                    textPane.setText("Write something...");
-                }
-            }
-        });
+        textPane.setEditable(false);
 
         scrollPane = new JScrollPane(textPane);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -175,6 +177,7 @@ public class EditPage {
         removeButton.setBackground(new Color(47,69,92));
         removeButton.setForeground(Color.white);
         removeButton.setFocusable(false);
+        removeButton.setEnabled(false);
 
         insertButton = new JButton("Insert");
         insertButton.setBounds(385, 285, 120, 35);
@@ -182,6 +185,7 @@ public class EditPage {
         insertButton.setBackground(new Color(47,69,92));
         insertButton.setForeground(Color.white);
         insertButton.setFocusable(false);
+        insertButton.setEnabled(false);
 
         editButton = new JButton("Edit");
         editButton.setBounds(385, 245, 120, 35);
@@ -189,6 +193,7 @@ public class EditPage {
         editButton.setBackground(new Color(47,69,92));
         editButton.setForeground(Color.white);
         editButton.setFocusable(false);
+        editButton.setEnabled(false);
 
         centralPanel.setLayout(null);
         centralPanel.setBackground(new Color(194, 232, 255));
@@ -199,28 +204,10 @@ public class EditPage {
         //titleLabel = new JLabel("Titolo");
         //titleLabel.setBounds(10, 10, 75, 25);
 
-        titleField = new JTextField("Insert title...");
+        titleField = new JTextField(controllerPrincipale.paginaAperta.getTitolo());
         titleField.setBounds(10, 5, 200, 35);
         //titleField.setBackground(new Color(196, 220, 235));
         titleField.setFont(new Font("Arial", Font.PLAIN, 20));
-        titleField.setForeground(Color.GRAY);
-        titleField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (titleField.getText().equals("Insert title...")) {
-                    titleField.setText("");
-                    titleField.setForeground(Color.BLACK);
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (titleField.getText().isEmpty()) {
-                    titleField.setForeground(Color.GRAY);
-                    titleField.setText("Insert title...");
-                }
-            }
-        });
 
         titlePanel.setLayout(null);
         titlePanel.setBackground(new Color(139, 183, 240));
@@ -257,15 +244,6 @@ public class EditPage {
         for (Tema tema : listaTemi) {
             dropdownMenu.addItem(tema.getNome());
         }
-
-        insertButton = new JButton("Insert");
-        insertButton.setBounds(380, 415, 80, 25);
-
-        editButton = new JButton("Edit");
-        editButton.setBounds(380, 415, 80, 25);
-
-        removeButton = new JButton("Remove");
-        removeButton.setBounds(380, 415, 80, 25);
 
 
         dropdownMenu.setBounds(370, 30, 150, 25);
@@ -333,4 +311,27 @@ public class EditPage {
         frame.requestFocusInWindow();
     }
 
+
+    public Style attribuzioneColore(String s)
+    {
+        Style stile = textPane.addStyle("ColorStyle", null);
+        Color c;
+
+        if(s.contains("##l")) {
+            StyleConstants.setUnderline(stile, true);
+            c = Color.orange;
+        }
+        else
+            c = Color.black;
+
+        if(s.contains("##i"))
+            c = Color.blue;
+        else if (s.contains("##m"))
+            c = Color.green;
+        else if (s.contains("##c"))
+            c = Color.red;
+
+        StyleConstants.setForeground(stile, c);
+        return stile;
+    }
 }

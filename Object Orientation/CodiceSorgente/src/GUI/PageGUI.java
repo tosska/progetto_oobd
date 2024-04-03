@@ -52,16 +52,17 @@ public class PageGUI {
 
         for(String f : controllerPrincipale.getFrasiPaginaAperta())
         {
+            String frase = f;
             try {
 
-                if (f.contains("##l")) {
+                if (frase.contains("##l")) {
                     attuale = collegamento;
-                    f = f.replace("##l", "");
+                    frase = frase.replace("##l", "");
                 }
                 else
                     attuale = null;
 
-                doc.insertString(doc.getLength(), f, attuale);
+                doc.insertString(doc.getLength(), frase, attuale);
             }
             catch (BadLocationException e)
             {
@@ -202,8 +203,7 @@ public class PageGUI {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                super.mouseClicked(e);
-                controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()));
+                controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()), false);
 
                 if (controllerPrincipale.PhraseIsLink()) {
                     controllerPrincipale.attivazioneCollegamento();
@@ -213,6 +213,7 @@ public class PageGUI {
             }
         });
     }
+
 
 
 

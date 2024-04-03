@@ -3,7 +3,7 @@
 (va migliorato) - gestione delle modifiche dei testi (inserimento, modifica, cancellazione)
 (fatto) - proposte
 (fatto) - approvazioni
-- funzionamento collegamenti
+(fatto)- funzionamento collegamenti
 (fatto) - gestione temi
 - aggiungere il punto alla fine di una frase nel database
 (fatto) - problema new line dentro le frasi: risoluzione con la considerazioni di nuove frasi quando c'è il new line

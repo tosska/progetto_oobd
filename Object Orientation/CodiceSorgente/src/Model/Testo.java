@@ -118,7 +118,12 @@ public class Testo implements Cloneable{
 
         for(Frase f : this.listaFrasi)
         {
-            Frase clone = new Frase(f.getRiga(), f.getOrdine(), f.getContenuto(), testo);
+            Frase clone;
+
+            if(f instanceof Collegamento)
+                clone = new Collegamento(f.getRiga(), f.getOrdine(), f.getContenuto(), testo, ((Collegamento) f).getPaginaCollegata());
+            else
+                clone = new Frase(f.getRiga(), f.getOrdine(), f.getContenuto(), testo);
             testo.listaFrasi.add(clone);
         }
 
@@ -335,6 +340,11 @@ public class Testo implements Cloneable{
 
         System.out.println("Sono il testo formattato: " + textFormatted);
         return textFormatted;
+    }
+
+    public void aggiorna()
+    {
+        this.setTestoString(this.getTestoString());
     }
 
 

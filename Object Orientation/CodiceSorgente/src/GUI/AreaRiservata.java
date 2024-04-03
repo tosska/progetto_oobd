@@ -661,12 +661,6 @@ public class AreaRiservata {
         centralPanel.add(storicoPanel, "storicoPanel");
 
 
-
-
-
-
-
-
         ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
         frame.setResizable(false);
         frame.setIconImage(logo.getImage());
