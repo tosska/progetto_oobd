@@ -68,12 +68,29 @@ public class Controller {
         pagina.setStorico(s);
     }
 
+    public void removeOldActiveProposal(){
+        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        l.removeActiveProposalDB(utilizzatore, paginaAperta);
+        caricaStoricoOperazioniUtente();
+    }
+
+    public boolean isActivedProposal()
+    {
+        for(Operazione op : storicoOperazioniUtente)
+        {
+            if(op.getProposta() && op.getApprovazione()!=null && op.getApprovazione().getRisposta()==null)
+                return true;
+        }
+
+        return false;
+    }
+
     public Testo getTestoConProposte()
     {
 
         ArrayList<Operazione> listaProposte = getProposteUtenteUP(paginaAperta, utilizzatore);
 
-        if(listaProposte==null)
+        if(listaProposte.isEmpty())
             return null;
 
         Testo clone = paginaAperta.getTestoRiferito().clonaTesto();
@@ -118,8 +135,12 @@ public class Controller {
         operazioniModifica.add(inserimento);
     }
 
-    public void caricaModifichePagina(Pagina paginaOriginale, Testo testoModificato, Boolean proposta)
+    public void caricaModifichePagina(String testo, Boolean proposta)
     {
+        Pagina paginaOriginale = paginaAperta;
+        Testo testoModificato = new Testo(paginaAperta);
+        testoModificato.setTestoString(testo);
+
         Testo testoOriginale  = paginaOriginale.getTestoRiferito();
         ArrayList<Operazione> listaOperazioni = new ArrayList<>();
 
@@ -143,6 +164,7 @@ public class Controller {
                     Frase fraseNew = rowNew.getFirst();
                     rowNew.removeFirst();
 
+
                     if (!(contenutoOld.equals(contenutoNew))) {
                         Modifica modifica = new Modifica(proposta, fraseOld, fraseNew, new Timestamp(System.currentTimeMillis()), utilizzatore,  paginaOriginale.getStorico(), paginaOriginale);
                         listaOperazioni.add(modifica);
@@ -154,10 +176,7 @@ public class Controller {
             {
                 for(Frase f : rowNew)
                 {
-                    String contenuto = f.getContenuto().replace("\n", "");
-                    contenuto = contenuto.replace("-", "");
-
-                    Inserimento inserimento = new Inserimento(proposta,  f, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
+                    Inserimento inserimento = new Inserimento(proposta, f, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaOriginale.getStorico(), paginaOriginale);
                     listaOperazioni.add(inserimento);
                 }
             }
@@ -342,31 +361,21 @@ public class Controller {
     public void creaAnteprime()
     {
         ArrayList<Pagina> anteprime = new ArrayList<>();
-
-
         Operazione temp = proposteDaApprovare.getFirst();
         Pagina antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente(), temp.getPagina().getTema());
 
-        for(Operazione proposta : proposteDaApprovare)
-        {
-
-            if(temp.getPagina().getId() == proposta.getPagina().getId() && temp.getUtente().getUsername().equals(proposta.getUtente().getUsername()))
-            {
+        for(Operazione proposta : proposteDaApprovare) {
+            if(temp.getPagina().getId() == proposta.getPagina().getId() && temp.getUtente().getUsername().equals(proposta.getUtente().getUsername())) {
                 inserisciProposta(antem, proposta);
             }
-            else
-            {
+            else {
                 anteprime.add(antem);
                 temp = proposta;
                 antem = creazioneAnteprimaPagina(temp.getPagina(), temp.getData(), temp.getUtente(), temp.getPagina().getTema());
-
             }
         }
-
         if(!proposteDaApprovare.isEmpty())
             anteprime.add(antem);
-
-
         this.anteprime = anteprime;
     }
 

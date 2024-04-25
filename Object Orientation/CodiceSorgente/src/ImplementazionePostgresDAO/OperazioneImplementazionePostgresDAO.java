@@ -155,6 +155,10 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
                     operazione.setId(idOperazione);
                 }
 
+                if(proposta){
+                    Approvazione approvazione = getApprovazioneDB(operazione);
+                    operazione.setApprovazione(approvazione);
+                }
 
                 operazioni.add(operazione);
             }
@@ -171,6 +175,38 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
 
     }
 
+    public Approvazione getApprovazioneDB(Operazione operazione)
+    {
+        if(!operazione.getProposta())
+            return null;
+
+        String comandoSql = "SELECT * FROM APPROVAZIONE WHERE id_operazione=" + operazione.getId();
+        Approvazione approvazione;
+
+        PreparedStatement ps = null;
+        try {
+            ps = connection.prepareStatement(comandoSql);
+            ResultSet rs = ps.executeQuery();
+
+            rs.next();
+            Boolean risposta;
+            if(rs.getObject("risposta")==null)
+                risposta=null;
+            else
+                risposta = rs.getBoolean("risposta");
+
+            approvazione= new Approvazione(rs.getTimestamp("data"), risposta, operazione, operazione.getUtente());
+
+            ps.close();
+            rs.close();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return approvazione;
+    }
 
 
     public void approvaPropostaDB(Operazione proposta, Utente utilizzatore, Boolean risposta)
@@ -243,6 +279,19 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
         }
 
         return operazioni;
+    }
+
+    public void removeActiveProposalDB(Utente utente, Pagina pagina)
+    {
+        String sql = "DELETE FROM OPERAZIONE AS O USING APPROVAZIONE AS A WHERE O.id_operazione=A.id_operazione AND O.id_pagina=" +pagina.getId()+ " AND O.utente= '"+ utente.getUsername() + "'AND A.risposta IS NULL";
+
+        PreparedStatement statement = null;
+        try {
+            statement = connection.prepareStatement(sql);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

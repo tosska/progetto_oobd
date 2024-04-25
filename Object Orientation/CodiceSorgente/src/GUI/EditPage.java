@@ -21,9 +21,6 @@ public class EditPage {
     private JTextField titleField;
     private JButton backButton;
     private JButton submitButton;
-    private JButton removeButton;
-    private JButton insertButton;
-    private JButton editButton;
     private JPanel titlePanel = new JPanel();
     private JPanel centralPanel = new JPanel();
     private JLabel chooseTheme = new JLabel("Choose Theme:");
@@ -36,24 +33,16 @@ public class EditPage {
 
         creationGUI();
         functionButton();
-        stampaTesto();
+        stampaTesto(controllerPrincipale.paginaAperta.getTestoRiferito().getFrasiString());
 
-        if(!controller.checkAutore())
-        {
-            if(controller.getTestoConProposte()!=null)
-            {
-                JOptionPane.showMessageDialog(null, "Sono state caricate le precedenti proposte fatte su questa pagina", "Avviso", JOptionPane.INFORMATION_MESSAGE);
-                textPane.setText(controller.getTestoConProposte().getTestoString());
-            }
-        }
     }
 
-    private void stampaTesto()
+    private void stampaTesto(ArrayList<String> testo)
     {
         textPane.setText("");
         Document doc = textPane.getDocument();
 
-        for(String f : controllerPrincipale.anteprimaModifica.getTestoRiferito().getFrasiString())
+        for(String f : testo)
         {
             try {
 
@@ -83,59 +72,6 @@ public class EditPage {
             }
         });
 
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-
-
-            }
-        });
-
-        //quando clicco sul testo
-        textPane.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-                super.mouseClicked(e);
-                controllerPrincipale.selezionaFrase(textPane.viewToModel2D(e.getPoint()), true);
-                System.out.println(controllerPrincipale.fraseSelezionata.getRiga() +";"+ controllerPrincipale.fraseSelezionata.getOrdine());
-
-                if(controllerPrincipale.PhraseIsSelected())
-                {
-                    insertButton.setEnabled(true);
-                    editButton.setEnabled(true);
-                    removeButton.setEnabled(true);
-                }
-                else
-                {
-                    insertButton.setEnabled(false);
-                    editButton.setEnabled(false);
-                    removeButton.setEnabled(false);
-                }
-
-
-            }
-        });
-
-        insertButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                JTextArea textArea = new JTextArea(10, 30);
-                int option= JOptionPane.showOptionDialog(null, textArea, "Inserisci la frase:",
-                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
-
-                if(option == JOptionPane.OK_OPTION)
-                {
-                    String frase = textArea.getText();
-                    controllerPrincipale.inserisciFrasePostCreazione(frase, controllerPrincipale.fraseSelezionata.getRiga(), controllerPrincipale.fraseSelezionata.getOrdine());
-                    stampaTesto();
-                }
-
-
-            }
-        });
 
     }
 
@@ -143,36 +79,14 @@ public class EditPage {
         textPane = new JTextPane();
 
         textPane.setFont(new Font("Arial", Font.PLAIN, 20));
-        textPane.setEditable(false);
+        //textPane.setEditable(false);
         textPane.setBounds(10, 50, 460, 350);
 
         scrollPane = new JScrollPane(textPane);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBounds(10, 10, 460, 350);
 
-        removeButton = new JButton("Remove");
-        removeButton.setBounds(495, 325, 120, 35);
-        removeButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        removeButton.setBackground(new Color(47,69,92));
-        removeButton.setForeground(Color.white);
-        removeButton.setFocusable(false);
-        removeButton.setEnabled(false);
 
-        insertButton = new JButton("Insert");
-        insertButton.setBounds(495, 285, 120, 35);
-        insertButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        insertButton.setBackground(new Color(47,69,92));
-        insertButton.setForeground(Color.white);
-        insertButton.setFocusable(false);
-        insertButton.setEnabled(false);
-
-        editButton = new JButton("Edit");
-        editButton.setBounds(495, 245, 120, 35);
-        editButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        editButton.setBackground(new Color(47,69,92));
-        editButton.setForeground(Color.white);
-        editButton.setFocusable(false);
-        editButton.setEnabled(false);
 
         centralPanel.setLayout(null);
         centralPanel.setBackground(new Color(194, 232, 255));
@@ -238,13 +152,22 @@ public class EditPage {
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                if(controllerPrincipale.isActivedProposal()) {
+                    JOptionPane.showMessageDialog(null, "Le vecchie proposte ancora attive verranno rimosse.", "Avviso", JOptionPane.INFORMATION_MESSAGE);
+                    controllerPrincipale.removeOldActiveProposal();
+                }
+
                 String title = titleField.getText();
                 String text = textPane.getText();
 
                 // Ottenimento dell'indice della voce selezionata
                 int selectedIndex = dropdownMenu.getSelectedIndex();
 
-                controllerPrincipale.creazionePagina(title, text, controllerPrincipale.ListaTemi.get(selectedIndex));
+                Tema tema = listaTemi.get(selectedIndex);
+
+                controllerPrincipale.caricaModifichePagina(textPane.getText(), false);
+
 
                 frame.dispose();
                 frameChiamante.setVisible(true);
@@ -255,9 +178,6 @@ public class EditPage {
         centralPanel.add(scrollPane);
         centralPanel.add(dropdownMenu);
         centralPanel.add(chooseTheme);
-        centralPanel.add(removeButton);
-        centralPanel.add(insertButton);
-        centralPanel.add(editButton);
 
         bottomPanel.add(backButton);
         bottomPanel.add(submitButton);
