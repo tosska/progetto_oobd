@@ -69,7 +69,7 @@ public class Controller {
     }
 
     public void removeOldActiveProposal(){
-        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        OperazioneDAO l= new OperazioneImplementazionePostgresDAO();
         l.removeActiveProposalDB(utilizzatore, paginaAperta);
         caricaStoricoOperazioniUtente();
     }

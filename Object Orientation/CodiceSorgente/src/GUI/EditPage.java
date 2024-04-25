@@ -10,6 +10,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class EditPage {
 
@@ -164,7 +165,7 @@ public class EditPage {
                 // Ottenimento dell'indice della voce selezionata
                 int selectedIndex = dropdownMenu.getSelectedIndex();
 
-                Tema tema = listaTemi.get(selectedIndex);
+                // Tema tema = listaTemi.get(selectedIndex);  modificare tema
 
                 controllerPrincipale.caricaModifichePagina(textPane.getText(), false);
 
