@@ -18,7 +18,7 @@ public class AnteprimaGUI {
     private Controller controllerPrincipale;
     private JTextPane textArea;
 
-    private  JScrollPane scrollPane;
+    private JScrollPane scrollPane;
     private JLabel titleLabel;
 
     private JLabel autoreLabel;
@@ -33,11 +33,11 @@ public class AnteprimaGUI {
 
         creationGUI();
         functionButton();
+        stampaTesto();
 
     }
 
-    private void creationGUI()
-    {
+    private void creationGUI() {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Anteprima: " + controllerPrincipale.paginaAperta.getTitolo());
@@ -60,7 +60,7 @@ public class AnteprimaGUI {
         titleLabel.setBounds(10, 10, 200, 25);
 
         autoreLabel = new JLabel("Proposta di " + controllerPrincipale.paginaAperta.getAutore().getUsername());
-        autoreLabel.setBounds(10, 25,  200, 25);
+        autoreLabel.setBounds(10, 25, 200, 25);
 
         backButton = new JButton("Back");
         backButton.setBounds(390, 10, 70, 25);
@@ -69,7 +69,7 @@ public class AnteprimaGUI {
         paginaButton.setBounds(330, 410, 135, 25);
 
 
-        caricamentoTestoColori();
+
         //frame.add(textArea);
         frame.add(titleLabel);
         frame.add(autoreLabel);
@@ -78,15 +78,11 @@ public class AnteprimaGUI {
         frame.add(paginaButton);
 
 
-
-
-
         frame.setVisible(true);
 
     }
 
-    private void functionButton()
-    {
+    private void functionButton() {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -106,16 +102,39 @@ public class AnteprimaGUI {
 
     }
 
-    private void caricamentoTestoColori()
+    private void stampaTesto()
     {
+        textArea.setText("");
+        Document doc = textArea.getDocument();
+
+        for(String f : controllerPrincipale.paginaAperta.getTestoRiferito().getFrasiString())
+        {
+            try {
+
+                Style colore = attribuzioneColore(f);
+                f = f.replace("##i", "");
+                f= f.replace("##m", "");
+                f= f.replace("##c", "");
+                f= f.replace("##l", "");
+
+                doc.insertString(doc.getLength(), f, colore);
+            }
+            catch (BadLocationException e)
+            {
+                System.out.println(e.getMessage());
+            }
+
+        }
+    }
+/*
+    private void caricamentoTestoColori() {
         StyledDocument doc = textArea.getStyledDocument();
         String testo = controllerPrincipale.paginaAperta.getTestoString();
         Style style = textArea.addStyle("ColorStyle", null);
         String[] testoDiviso = testo.split("\\.");
         Color c;
 
-        for(int i=0; i<testoDiviso.length-1; i++)
-        {
+        for (int i = 0; i < testoDiviso.length - 1; i++) {
             String s = testoDiviso[i];
 
             ArrayList<String> frasiNewLine = new ArrayList<>(Arrays.stream(s.split("\n")).toList());
@@ -123,48 +142,51 @@ public class AnteprimaGUI {
             frasiNewLine.remove("");
             frasiNewLine.remove(" ");
 
-            for(int j=0; j<frasiNewLine.size(); j++)
-            {
+            for (int j = 0; j < frasiNewLine.size(); j++) {
                 String fraseNewLine = frasiNewLine.get(j);
-                String punto="";
+                String punto = "";
 
                 c = attribuzioneColore(fraseNewLine);
 
                 StyleConstants.setForeground(style, c);
 
-                if(j==frasiNewLine.size()-1)
+                if (j == frasiNewLine.size() - 1)
                     punto = ".";
 
                 try {
 
-                    if(c.equals(Color.black))
+                    if (c.equals(Color.black))
                         doc.insertString(doc.getLength(), s + punto, style);
                     else
-                        doc.insertString(doc.getLength(), s.split("##")[0] + punto , style);
+                        doc.insertString(doc.getLength(), s.split("##")[0] + punto, style);
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
 
 
-
-
             }
         }
     }
-
-    public Color attribuzioneColore(String s)
-    {
+*/
+    public Style attribuzioneColore(String s) {
+        Style stile = textArea.addStyle("ColorStyle", null);
         Color c;
 
-        if(s.contains("##i"))
+        if (s.contains("##l")) {
+            StyleConstants.setUnderline(stile, true);
+            c = Color.orange;
+        } else
+            c = Color.black;
+
+        if (s.contains("##i"))
             c = Color.blue;
         else if (s.contains("##m"))
             c = Color.green;
         else if (s.contains("##c"))
             c = Color.red;
-        else
-            c = Color.black;
 
-        return c;
+        StyleConstants.setForeground(stile, c);
+        return stile;
     }
+
 }

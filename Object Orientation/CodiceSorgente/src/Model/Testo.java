@@ -43,6 +43,7 @@ public class Testo implements Cloneable{
 
     public void setTestoString(String testo)
     {
+
         if(!listaFrasi.isEmpty())
         {
             listaFrasi.clear();
@@ -94,8 +95,10 @@ public class Testo implements Cloneable{
                             Frase frase = new Frase(riga, ordine, contenutoFrase, this);
                             listaFrasi.add(frase);
 
-                            if(i<frasiNewLine.length-1)
+                            if(i<frasiNewLine.length-1) {
                                 riga++;
+                                ordine= 1;
+                            }
 
                         }
                     }
@@ -316,6 +319,7 @@ public class Testo implements Cloneable{
 
     private String formattaTesto(String testo)
     {
+        testo = testo.replace("\r", "");
         testo = testo + "\n"; // da valutare se la soluzione migliore
         String[] splitLine = testo.split("\\n");
         String textFormatted="";

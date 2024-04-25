@@ -60,4 +60,7 @@ public abstract class Operazione { //fare interfaccia?
 
     public abstract String getTipo();
 
+    public Approvazione getApprovazione() {
+        return approvazione;
+    }
 }
