@@ -6,7 +6,7 @@ import Model.Utente;
 
 import java.util.ArrayList;
 
-public interface ListaOperazioneDAO {
+public interface OperazioneDAO {
 
     public ArrayList<Operazione> getProposteDaApprovareDB(ArrayList<Pagina> pagineUtilizzatore, Utente utilizzatore);
     public ArrayList<Operazione> getOperazioniDB(Utente utilizzatore, int tipo);

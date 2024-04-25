@@ -1,15 +1,15 @@
 package ImplementazionePostgresDAO;
 
-import DAO.ListaUtentiDAO;
+import DAO.UtenteDAO;
 import Database.ConnessioneDatabase;
 import Model.Utente;
 
 import java.sql.*;
 
-public class ListaUtentiImplementazionePostgresDAO implements ListaUtentiDAO {
+public class UtenteImplementazionePostgresDAO implements UtenteDAO {
     private Connection connection;
 
-    public ListaUtentiImplementazionePostgresDAO() {
+    public UtenteImplementazionePostgresDAO() {
         try {
             connection = ConnessioneDatabase.getInstance().getConnection();
         } catch (SQLException e) {

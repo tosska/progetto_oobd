@@ -1,32 +1,57 @@
 package GUI;
 
 import Controller.Controller;
-import Model.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class StoricoGUI {
 
     private JFrame frame = new JFrame();
     private JFrame frameChiamante;
-    private JTable table;
     private Controller controllerPrincipale;
-    private Pagina pagina;
     private JPanel panelPrincipale = new JPanel();
+    private JPanel bottomPanel = new JPanel();
+    private JButton backButton = new JButton();
 
     public StoricoGUI(JFrame frameChiamante, Controller controller)
     {
         this.frameChiamante = frameChiamante;
         controllerPrincipale = controller;
-        this.pagina = controller.paginaAperta;
 
+        creationGUI();
+    }
+
+    private void creationGUI()
+    {
         panelPrincipale.setLayout(new BorderLayout());
         panelPrincipale.setBackground(Color.white);
+        panelPrincipale.setBounds(0, 0,900, 300);
+
+        bottomPanel.setLayout(null);
+        bottomPanel.setBackground(new Color(181, 212, 253));
+        bottomPanel.setBounds(0, 300, 900, 100);
+
+        backButton = new JButton("Back");
+        backButton.setBounds(10, 10, 100, 40);
+        backButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        backButton.setBackground(new Color(47,69,92));
+        backButton.setForeground(Color.white);
+        backButton.setFocusable(false);
+        bottomPanel.add(backButton);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                frameChiamante.setVisible(true);
+                frameChiamante.requestFocusInWindow();
+            }
+        });
+
 
         // Creazione del modello di tabella vuoto
         DefaultTableModel storico = new DefaultTableModel();
@@ -42,28 +67,23 @@ public class StoricoGUI {
         JTable tabellaStorico = new JTable(storico);
         tabellaStorico.setEnabled(false); // Rende la tabella non modificabile
 
-        ArrayList<Operazione> listaOp = pagina.getStorico().getListaOperazioni();
 
-        for (Operazione o : listaOp)
+        for (int i = 0; i < controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().size(); i++)
         {
             String tipo = "";
             String fraseModificata = "";
 
-            if (o instanceof Inserimento) {
-                tipo = "Inserimento";
-            } else if (o instanceof Modifica) {
-                tipo = "Modifica";
-                fraseModificata = ((Modifica) o).getFraseModificata().getContenuto();
-            } else if (o instanceof Cancellazione) {
-                tipo = "Cancellazione";
-            }
 
-            storico.addRow(new Object[]{tipo, o.getProposta(), o.getFraseCoinvolta().getRiga(), o.getFraseCoinvolta().getOrdine(),
-            o.getFraseCoinvolta().getContenuto(), fraseModificata, o.getUtente().getUsername(), o.getData()});
+            tipo = controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getTipo();
 
+            storico.addRow(new Object[]{tipo, controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getProposta(),
+                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getFraseCoinvolta().getRiga(),
+                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getFraseCoinvolta().getOrdine(),
+                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getFraseCoinvolta().getContenuto(),
+                    fraseModificata,
+                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getUtente().getUsername(),
+                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getData()});
         }
-
-
 
 
         // Imposta il rendering delle linee verticali su nessuna
@@ -88,11 +108,13 @@ public class StoricoGUI {
         panelPrincipale.add(new JScrollPane(tabellaStorico), BorderLayout.CENTER); // Utilizza uno JScrollPane per la visualizzazione della tabella
 
         frame.add(panelPrincipale);
+        frame.add(bottomPanel);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Page: " + pagina.getTitolo());
-        frame.setSize(500, 500);
-        frame.setLayout(new FlowLayout());
+        frame.setTitle("Page: " + controllerPrincipale.paginaAperta.getTitolo());
+        frame.setSize(900, 400);
+        frame.setLayout(null);
+        frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }

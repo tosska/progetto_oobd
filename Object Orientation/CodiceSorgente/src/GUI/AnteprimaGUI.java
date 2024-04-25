@@ -11,21 +11,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class AnteprimaGUI {
-
     private JFrame frame = new JFrame();
-
     private JFrame frameChiamante;
     private Controller controllerPrincipale;
     private JTextPane textArea;
-
     private  JScrollPane scrollPane;
     private JLabel titleLabel;
-
     private JLabel autoreLabel;
     private JButton backButton;
-
     private JButton paginaButton;
-
 
     AnteprimaGUI(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
@@ -52,7 +46,6 @@ public class AnteprimaGUI {
 
 
         scrollPane = new JScrollPane(textArea);
-        // scrollPane.setPreferredSize(new Dimension(450, 450));
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBounds(10, 50, 460, 350);
 
@@ -70,15 +63,11 @@ public class AnteprimaGUI {
 
 
         caricamentoTestoColori();
-        //frame.add(textArea);
         frame.add(titleLabel);
         frame.add(autoreLabel);
         frame.add(scrollPane);
         frame.add(backButton);
         frame.add(paginaButton);
-
-
-
 
 
         frame.setVisible(true);
@@ -144,9 +133,6 @@ public class AnteprimaGUI {
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
-
-
-
 
             }
         }

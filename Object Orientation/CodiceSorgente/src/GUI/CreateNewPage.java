@@ -1,7 +1,6 @@
 package GUI;
 
 import Controller.Controller;
-import Model.Tema;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -10,14 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.ArrayList;
 
 public class CreateNewPage{
     private JFrame frame = new JFrame();
     private Controller controllerPrincipale;
     private JTextArea textArea;
     private JScrollPane scrollPane;
-    private JLabel titleLabel;
     private JTextField titleField;
     private JButton backButton;
     private JButton submitButton;
@@ -25,10 +22,17 @@ public class CreateNewPage{
     private JPanel centralPanel = new JPanel();
     private JLabel chooseTheme = new JLabel("Choose Theme:");
     private JPanel bottomPanel = new JPanel();
+    private JFrame frameChiamante;
 
     CreateNewPage(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
+        this.frameChiamante = frameChiamante;
 
+        creationGUI();
+    }
+
+    private void creationGUI()
+    {
         textArea = new JTextArea();
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
@@ -44,7 +48,6 @@ public class CreateNewPage{
                     textArea.setForeground(Color.BLACK);
                 }
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 if (textArea.getText().isEmpty()) {
@@ -64,12 +67,9 @@ public class CreateNewPage{
         MatteBorder borderCentral = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(116,150,196));
         centralPanel.setBorder(borderCentral);
 
-        //titleLabel = new JLabel("Titolo");
-        //titleLabel.setBounds(10, 10, 75, 25);
 
         titleField = new JTextField("Insert title...");
         titleField.setBounds(10, 5, 200, 35);
-        //titleField.setBackground(new Color(196, 220, 235));
         titleField.setFont(new Font("Arial", Font.PLAIN, 20));
         titleField.setForeground(Color.GRAY);
         titleField.addFocusListener(new FocusListener() {
@@ -80,7 +80,6 @@ public class CreateNewPage{
                     titleField.setForeground(Color.BLACK);
                 }
             }
-
             @Override
             public void focusLost(FocusEvent e) {
                 if (titleField.getText().isEmpty()) {
@@ -95,7 +94,6 @@ public class CreateNewPage{
         titlePanel.setBounds(0,0, 550, 50);
         MatteBorder borderTitle = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(72,122,181));
         titlePanel.setBorder(borderTitle);
-        //titlePanel.add(titleLabel);
         titlePanel.add(titleField);
 
         bottomPanel.setLayout(null);
@@ -118,12 +116,10 @@ public class CreateNewPage{
 
         // Creazione di un menu a tendina
         JComboBox<String> dropdownMenu = new JComboBox<>();
-        ArrayList<Tema> listaTemi;
-        listaTemi = controllerPrincipale.generaListaTemi();
 
-        // Ciclo for-each per scorrere l'ArrayList
-        for (Tema tema : listaTemi) {
-            dropdownMenu.addItem(tema.getNome());
+        for (int i = 0; i < controllerPrincipale.ListaTemi.size(); i++)
+        {
+            dropdownMenu.addItem(controllerPrincipale.ListaTemi.get(i).getNome());
         }
 
 
@@ -131,9 +127,6 @@ public class CreateNewPage{
         chooseTheme.setBounds(370, 10, 100, 25);
         chooseTheme.setFont(new Font("Roboto", Font.BOLD, 13));
         chooseTheme.setForeground(new Color(47,69,92));
-
-
-
 
         backButton.addActionListener(new ActionListener() {
             @Override
@@ -153,9 +146,7 @@ public class CreateNewPage{
                 // Ottenimento dell'indice della voce selezionata
                 int selectedIndex = dropdownMenu.getSelectedIndex();
 
-                Tema tema = listaTemi.get(selectedIndex);
-
-                controllerPrincipale.creazionePagina(title, text, tema);
+                controllerPrincipale.creazionePagina(title, text, controllerPrincipale.ListaTemi.get(selectedIndex));
 
                 frame.dispose();
                 frameChiamante.setVisible(true);

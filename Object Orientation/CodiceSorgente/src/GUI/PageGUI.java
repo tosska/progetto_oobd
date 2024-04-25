@@ -1,7 +1,6 @@
 package GUI;
 
 import Controller.Controller;
-import Model.Pagina;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -10,7 +9,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class PageGUI {
-
     private JFrame frame = new JFrame();
     private JFrame frameChiamante;
     private Controller controllerPrincipale;
@@ -20,7 +18,6 @@ public class PageGUI {
     private JButton backButton;
     private JButton editButton;
     private JButton linkButton;
-    private Pagina pagina; //la pagina aperta
     private JPanel titlePanel = new JPanel();
     private JPanel centralPanel = new JPanel();
     private JPanel bottomPanel = new JPanel();
@@ -30,11 +27,10 @@ public class PageGUI {
     PageGUI(Controller controller, JFrame frameChiamante) { //da decidere se mandare la pagina tramite controller o tramite oggetto a se
         controllerPrincipale = controller;
         this.frameChiamante = frameChiamante;
-        pagina = controller.paginaAperta;
 
         if(controllerPrincipale.checkAutore()) {
-            controllerPrincipale.caricaStoricoDaPagina(pagina);
-            pagina.getStorico().stampaOperazioni();
+            controllerPrincipale.caricaStoricoDaPagina(controllerPrincipale.paginaAperta);
+            controllerPrincipale.paginaAperta.getStorico().stampaOperazioni();
         }
 
         creationGUI();
@@ -75,14 +71,11 @@ public class PageGUI {
     private void creationGUI()
     {
         String editTesto;
-        int larghezza;
         if(controllerPrincipale.checkAutore()) {
             editTesto = "Edit";
-            larghezza = 90;
         }
         else {
             editTesto = "Propose Edit";
-            larghezza = 120;
         }
 
         titlePanel.setLayout(null);
@@ -158,7 +151,7 @@ public class PageGUI {
         frame.add(bottomPanel);
 
         ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
-        frame.setTitle(pagina.getTitolo());
+        frame.setTitle(controllerPrincipale.paginaAperta.getTitolo());
         frame.setResizable(false);
         frame.setIconImage(logo.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

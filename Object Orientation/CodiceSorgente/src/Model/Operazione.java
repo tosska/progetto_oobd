@@ -6,6 +6,7 @@ public abstract class Operazione { //fare interfaccia?
     private int id;
     private Boolean proposta;
     private Frase fraseCoinvolta;
+    private Frase fraseModificata;
     private Timestamp data;
     private Utente utente;
     private Approvazione approvazione;
@@ -59,5 +60,6 @@ public abstract class Operazione { //fare interfaccia?
     }
 
     public abstract String getTipo();
+
 
 }

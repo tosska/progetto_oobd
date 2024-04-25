@@ -1,20 +1,19 @@
 package ImplementazionePostgresDAO;
 
-import DAO.ListaOperazioneDAO;
-import DAO.ListaPagineDAO;
-import DAO.ListaUtentiDAO;
+import DAO.OperazioneDAO;
+import DAO.PaginaDAO;
+import DAO.UtenteDAO;
 import Database.ConnessioneDatabase;
-import GUI.PageGUI;
 import Model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazioneDAO {
+public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
 
     private Connection connection;
 
-    public ListaOperazioneImplementazionePostgresDAO() {
+    public OperazioneImplementazionePostgresDAO() {
         try {
             connection = ConnessioneDatabase.getInstance().getConnection();
         } catch (SQLException e) {
@@ -36,10 +35,10 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
             while(rs.next())
             {
                 //recupero le informazioni sull'operazione
-                ListaPagineDAO lPagina = new ListaPagineImplementazionePostgresDAO();
+                PaginaDAO lPagina = new PaginaImplementazionePostgresDAO();
                 int idOperazione = rs.getInt("id_operazione");
                 int idPagina = rs.getInt("id_pagina"); //preleviamo la pagina che fa riferimento la proposta
-                ListaUtentiDAO lUtente= new ListaUtentiImplementazionePostgresDAO();
+                UtenteDAO lUtente= new UtenteImplementazionePostgresDAO();
                 Utente generico = lUtente.getUtenteDB(rs.getString("utente")); //preleviamo l'utente che ha proposto la modifica
                 Timestamp data = rs.getTimestamp("data");
                 Boolean proposta = rs.getBoolean("proposta");
@@ -122,9 +121,9 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
             {
                 //recupero le informazioni sull'operazione
                 int idOperazione = rs.getInt("id_operazione");
-                ListaPagineDAO lPagina = new ListaPagineImplementazionePostgresDAO();
+                PaginaDAO lPagina = new PaginaImplementazionePostgresDAO();
                 Pagina pagina = lPagina.getPaginaByIdDB(rs.getInt("id_pagina")); //preleviamo la pagina che fa riferimento la proposta
-                ListaUtentiDAO lUtente= new ListaUtentiImplementazionePostgresDAO();
+                UtenteDAO lUtente= new UtenteImplementazionePostgresDAO();
                 Utente generico = lUtente.getUtenteDB(rs.getString("utente")); //preleviamo l'utente che ha proposto la modifica
                 Timestamp data = rs.getTimestamp("data");
                 Boolean proposta = rs.getBoolean("proposta");
@@ -201,8 +200,8 @@ public class ListaOperazioneImplementazionePostgresDAO implements ListaOperazion
             {
                 //recupero le informazioni sull'operazione
                 int idOperazione = rs.getInt("id_operazione");
-                ListaPagineDAO lPagina = new ListaPagineImplementazionePostgresDAO();
-                ListaUtentiDAO lUtente= new ListaUtentiImplementazionePostgresDAO();
+                PaginaDAO lPagina = new PaginaImplementazionePostgresDAO();
+                UtenteDAO lUtente= new UtenteImplementazionePostgresDAO();
                 Timestamp data = rs.getTimestamp("data");
                 Boolean proposta = rs.getBoolean("proposta");
                 Operazione operazione = null;

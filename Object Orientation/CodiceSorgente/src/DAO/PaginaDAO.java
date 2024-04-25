@@ -5,7 +5,7 @@ import Model.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
-public interface ListaPagineDAO {
+public interface PaginaDAO {
     public void addPaginaDB(String titolo, Timestamp data, String autore, int idTema);
     public void addTemaDB(String tema);
     public ArrayList<Tema> raccogliTemi();

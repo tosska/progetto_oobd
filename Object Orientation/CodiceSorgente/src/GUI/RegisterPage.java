@@ -3,12 +3,8 @@ package GUI;
 import Controller.Controller;
 
 import javax.swing.*;
-import javax.swing.border.MatteBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.sql.Timestamp;
 
 public class RegisterPage {
@@ -33,12 +29,18 @@ public class RegisterPage {
     private JPasswordField passwordConfField = new JPasswordField();
     private JLabel alreadyHaveAnAccountLabel = new JLabel("Already have an account?");
     private JLabel loginLabel = new JLabel("Log in");
-
+    private JFrame frameChiamante;
 
     public RegisterPage(Controller controller, JFrame frameChiamante)
     {
         controllerPrincipale = controller;
+        this.frameChiamante = frameChiamante;
 
+        creationGUI();
+    }
+
+    private void creationGUI()
+    {
         panel.setBackground(Color.white);
         panel.setBounds(0, 0, 750, 400);
         panel.setLayout(null);
@@ -87,12 +89,7 @@ public class RegisterPage {
         ImageIcon notVisibleImagine = new ImageIcon(this.getClass().getResource("/icon/notvisible.png"));
         iconNotVisibleLabel.setIcon(notVisibleImagine);
         iconNotVisibleLabel.setBounds(645, 150, 25, 25);
-        iconNotVisibleLabel.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
-
+        iconNotVisibleLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 passwordField.setEchoChar((char)0);
@@ -116,10 +113,6 @@ public class RegisterPage {
                 iconNotVisibleLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
 
@@ -137,11 +130,7 @@ public class RegisterPage {
 
         iconNotVisible2Label.setIcon(notVisibleImagine);
         iconNotVisible2Label.setBounds(645, 230, 25, 25);
-        iconNotVisible2Label.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
+        iconNotVisible2Label.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mousePressed(MouseEvent e) {
@@ -166,10 +155,6 @@ public class RegisterPage {
                 iconNotVisible2Label.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
 
@@ -183,7 +168,7 @@ public class RegisterPage {
 
         loginLabel.setBounds(580, 310, 50, 20);
         loginLabel.setForeground(new Color(47,69,92));
-        loginLabel.addMouseListener(new MouseListener() {
+        loginLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
@@ -191,24 +176,10 @@ public class RegisterPage {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 loginLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
 

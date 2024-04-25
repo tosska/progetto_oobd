@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class LoginPage {
-
     private JFrame frame = new JFrame();
     private JButton loginButton = new JButton("Login");
     private JTextField usernameField = new JTextField();
@@ -29,7 +28,12 @@ public class LoginPage {
     public LoginPage(Controller controller) {
 
         controllerPrincipale = controller;
+        creationGUI();
 
+    }
+
+    private void creationGUI()
+    {
         frame.setTitle("Danilo Wiki: Login");
         leftPanel.setBackground(new Color(47,69,92));
         leftPanel.setBounds(0, 0, 400, 500);
@@ -72,12 +76,7 @@ public class LoginPage {
         ImageIcon notVisibleImagine = new ImageIcon(this.getClass().getResource("/icon/notvisible.png"));
         iconNotVisibleLabel.setIcon(notVisibleImagine);
         iconNotVisibleLabel.setBounds(305, 230, 25, 25);
-        iconNotVisibleLabel.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
-
+        iconNotVisibleLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mousePressed(MouseEvent e) {
                 passwordField.setEchoChar((char)0);
@@ -101,11 +100,6 @@ public class LoginPage {
             public void mouseEntered(MouseEvent e) {
                 iconNotVisibleLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
 
@@ -120,13 +114,7 @@ public class LoginPage {
 
 
         //DA CANCELLARE, UTILE PER UN VELOCE TESTING
-        usernameField.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
+        usernameField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode()==KeyEvent.VK_Z)
@@ -140,11 +128,6 @@ public class LoginPage {
                     usernameField.setText("cristina_rizzo");
                     passwordField.setText("RizzoPass456@");
                 }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
             }
 
         });
@@ -185,7 +168,7 @@ public class LoginPage {
 
         signUpLabel.setBounds(200, 350, 50, 20);
         signUpLabel.setForeground(new Color(47,69,92));
-        signUpLabel.addMouseListener(new MouseListener() {
+        signUpLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
@@ -198,24 +181,10 @@ public class LoginPage {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 signUpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         copyrightLabel.setBounds(80, 420, 300, 20);

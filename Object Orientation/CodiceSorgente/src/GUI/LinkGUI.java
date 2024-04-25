@@ -1,10 +1,6 @@
 package GUI;
 
 import Controller.Controller;
-import Model.Collegamento;
-import Model.Frase;
-import Model.Pagina;
-import Model.Tema;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,39 +10,32 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LinkGUI {
-
     private JFrame frame = new JFrame();
     private JFrame frameChiamante;
     private Controller controllerPrincipale;
     private JTextPane textPane;
-
-    private  JScrollPane scrollPane;
     private JLabel titleLabel;
-
     private JLabel autoreLabel;
     private JButton backButton;
     private JButton insertLink;
     private JButton removeLink;
-    private Pagina pagina; //la pagina aperta
-
     private JLabel selectedPhrase;
 
 
     LinkGUI(Controller controller, JFrame frameChiamante) { //da decidere se mandare la pagina tramite controller o tramite oggetto a se
         controllerPrincipale = controller;
         this.frameChiamante = frameChiamante;
-        pagina = controller.paginaAperta;
 
         creationGUI();
         functionButton();
 
-        textPane.setText(pagina.getTestoString());
+        textPane.setText(controllerPrincipale.paginaAperta.getTestoString());
     }
 
     private void creationGUI()
     {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Manage links: " + pagina.getTitolo());
+        frame.setTitle("Manage links: " + controllerPrincipale.paginaAperta.getTitolo());
         frame.setSize(500, 500);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
@@ -58,10 +47,10 @@ public class LinkGUI {
 
 
 
-        titleLabel = new JLabel(pagina.getTitolo());
+        titleLabel = new JLabel(controllerPrincipale.paginaAperta.getTitolo());
         titleLabel.setBounds(10, 10, 200, 25);
 
-        autoreLabel = new JLabel("Di " + pagina.getAutore().getUsername());
+        autoreLabel = new JLabel("Di " + controllerPrincipale.paginaAperta.getAutore().getUsername());
         autoreLabel.setBounds(10, 25,  200, 25);
 
         backButton = new JButton("Back");
@@ -78,7 +67,6 @@ public class LinkGUI {
         removeLink.setBounds(280, 410, 100, 25);
         removeLink.setEnabled(false);
 
-        //frame.add(textArea);
         frame.add(titleLabel);
         frame.add(autoreLabel);
         frame.add(textPane);
@@ -103,11 +91,11 @@ public class LinkGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String titolo = JOptionPane.showInputDialog(null, "Inserisci titolo della pagina per il collegamento:", "Input", JOptionPane.QUESTION_MESSAGE);
-                Pagina paginaCollegamento = controllerPrincipale.cercaPagina(titolo);
                 int riga = Integer.parseInt(selectedPhrase.getText().split(";")[0]);
                 int ordine = Integer.parseInt(selectedPhrase.getText().split(";")[1]);
 
-                controllerPrincipale.insertLink(pagina, riga, ordine, paginaCollegamento, controllerPrincipale.utilizzatore);
+                controllerPrincipale.insertLink(controllerPrincipale.paginaAperta, riga, ordine,
+                        controllerPrincipale.cercaPagina(titolo), controllerPrincipale.utilizzatore);
             }
         });
 
@@ -118,7 +106,7 @@ public class LinkGUI {
                 int riga = Integer.parseInt(selectedPhrase.getText().split(";")[0]);
                 int ordine = Integer.parseInt(selectedPhrase.getText().split(";")[1]);
 
-                controllerPrincipale.removeLink(pagina, riga, ordine, controllerPrincipale.utilizzatore);
+                controllerPrincipale.removeLink(controllerPrincipale.paginaAperta, riga, ordine, controllerPrincipale.utilizzatore);
 
             }
         });

@@ -4,60 +4,69 @@ import Controller.Controller;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
 
 
 public class AreaRiservata {
-    JFrame frame = new JFrame();
-    JPanel topPanel = new JPanel();
-    JPanel menuPanel = new JPanel();
-    JPanel centralPanel = new JPanel();
-    JLabel titleLabel = new JLabel("Area Riservata");
-    JPanel profilePanel = new JPanel();
-    JLabel profileLabel = new JLabel("  PROFILO");
-    JLabel gestProfiloLabel = new JLabel("  Gestione profilo");
-    JPanel gestProfiloPanel = new JPanel();
-    JLabel datiTitleLabel = new JLabel("Riepilogo Account");
-    JLabel usernameLabel = new JLabel();
-    JLabel modUsernameLabel = new JLabel("Modifica username");
-    JLabel iscrizioneLabel = new JLabel();
-    JLabel emailLabel = new JLabel();
-    JLabel modEmailLabel = new JLabel("Modifica email");
-    JLabel passwordInfo1Label = new JLabel("Password e info di sicurezza");
-    JLabel passwordInfo2Label = new JLabel("È consigliabile scegliere una password che non usi in altre posizioni.");
-    JLabel modPasswordLabel = new JLabel("Modifica password");
-    JLabel deleteAccountLabel = new JLabel("Elimina account");
-    JLabel welcomeLabel = new JLabel();
-    JLabel proposteLabel = new JLabel("  Proposte di modifica");
-    JLabel operazioniLabel = new JLabel("  Operazioni effettuate");
-    JLabel storicoLabel = new JLabel("  Storico pagine");
-    JLabel esciLabel = new JLabel("  Esci");
-    CardLayout cardLayout = new CardLayout();
-    JPanel welcomePanel = new JPanel();
-    JPanel propostePanel = new JPanel();
-    JPanel operazioniPanel = new JPanel();
-    JPanel storicoPanel = new JPanel();
-    JLabel nessunaPaginaLabel = new JLabel("Non hai creato nessuna pagina");
+    private JFrame frame = new JFrame();
+    private JPanel topPanel = new JPanel();
+    private JPanel menuPanel = new JPanel();
+    private JPanel centralPanel = new JPanel();
+    private JLabel titleLabel = new JLabel("Area Riservata");
+    private JPanel profilePanel = new JPanel();
+    private JLabel profileLabel = new JLabel("  PROFILO");
+    private JLabel gestProfiloLabel = new JLabel("  Gestione profilo");
+    private JPanel gestProfiloPanel = new JPanel();
+    private JLabel datiTitleLabel = new JLabel("Riepilogo Account");
+    private JLabel usernameLabel = new JLabel();
+    private JLabel modUsernameLabel = new JLabel("Modifica username");
+    private JLabel iscrizioneLabel = new JLabel();
+    private JLabel emailLabel = new JLabel();
+    private JLabel modEmailLabel = new JLabel("Modifica email");
+    private JLabel passwordInfo1Label = new JLabel("Password e info di sicurezza");
+    private JLabel passwordInfo2Label = new JLabel("È consigliabile scegliere una password che non usi in altre posizioni.");
+    private JLabel modPasswordLabel = new JLabel("Modifica password");
+    private JLabel deleteAccountLabel = new JLabel("Elimina account");
+    private JLabel welcomeLabel = new JLabel();
+    private JLabel proposteLabel = new JLabel("  Proposte di modifica");
+    private JLabel operazioniLabel = new JLabel("  Operazioni effettuate");
+    private JLabel storicoLabel = new JLabel("  Storico pagine");
+    private JLabel esciLabel = new JLabel("  Esci");
+    private CardLayout cardLayout = new CardLayout();
+    private JPanel welcomePanel = new JPanel();
+    private JPanel propostePanel = new JPanel();
+    private JPanel operazioniPanel = new JPanel();
+    private JPanel storicoPanel = new JPanel();
+    private JLabel nessunaPaginaLabel = new JLabel("Non hai creato nessuna pagina");
+    private Controller controller;
+    private JFrame frameChiamante;
+    private JLabel userLabel;
 
-    Controller controller;
 
     public AreaRiservata(Controller controller, JFrame frameChiamante, JLabel userLabel) {
 
         centralPanel.setLayout(cardLayout);
-        frame.setTitle("Danilo Wiki: Area Riservata");
         this.controller = controller;
+
+        this.frameChiamante = frameChiamante;
+        this.userLabel = userLabel;
+
+        creationGUI();
+
+    }
+
+
+
+
+    private void creationGUI()
+    {
+        frame.setTitle("Danilo Wiki: Area Riservata");
+
 
         // pannello superiore
         topPanel.setBounds(0, 0, 1100, 60);
@@ -92,20 +101,10 @@ public class AreaRiservata {
         gestProfiloLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         gestProfiloLabel.setForeground(new Color(47,69,92));
         gestProfiloLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
-        gestProfiloLabel.addMouseListener(new MouseListener() {
+        gestProfiloLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
                 cardLayout.show(centralPanel, "gestProfiloPanel");
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
             }
 
             @Override
@@ -113,10 +112,6 @@ public class AreaRiservata {
                 gestProfiloLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         areaProposte();
@@ -128,7 +123,7 @@ public class AreaRiservata {
 
 
 
-        operazioniLabel.addMouseListener(new MouseListener() {
+        operazioniLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
 
@@ -181,24 +176,10 @@ public class AreaRiservata {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 operazioniLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
 
@@ -207,7 +188,7 @@ public class AreaRiservata {
         storicoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         storicoLabel.setForeground(new Color(47,69,92));
         storicoLabel.setBorder(new MatteBorder(0, 0, 1, 0, Color.white));
-        storicoLabel.addMouseListener(new MouseListener() {
+        storicoLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
 
@@ -271,9 +252,6 @@ public class AreaRiservata {
                         }
                     });
 
-
-
-
                     // Imposta il rendering delle linee verticali su nessuna
                     tabellaPag.setShowVerticalLines(false);
 
@@ -294,7 +272,6 @@ public class AreaRiservata {
 
 
                     storicoPanel.add(new JScrollPane(tabellaPag), BorderLayout.CENTER); // Utilizza uno JScrollPane per la visualizzazione della tabella
-
                 } else {
                     storicoPanel.add(nessunaPaginaLabel);
                 }
@@ -303,30 +280,16 @@ public class AreaRiservata {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 storicoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         esciLabel.setBounds(0, 150, 230, 30);
         esciLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         esciLabel.setForeground(new Color(47,69,92));
-        esciLabel.addMouseListener(new MouseListener() {
+        esciLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.dispose();
@@ -334,24 +297,10 @@ public class AreaRiservata {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 esciLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
 
@@ -374,10 +323,15 @@ public class AreaRiservata {
         propostePanel.setLayout(new BorderLayout());
         propostePanel.setBackground(Color.white);
 
-        // operazionii panel
+        // operazioni panel
         operazioniPanel.setBounds(250, 60, 850, 540);
         operazioniPanel.setLayout(new BorderLayout());
         operazioniPanel.setBackground(Color.white);
+
+        // storico panel
+        storicoPanel.setBounds(250, 60, 850, 540);
+        storicoPanel.setLayout(new BorderLayout());
+        storicoPanel.setBackground(Color.white);
 
         // gestione profilo panel
         gestProfiloPanel.setBounds(250, 60, 850, 540);
@@ -394,7 +348,7 @@ public class AreaRiservata {
         modUsernameLabel.setForeground(new Color(47,69,92));
         modUsernameLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         modUsernameLabel.setBounds(20, 95, 300, 15);
-        modUsernameLabel.addMouseListener(new MouseListener() {
+        modUsernameLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String newUsername;
@@ -415,24 +369,10 @@ public class AreaRiservata {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 modUsernameLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         emailLabel.setText("<html>Email<br><b>" + controller.utilizzatore.getEmail() + "</b></html>");
@@ -442,7 +382,7 @@ public class AreaRiservata {
         modEmailLabel.setForeground(new Color(47,69,92));
         modEmailLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         modEmailLabel.setBounds(20, 180, 300, 15);
-        modEmailLabel.addMouseListener(new MouseListener() {
+        modEmailLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String newEmail;
@@ -461,24 +401,10 @@ public class AreaRiservata {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 modEmailLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         iscrizioneLabel.setText("<html>Iscritto in data: <b>" + controller.utilizzatore.getDataIscrizione() + "</b></html>");
@@ -496,7 +422,7 @@ public class AreaRiservata {
         modPasswordLabel.setForeground(new Color(47,69,92));
         modPasswordLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         modPasswordLabel.setBounds(20, 330, 300, 15);
-        modPasswordLabel.addMouseListener(new MouseListener() {
+        modPasswordLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String oldPassword;
@@ -539,30 +465,16 @@ public class AreaRiservata {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 modPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         deleteAccountLabel.setForeground(Color.red);
         deleteAccountLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         deleteAccountLabel.setBounds(20, 410, 300, 15);
-        deleteAccountLabel.addMouseListener(new MouseListener() {
+        deleteAccountLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int result = JOptionPane.showConfirmDialog(null, "Sei sicuro?", "Eliminazione definitiva account", JOptionPane.YES_NO_OPTION);
@@ -603,25 +515,9 @@ public class AreaRiservata {
 
                 }
             }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
             @Override
             public void mouseEntered(MouseEvent e) {
                 deleteAccountLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
             }
         });
 
@@ -685,7 +581,7 @@ public class AreaRiservata {
         JLabel vuotoLabel = new JLabel("Non vi sono proposte da approvare");
 
 
-        proposteLabel.addMouseListener(new MouseListener() {
+        proposteLabel.addMouseListener(new MouseAdapter()  {
             @Override
             public void mouseClicked(MouseEvent e) {
                 cardLayout.show(centralPanel, "propostePanel");
@@ -838,24 +734,10 @@ public class AreaRiservata {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 proposteLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
     }
 }

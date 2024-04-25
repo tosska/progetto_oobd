@@ -4,7 +4,7 @@ import Model.Utente;
 
 import java.sql.Timestamp;
 
-public interface ListaUtentiDAO {
+public interface UtenteDAO {
     void addUtenteDB(String username, String email, String password, Timestamp data);
     boolean verificaUsernameDB(String username);
     boolean verificaPasswordDB(String username, String password);

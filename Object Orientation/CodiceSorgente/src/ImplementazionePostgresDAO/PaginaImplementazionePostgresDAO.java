@@ -1,18 +1,18 @@
 package ImplementazionePostgresDAO;
 
-import DAO.ListaPagineDAO;
-import DAO.ListaUtentiDAO;
+import DAO.PaginaDAO;
+import DAO.UtenteDAO;
 import Database.ConnessioneDatabase;
 import Model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
+public class PaginaImplementazionePostgresDAO implements PaginaDAO {
     private Connection connection;
 
 
-    public ListaPagineImplementazionePostgresDAO() {
+    public PaginaImplementazionePostgresDAO() {
         try {
             connection = ConnessioneDatabase.getInstance().getConnection();
         } catch (SQLException e) {
@@ -29,7 +29,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
             ResultSet rs = ps.executeQuery();
 
             rs.next();
-            ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+            UtenteDAO l = new UtenteImplementazionePostgresDAO();
 
             Tema tema = getTemaDB(rs.getInt("tema"));    // vado a recuperare il tema
 
@@ -234,7 +234,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM PAGINA WHERE titolo=" + "'" + titolo + "'");
             ResultSet rs = ps.executeQuery();
             rs.next();//da capire se è possibile fare meglio
-            ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+            UtenteDAO l = new UtenteImplementazionePostgresDAO();
 
             Tema tema = getTemaDB(rs.getInt("tema"));
 
@@ -283,7 +283,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
 
             while(rs.next())
             {
-                ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+                UtenteDAO l = new UtenteImplementazionePostgresDAO();
                 Utente utente = l.getUtenteDB(rs.getString("utente"));
 
                 int riga = rs.getInt("riga");
@@ -463,7 +463,7 @@ public class ListaPagineImplementazionePostgresDAO implements ListaPagineDAO {
             ResultSet rs = ps.executeQuery();
             rs.next();
 
-            ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+            UtenteDAO l = new UtenteImplementazionePostgresDAO();
             Utente autore = l.getUtenteDB(rs.getString("autore"));
 
             approvazione = new Approvazione(rs.getTimestamp("data"), rs.getBoolean("risposta"), operazione, autore);

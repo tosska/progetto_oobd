@@ -1,7 +1,6 @@
 package GUI;
 
 import Controller.Controller;
-import Model.Tema;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -11,20 +10,16 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 public class EditPage {
 
     private JFrame frame = new JFrame();
-
     private JFrame frameChiamante;
     private Controller controllerPrincipale;
     private JTextPane textPane;
     private JScrollPane scrollPane;
-    private JLabel titleLabel;
     private JTextField titleField;
     private JButton backButton;
-
     private JButton submitButton;
     private JButton removeButton;
     private JButton insertButton;
@@ -37,7 +32,6 @@ public class EditPage {
     EditPage(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
         this.frameChiamante = frameChiamante;
-        String userID = controllerPrincipale.utilizzatore.getUsername();
         controllerPrincipale.caricamentoAnteprimaModifica();
 
         creationGUI();
@@ -143,31 +137,11 @@ public class EditPage {
             }
         });
 
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-
-        removeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-
-
-            }
-        });
-
-
-
-
     }
 
     private void creationGUI() {
         textPane = new JTextPane();
 
-        //textArea.setBackground(new Color(196, 220, 235));
         textPane.setFont(new Font("Arial", Font.PLAIN, 20));
         textPane.setEditable(false);
         textPane.setBounds(10, 50, 460, 350);
@@ -206,12 +180,8 @@ public class EditPage {
         MatteBorder borderCentral = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(116,150,196));
         centralPanel.setBorder(borderCentral);
 
-        //titleLabel = new JLabel("Titolo");
-        //titleLabel.setBounds(10, 10, 75, 25);
-
         titleField = new JTextField(controllerPrincipale.paginaAperta.getTitolo());
         titleField.setBounds(10, 5, 200, 35);
-        //titleField.setBackground(new Color(196, 220, 235));
         titleField.setFont(new Font("Arial", Font.PLAIN, 20));
 
         titlePanel.setLayout(null);
@@ -219,7 +189,6 @@ public class EditPage {
         titlePanel.setBounds(0,0, 650, 50);
         MatteBorder borderTitle = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(72,122,181));
         titlePanel.setBorder(borderTitle);
-        //titlePanel.add(titleLabel);
         titlePanel.add(titleField);
 
         bottomPanel.setLayout(null);
@@ -242,12 +211,10 @@ public class EditPage {
 
         // Creazione di un menu a tendina
         JComboBox<String> dropdownMenu = new JComboBox<>();
-        ArrayList<Tema> listaTemi;
-        listaTemi = controllerPrincipale.generaListaTemi();
 
-        // Ciclo for-each per scorrere l'ArrayList
-        for (Tema tema : listaTemi) {
-            dropdownMenu.addItem(tema.getNome());
+        for (int i = 0; i < controllerPrincipale.ListaTemi.size(); i++)
+        {
+            dropdownMenu.addItem(controllerPrincipale.ListaTemi.get(i).getNome());
         }
 
 
@@ -277,9 +244,7 @@ public class EditPage {
                 // Ottenimento dell'indice della voce selezionata
                 int selectedIndex = dropdownMenu.getSelectedIndex();
 
-                Tema tema = listaTemi.get(selectedIndex);
-
-                controllerPrincipale.creazionePagina(title, text, tema);
+                controllerPrincipale.creazionePagina(title, text, controllerPrincipale.ListaTemi.get(selectedIndex));
 
                 frame.dispose();
                 frameChiamante.setVisible(true);

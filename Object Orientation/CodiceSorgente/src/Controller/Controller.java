@@ -1,19 +1,17 @@
 package Controller;
 
-import DAO.ListaOperazioneDAO;
-import DAO.ListaPagineDAO;
-import DAO.ListaUtentiDAO;
-import ImplementazionePostgresDAO.ListaOperazioneImplementazionePostgresDAO;
-import ImplementazionePostgresDAO.ListaPagineImplementazionePostgresDAO;
-import ImplementazionePostgresDAO.ListaUtentiImplementazionePostgresDAO;
+import DAO.OperazioneDAO;
+import DAO.PaginaDAO;
+import DAO.UtenteDAO;
+import ImplementazionePostgresDAO.OperazioneImplementazionePostgresDAO;
+import ImplementazionePostgresDAO.PaginaImplementazionePostgresDAO;
+import ImplementazionePostgresDAO.UtenteImplementazionePostgresDAO;
 import Model.*;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class Controller {
-
-    public ArrayList<Utente> ListaUtenti;
     public Utente utilizzatore;
     public ArrayList<Pagina> pagineCreate;
     public ArrayList<Operazione> proposteDaApprovare;
@@ -22,21 +20,20 @@ public class Controller {
     public Pagina paginaPrecedente;
     public Frase fraseSelezionata;
     public ArrayList<Pagina> anteprime;
-
     public ArrayList<Operazione> operazioniModifica;
-
+    public ArrayList<Tema> ListaTemi;
     public Pagina anteprimaModifica;
 
 
     //creare un array pagine caricate
     public Controller()
     {
-        ListaUtenti = new ArrayList<Utente>();
+        ListaTemi = generaListaTemi();
     }
 
     public boolean checkAutore()
     {
-        if(utilizzatore.getUsername().equals(paginaAperta.getAutore().getUsername()))
+        if (utilizzatore.getUsername().equals(paginaAperta.getAutore().getUsername()))
             return true;
         else
             return false;
@@ -44,7 +41,7 @@ public class Controller {
 
     public void caricaPagineCreate()
     {
-        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        PaginaDAO l = new PaginaImplementazionePostgresDAO();
         pagineCreate = l.getPagineCreateDB(utilizzatore);
         stampaPagineCreate();
     }
@@ -54,19 +51,19 @@ public class Controller {
         if(proposteDaApprovare!=null && !proposteDaApprovare.isEmpty())
             proposteDaApprovare.clear();
 
-        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        OperazioneDAO l= new OperazioneImplementazionePostgresDAO();
         proposteDaApprovare= l.getProposteDaApprovareDB(pagineCreate, utilizzatore);
     }
 
     public void caricaStoricoOperazioniUtente()
     {
-        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        OperazioneDAO l= new OperazioneImplementazionePostgresDAO();
         storicoOperazioniUtente = l.getOperazioniDB(utilizzatore, 1);
     }
 
     public void caricaStoricoDaPagina(Pagina pagina)
     {
-        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        PaginaDAO l = new PaginaImplementazionePostgresDAO();
         Storico s = l.getStoricoDB(pagina);
         pagina.setStorico(s);
     }
@@ -189,7 +186,7 @@ public class Controller {
         //paginaOriginale.setTestoRiferito(testoModificato);
         //modifica pagina nel database (da fare)
         //paginaOriginale.getStorico().stampaOperazioni();
-        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        PaginaDAO l = new PaginaImplementazionePostgresDAO();
         l.editPageDB(paginaOriginale, listaOperazioni);
 
         if(!proposta)
@@ -230,12 +227,12 @@ public class Controller {
         aggiornaPagineCreate(p);
 
         //la memorizzo nel database
-        ListaPagineDAO listaPagineDAO = new ListaPagineImplementazionePostgresDAO();
-        listaPagineDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername(), tema.getIdTema());
+        PaginaDAO paginaDAO = new PaginaImplementazionePostgresDAO();
+        paginaDAO.addPaginaDB(p.getTitolo(), p.getDataCreazione(), p.getAutore().getUsername(), tema.getIdTema());
 
-        int idPagina = listaPagineDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
+        int idPagina = paginaDAO.recuperaIdPagina(); //da sostituire con getPaginaDB (da creare)
 
-        listaPagineDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi(), utilizzatore);
+        paginaDAO.addTextDB(idPagina, p.getTestoRiferito().getListaFrasi(), utilizzatore);
 
 
     }
@@ -257,70 +254,70 @@ public class Controller {
 
     public void creaTema(String tema)
     {
-        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
-        l.addTemaDB(tema);   // scrive sul DB
+        PaginaDAO l = new PaginaImplementazionePostgresDAO();
+        l.addTemaDB(tema);
     }
 
     public ArrayList<Tema> generaListaTemi()
     {
         ArrayList<Tema> listaTemi;
-        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
-        listaTemi = l.raccogliTemi();   // scrive sul DB
+        PaginaDAO l = new PaginaImplementazionePostgresDAO();
+        listaTemi = l.raccogliTemi();
 
         return listaTemi;
     }
 
     public void aggiungiUtente(String username, String email, String password, Timestamp data)
     {
-        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        UtenteDAO l = new UtenteImplementazionePostgresDAO();
         l.addUtenteDB(username, email, password, data);   // scrive sul DB
     }
 
     public boolean modificaUsername(String oldUsername, String newUsername)
     {
-        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        UtenteDAO l = new UtenteImplementazionePostgresDAO();
         boolean result = l.modificaUsernameDB(oldUsername, newUsername);
         return result;
     }
 
     public boolean modificaEmail(String oldEmail, String newEmail)
     {
-        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        UtenteDAO l = new UtenteImplementazionePostgresDAO();
         boolean result = l.modificaEmailDB(oldEmail, newEmail);
         return result;
     }
 
     public boolean eliminaAccount(String username)
     {
-        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        UtenteDAO l = new UtenteImplementazionePostgresDAO();
         boolean result = l.eliminaAccountDB(username);
         return result;
     }
 
     public boolean modificaPassword(String oldPassword, String newPassword)
     {
-        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        UtenteDAO l = new UtenteImplementazionePostgresDAO();
         boolean result = l.modificaPasswordDB(oldPassword, newPassword);
         return result;
     }
 
     public boolean verificaUsername(String username)
     {
-        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        UtenteDAO l = new UtenteImplementazionePostgresDAO();
         boolean result = l.verificaUsernameDB(username);
         return result;
     }
 
     public boolean verificaPassword(String username, String password)
     {
-        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        UtenteDAO l = new UtenteImplementazionePostgresDAO();
         boolean result = l.verificaPasswordDB(username, password);
         return result;
     }
 
     public void impostaUtilizzatore(String username)
     {
-        ListaUtentiDAO l = new ListaUtentiImplementazionePostgresDAO();
+        UtenteDAO l = new UtenteImplementazionePostgresDAO();
         utilizzatore = l.getUtenteDB(username);
     }
 
@@ -332,16 +329,15 @@ public class Controller {
 
     public Pagina cercaPagina(String titolo)
     {
-        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        PaginaDAO l = new PaginaImplementazionePostgresDAO();
         return l.cercaPaginaDB(titolo);
     }
 
     public Pagina searchPageById(int id)
     {
-        ListaPagineDAO l = new ListaPagineImplementazionePostgresDAO();
+        PaginaDAO l = new PaginaImplementazionePostgresDAO();
         return l.getPaginaByIdDB(id);
     }
-
 
     public void creaAnteprime()
     {
@@ -369,9 +365,6 @@ public class Controller {
 
         if(!proposteDaApprovare.isEmpty())
             anteprime.add(antem);
-
-
-
 
 
         this.anteprime = anteprime;
@@ -408,7 +401,7 @@ public class Controller {
 
     public void approvaProposta(Operazione proposta, Boolean risposta)
     {
-        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        OperazioneDAO l= new OperazioneImplementazionePostgresDAO();
         l.approvaPropostaDB(proposta, utilizzatore, risposta);
     }
 
@@ -416,7 +409,7 @@ public class Controller {
     {
         ArrayList<Operazione> listaProposte;
 
-        ListaOperazioneDAO l= new ListaOperazioneImplementazionePostgresDAO();
+        OperazioneDAO l= new OperazioneImplementazionePostgresDAO();
         listaProposte = l.getProposteUP_DB(pagina, utente);
 
         return listaProposte;
@@ -437,13 +430,13 @@ public class Controller {
 
     public void insertLink(Pagina pagina, int riga, int ordine, Pagina paginaLink, Utente utente)
     {
-        ListaPagineDAO l= new ListaPagineImplementazionePostgresDAO();
+        PaginaDAO l= new PaginaImplementazionePostgresDAO();
         l.insertLinkDB(pagina, riga, ordine, paginaLink, utente);
     }
 
     public void removeLink(Pagina pagina, int riga, int ordine, Utente utente)  {
 
-        ListaPagineDAO l= new ListaPagineImplementazionePostgresDAO();
+        PaginaDAO l= new PaginaImplementazionePostgresDAO();
         l.removeLinkDB(pagina, riga, ordine, utente);
     }
 
@@ -519,8 +512,6 @@ public class Controller {
         }
 
     }
-
-
 
     public ArrayList<String> getFrasiPaginaAperta()
     {

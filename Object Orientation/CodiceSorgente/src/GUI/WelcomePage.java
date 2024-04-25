@@ -1,32 +1,25 @@
 package GUI;
 
 import Controller.Controller;
-import Model.Pagina;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.*;
 
-// CLASSE PER DEBUG
+
 public class WelcomePage {
     private JFrame frame = new JFrame();
     private Controller controllerPrincipale;
-
-
     private JPanel menuPanel = new JPanel();
     private JLabel logoLabel = new JLabel();
     private JLabel logoutLabel = new JLabel("Log out");
     private JLabel createPageLabel = new JLabel("Create a new page");
     private JLabel createThemeLabel = new JLabel("Create a new theme");
-
-
     private JPanel panelWhite = new JPanel();
     private JLabel searchLabel = new JLabel();
     private JTextField searchField = new JTextField("Search...");
     private JLabel profileLabel = new JLabel();
-
-
     private JPanel centralPanel = new JPanel();
     private CardLayout cardLayout = new CardLayout();
     private JPanel welcomePanel = new JPanel();
@@ -34,11 +27,18 @@ public class WelcomePage {
     private JPanel createNewPagePanel = new JPanel();
     private JLabel titleLabel = new JLabel("Inserisci titolo:");
     private JTextField titleField = new JTextField();
+    private JFrame frameChiamante;
 
 
     WelcomePage(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
+        this.frameChiamante = frameChiamante;
 
+        creationGUI();
+    }
+
+    private void creationGUI()
+    {
         menuPanel.setBounds(0, 0, 200, 500);
         menuPanel.setLayout(null);
         menuPanel.setBackground(new Color(47,69,92));
@@ -53,7 +53,7 @@ public class WelcomePage {
         logoutLabel.setBounds(15, 350, 250, 70);
         logoutLabel.setIconTextGap(15);
         logoutLabel.setForeground(Color.white);
-        logoutLabel.addMouseListener(new MouseListener() {
+        logoutLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.dispose();
@@ -61,24 +61,10 @@ public class WelcomePage {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 logoutLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         ImageIcon createPageImagine = new ImageIcon(this.getClass().getResource("/icon/createPage.png"));
@@ -86,7 +72,7 @@ public class WelcomePage {
         createPageLabel.setBounds(15, 150, 250, 50);
         createPageLabel.setIconTextGap(15);
         createPageLabel.setForeground(Color.white);
-        createPageLabel.addMouseListener(new MouseListener() {
+        createPageLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
@@ -94,24 +80,10 @@ public class WelcomePage {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 createPageLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         ImageIcon createThemeImagine = new ImageIcon(this.getClass().getResource("/icon/createTheme.png"));
@@ -119,7 +91,7 @@ public class WelcomePage {
         createThemeLabel.setBounds(15, 210, 250, 50);
         createThemeLabel.setIconTextGap(15);
         createThemeLabel.setForeground(Color.white);
-        createThemeLabel.addMouseListener(new MouseListener() {
+        createThemeLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String tema = JOptionPane.showInputDialog(null, "Inserisci un tema:", "Input", JOptionPane.QUESTION_MESSAGE);
@@ -134,24 +106,10 @@ public class WelcomePage {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 createThemeLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
 
@@ -203,7 +161,7 @@ public class WelcomePage {
         // Imposta la posizione della JLabel
         profileLabel.setBounds(x, y, labelSize.width, labelSize.height);
 
-        profileLabel.addMouseListener(new MouseListener() {
+        profileLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
@@ -211,24 +169,10 @@ public class WelcomePage {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
             public void mouseEntered(MouseEvent e) {
                 profileLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
         });
 
         // quando premo invio inizia la ricerca
@@ -236,8 +180,7 @@ public class WelcomePage {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    Pagina p = controllerPrincipale.cercaPagina(searchField.getText());
-                    controllerPrincipale.paginaAperta = p;
+                    controllerPrincipale.paginaAperta = controllerPrincipale.cercaPagina(searchField.getText());
                     PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
                     frame.setVisible(false);
                 }
