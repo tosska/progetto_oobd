@@ -3,11 +3,16 @@ package GUI;
 import Controller.Controller;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 public class LinkGUI {
     private JFrame frame = new JFrame();
@@ -29,7 +34,56 @@ public class LinkGUI {
         creationGUI();
         functionButton();
 
-        textPane.setText(controllerPrincipale.paginaAperta.getTestoString());
+        stampaTesto(controller.paginaAperta.getTestoRiferito().getFrasiString());
+
+    }
+
+    private void stampaTesto(ArrayList<String> testo)
+    {
+        textPane.setText("");
+        Document doc = textPane.getDocument();
+
+        for(String f : testo)
+        {
+            try {
+
+                Style colore = attribuzioneColore(f);
+                f = f.replace("##i", "");
+                f= f.replace("##m", "");
+                f= f.replace("##c", "");
+                f= f.replace("##l", "");
+
+                doc.insertString(doc.getLength(), f, colore);
+            }
+            catch (BadLocationException e)
+            {
+                System.out.println(e.getMessage());
+            }
+
+        }
+    }
+
+    public Style attribuzioneColore(String s)
+    {
+        Style stile = textPane.addStyle("ColorStyle", null);
+        Color c;
+
+        if(s.contains("##l")) {
+            StyleConstants.setUnderline(stile, true);
+            c = Color.orange;
+        }
+        else
+            c = Color.black;
+
+        if(s.contains("##i"))
+            c = Color.blue;
+        else if (s.contains("##m"))
+            c = Color.green;
+        else if (s.contains("##c"))
+            c = Color.red;
+
+        StyleConstants.setForeground(stile, c);
+        return stile;
     }
 
     private void creationGUI()

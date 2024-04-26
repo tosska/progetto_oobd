@@ -202,6 +202,8 @@ public class Controller {
             }
         }
 
+        PuliziaOperazioni(listaOperazioni);
+
         //paginaOriginale.setTestoRiferito(testoModificato);
         //modifica pagina nel database (da fare)
         //paginaOriginale.getStorico().stampaOperazioni();
@@ -221,20 +223,47 @@ public class Controller {
     private void PuliziaOperazioni(ArrayList<Operazione> listaOperazioni)
     {
         Modifica mod=null;
+        Modifica precedente=null;
+        int position = 0;
         for(int i=0; i<listaOperazioni.size(); i++)
         {
             if(listaOperazioni.get(i) instanceof Modifica && mod==null){
                 mod = (Modifica) listaOperazioni.get(i);
-            } else if (listaOperazioni.get(i) instanceof Modifica){
-                if(mod==null){
-                    if(((Modifica) listaOperazioni.get(i)).getFraseModificata().equals(mod.getFraseModificata()))
-                        listaOperazioni.remove(i);
-                }else{
+                precedente = mod;
+                position = i;
+            } else if (listaOperazioni.get(i) instanceof Modifica && mod!=null){
 
+                if(((Modifica) listaOperazioni.get(i)).getFraseModificata().getContenuto().equals(precedente.getFraseCoinvolta().getContenuto())) {
+                    precedente = (Modifica) listaOperazioni.get(i);
+                    listaOperazioni.set(i, null);
+                } else if (listaOperazioni.get(i).getFraseCoinvolta().getContenuto().equals(precedente.getFraseModificata().getContenuto())){
+                    precedente = (Modifica) listaOperazioni.get(i);
+                    listaOperazioni.set(i, null);
                 }
+                else
+                    mod = null;
+
+            } else if(listaOperazioni.get(i) instanceof Inserimento && mod!=null){
+                Inserimento tmp = (Inserimento) listaOperazioni.get(i);
+                tmp.setFraseCoinvolta(mod.getFraseModificata());
+                listaOperazioni.set(i, tmp);
+                listaOperazioni.set(position, null);
+                mod = null;
+            } else if(listaOperazioni.get(i) instanceof Cancellazione && mod!=null){
+                Cancellazione tmp = (Cancellazione) listaOperazioni.get(i);
+                tmp.setFraseCoinvolta(mod.getFraseCoinvolta());
+                listaOperazioni.set(i, tmp);
+                listaOperazioni.set(position, null);
+                mod = null;
+            } else {
+                mod = null;
             }
+        }
 
-
+        for(int i=0; i<listaOperazioni.size(); i++)
+        {
+            if(listaOperazioni.get(i)==null)
+                listaOperazioni.remove(i);
         }
 
     }
