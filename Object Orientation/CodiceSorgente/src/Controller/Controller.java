@@ -289,9 +289,17 @@ public class Controller {
 
     public ArrayList<Tema> generaListaTemi()
     {
-        ArrayList<Tema> listaTemi;
+        ArrayList<Integer> listaIdTemi = new ArrayList<>();
+        ArrayList<String> listaNomiTemi = new ArrayList<>();
+
+        ArrayList<Tema> listaTemi = new ArrayList<>();
         PaginaDAO l = new PaginaImplementazionePostgresDAO();
-        listaTemi = l.raccogliTemi();
+        l.raccogliTemi(listaIdTemi, listaNomiTemi);
+
+        for (int i = 0; i < listaIdTemi.size(); i++)
+        {
+            listaTemi.add(new Tema(listaIdTemi.get(i), listaNomiTemi.get(i)));
+        }
 
         return listaTemi;
     }
@@ -344,10 +352,19 @@ public class Controller {
         return result;
     }
 
-    public void impostaUtilizzatore(String username)
+    public Utente getUtenteDB(String username)
     {
         UtenteDAO l = new UtenteImplementazionePostgresDAO();
-        utilizzatore = l.getUtenteDB(username);
+        ArrayList<String> utenteInfo = new ArrayList<>();
+        l.getUtenteDB(username, utenteInfo);
+
+        Utente utente = new Utente(username, utenteInfo.get(0), utenteInfo.get(1), utenteInfo.get(2));
+        return utente;
+    }
+
+    public void impostaUtilizzatore(String username)
+    {
+        utilizzatore = getUtenteDB(username);
     }
 
     public void stampaPagineCreate() //debug

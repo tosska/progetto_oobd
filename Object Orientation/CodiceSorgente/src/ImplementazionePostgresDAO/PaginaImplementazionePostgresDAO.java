@@ -3,7 +3,6 @@ package ImplementazionePostgresDAO;
 import DAO.PaginaDAO;
 import DAO.UtenteDAO;
 import Database.ConnessioneDatabase;
-import Model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,9 +19,8 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         }
     }
 
-    public Pagina getPaginaByIdDB(int idPagina)
+    public void getPaginaByIdDB(int idPagina, ArrayList<String> paginaInfo)
     {
-        Pagina pagina = null;
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM PAGINA WHERE id_pagina=" + idPagina);
@@ -31,10 +29,14 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             rs.next();
             UtenteDAO l = new UtenteImplementazionePostgresDAO();
 
-            Tema tema = getTemaDB(rs.getInt("tema"));    // vado a recuperare il tema
+            String tema = getTemaDB(rs.getInt("tema"));    // vado a recuperare il tema
 
-            pagina = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")),
-                    tema);
+            paginaInfo.set(0, rs.getInt(1));
+            paginaInfo.set(1, rs.getString("Titolo"));
+            paginaInfo.set(2, rs.getString("DataCreazione"));
+            paginaInfo.set(3, rs.getString("userAutore"));
+            paginaInfo.set(4, tema);
+
             pagina.setTestoRiferito(getTestoDB(pagina));
 
             rs.close();
@@ -44,7 +46,6 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             System.out.println("Errore: " + e.getMessage());
         }
 
-        return pagina;
     }
 
     @Override
@@ -71,19 +72,19 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         }
     }
 
-    public ArrayList<Tema> raccogliTemi()
+    public void raccogliTemi(ArrayList<Integer> listaIdTemi, ArrayList<String> listaNomiTemi)
     {
-        ArrayList<Tema> listaTemi = new ArrayList<>();
-
         try {
             // Esecuzione della query per ottenere i temi
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM tema");
 
+            int i = 0;
             // Aggiunta dei temi al menu a tendina
             while (resultSet.next()) {
-                Tema attuale = new Tema(resultSet.getInt("idTema"), resultSet.getString("nome"));
-                listaTemi.add(attuale);
+                listaIdTemi.set(i, resultSet.getInt("idTema"));
+                listaNomiTemi.set(i, resultSet.getString("nome"));
+                i++;
             }
 
             resultSet.close();
@@ -92,8 +93,6 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             System.out.println("Errore: " + e.getMessage());
         }
 
-
-        return listaTemi;
     }
 
 
@@ -226,9 +225,8 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
 
     }
 
-    public Pagina cercaPaginaDB(String titolo)
+    public void cercaPaginaDB(String titolo, ArrayList<String> pagina)
     {
-        Pagina p = null;
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM PAGINA WHERE titolo=" + "'" + titolo + "'");
@@ -251,16 +249,16 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         return p;
     }
 
-    public Tema getTemaDB(int idTema)
+    public String getTemaDB(int idTema)
     {
-        Tema tema = null;
+        String nome;
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM TEMA WHERE idTema = " + "'" + idTema + "'");
             ResultSet rs = ps.executeQuery();
             rs.next();
 
-            tema = new Tema(rs.getInt("idTema"), rs.getString("nome"));
+            nome = rs.getInt("idTema"), rs.getString("nome");
 
             rs.close();
             ps.close();
@@ -270,7 +268,7 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             System.out.println("Errore: " + e.getMessage());
         }
 
-        return tema;
+        return nome;
     }
 
     public Storico getStoricoDB(Pagina pagina)

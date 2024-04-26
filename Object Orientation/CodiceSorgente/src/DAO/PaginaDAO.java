@@ -1,14 +1,12 @@
 package DAO;
 
-import Model.*;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public interface PaginaDAO {
     public void addPaginaDB(String titolo, Timestamp data, String autore, int idTema);
     public void addTemaDB(String tema);
-    public ArrayList<Tema> raccogliTemi();
+    public void raccogliTemi(ArrayList<Integer> listaIdTemi, ArrayList<String> listaNomiTemi);
     public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi, Utente utilizzatore);
 
     public void addFraseDB(Pagina pagina, Inserimento inserimento);
@@ -16,7 +14,7 @@ public interface PaginaDAO {
     public void editFraseDB(Pagina pagina, Modifica modifica);
 
     public int recuperaIdPagina();
-    public Pagina cercaPaginaDB(String titolo);
+    public void cercaPaginaDB(String titolo);
     public Storico getStoricoDB(Pagina p);
     public Testo getTestoDB(Pagina p);
 
@@ -28,7 +26,7 @@ public interface PaginaDAO {
 
     //public ArrayList<Operazione> getProposteDaApprovareDB(Utente utilizzatore);
 
-    public Pagina getPaginaByIdDB(int idPagina);
+    public void getPaginaByIdDB(int idPagina, ArrayList<String> paginaInfo);
 
     public void insertLinkDB(Pagina pagina, int riga, int ordine, Pagina paginaCollegamento, Utente utente);
 

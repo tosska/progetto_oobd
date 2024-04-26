@@ -1,9 +1,6 @@
 package GUI;
 
 import Controller.Controller;
-import DAO.PaginaDAO;
-import DAO.UtenteDAO;
-import ImplementazionePostgresDAO.PaginaImplementazionePostgresDAO;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;

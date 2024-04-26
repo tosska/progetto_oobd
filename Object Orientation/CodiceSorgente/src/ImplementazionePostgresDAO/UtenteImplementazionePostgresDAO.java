@@ -5,6 +5,7 @@ import Database.ConnessioneDatabase;
 import Model.Utente;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class UtenteImplementazionePostgresDAO implements UtenteDAO {
     private Connection connection;
@@ -137,18 +138,16 @@ public class UtenteImplementazionePostgresDAO implements UtenteDAO {
     }
 
     @Override
-    public Utente getUtenteDB(String username) {
+    public void getUtenteDB(String username, ArrayList<String> utente) {
         try {
             PreparedStatement queryControllo = connection.prepareStatement("SELECT * from utente where username = '" + username + "'");
             ResultSet rs = queryControllo.executeQuery();
 
             if(rs.next())
             {
-                String email = rs.getString("email");
-                String password = rs.getString("password");
-                Timestamp data = rs.getTimestamp("dataiscrizione");
-                Utente u = new Utente(username, email, password, data);
-                return u;
+                utente.set(0, rs.getString("email"));
+                utente.set(1, rs.getString("password"));
+                utente.set(2, rs.getString("dataiscrizione"));
             }
 
             connection.close();
@@ -157,6 +156,5 @@ public class UtenteImplementazionePostgresDAO implements UtenteDAO {
         {
             System.out.println("Errore: " + e.getMessage());
         }
-        return null;
     }
 }
