@@ -4,10 +4,11 @@ import DAO.OperazioneDAO;
 import DAO.PaginaDAO;
 import DAO.UtenteDAO;
 import Database.ConnessioneDatabase;
-import Model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import Model.*;
+import java.util.Objects;
 
 public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
 
@@ -98,27 +99,41 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
 
     }
 
-    public ArrayList<Operazione> getOperazioniDB(Utente utilizzatore, int tipo)
+    public void getOperazioniDB(String username, int t, ArrayList<Object> operazioni)
     {
-        ArrayList<Operazione> operazioni = new ArrayList<>();
-        String comandoSql = "SELECT O.* FROM OPERAZIONE O WHERE utente = " + "'" + utilizzatore.getUsername() + "'";
+        String comandoSql = "SELECT O.* FROM OPERAZIONE O WHERE utente = " + "'" + username + "'";
         String comandoSql2 = "AND proposta=" ;
+        int index=0;
 
-        if(tipo==1) //per avere tutto
+        if(t==1) //per avere tutto
             comandoSql2 = " ORDER BY O.data DESC";
-        else if(tipo==2) //per avere solo operazioni da autore
+        else if(t==2) //per avere solo operazioni da autore
             comandoSql2 += "false";
-        else if(tipo==3) //per avere solo proposte
+        else if(t==3) //per avere solo proposte
             comandoSql2 += "true";
 
         comandoSql += comandoSql2;
+
+
 
         try {
             PreparedStatement ps = connection.prepareStatement(comandoSql);
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next())
-            {
+            while(rs.next()) {
+
+                operazioni.add(rs.getInt(1)); //id
+                operazioni.add(rs.getString(2)); //tipo
+                operazioni.add(rs.getBoolean(3)); //proposta
+                operazioni.add(rs.getInt(4)); //riga
+                operazioni.add(rs.getInt(5)); //ordine
+                operazioni.add(rs.getString(6)); //frase coinvolta
+                operazioni.add(rs.getString(7)); //frase modificata
+                operazioni.add(rs.getTimestamp(8)); //data
+                operazioni.add(rs.getInt(9)); //id pagina
+
+
+                /*
                 //recupero le informazioni sull'operazione
                 int idOperazione = rs.getInt("id_operazione");
                 PaginaDAO lPagina = new PaginaImplementazionePostgresDAO();
@@ -161,6 +176,9 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
                 }
 
                 operazioni.add(operazione);
+
+            */
+
             }
             rs.close();
             ps.close();
@@ -169,9 +187,6 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
         {
             System.out.println("Errore: " + e.getMessage());
         }
-
-        return operazioni;
-
 
     }
 
