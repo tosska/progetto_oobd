@@ -218,6 +218,27 @@ public class Controller {
 
     }
 
+    private void PuliziaOperazioni(ArrayList<Operazione> listaOperazioni)
+    {
+        Modifica mod=null;
+        for(int i=0; i<listaOperazioni.size(); i++)
+        {
+            if(listaOperazioni.get(i) instanceof Modifica && mod==null){
+                mod = (Modifica) listaOperazioni.get(i);
+            } else if (listaOperazioni.get(i) instanceof Modifica){
+                if(mod==null){
+                    if(((Modifica) listaOperazioni.get(i)).getFraseModificata().equals(mod.getFraseModificata()))
+                        listaOperazioni.remove(i);
+                }else{
+
+                }
+            }
+
+
+        }
+
+    }
+
     private void aggiornaPagineCreate(Pagina pagina)
     {
         boolean trovato=false;
