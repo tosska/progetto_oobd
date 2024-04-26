@@ -180,7 +180,7 @@ public class PageGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.setVisible(false);
-                EditPage editPage = new EditPage(controllerPrincipale, frame);
+                EditPage editPage = new EditPage(controllerPrincipale, frameChiamante);
             }
         });
 
@@ -188,7 +188,7 @@ public class PageGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.setVisible(false);
-                LinkGUI linkGUI = new LinkGUI(controllerPrincipale, frame);
+                LinkGUI linkGUI = new LinkGUI(controllerPrincipale, frameChiamante);
             }
         });
 

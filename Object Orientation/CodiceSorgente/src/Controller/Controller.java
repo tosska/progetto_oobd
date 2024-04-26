@@ -85,35 +85,7 @@ public class Controller {
         return false;
     }
 
-    public Testo getTestoConProposte()
-    {
 
-        ArrayList<Operazione> listaProposte = getProposteUtenteUP(paginaAperta, utilizzatore);
-
-        if(listaProposte.isEmpty())
-            return null;
-
-        Testo clone = paginaAperta.getTestoRiferito().clonaTesto();
-
-        for(Operazione op : listaProposte)
-        {
-            Frase frase = new Frase(op.getFraseCoinvolta().getRiga(), op.getFraseCoinvolta().getOrdine(), op.getFraseCoinvolta().getContenuto(), clone);
-
-            // e se mandassimo riga, ordine e contenuto senza creare l'oggetto Frase?
-            if(op instanceof Inserimento)
-                clone.inserisciFrase(frase, false);
-            else if (op instanceof Modifica) {
-                frase.setContenuto(((Modifica) op).getFraseModificata().getContenuto());
-                clone.modificaFrase(frase, false);
-            } else if (op instanceof Cancellazione) {
-                clone.cancellaFrase(frase, false);
-
-            }
-        }
-
-        return clone;
-
-    }
 
     public void caricamentoAnteprimaModifica()
     {
@@ -121,19 +93,7 @@ public class Controller {
         operazioniModifica = new ArrayList<>();
     }
 
-    public void inserisciFrasePostCreazione(String frase, int riga, int ordine)
-    {
-        Boolean proposta = !checkAutore();
-        Frase fraseI = new Frase(riga, ordine, frase, anteprimaModifica.getTestoRiferito());
 
-
-        anteprimaModifica.getTestoRiferito().inserisciFrase(fraseI, true);
-        anteprimaModifica.getTestoRiferito().aggiorna();
-
-        //storico deve essere opzionale ? quindi non va messa nel costruttore?
-        Inserimento inserimento = new Inserimento(proposta, fraseI, new Timestamp(System.currentTimeMillis()), utilizzatore, paginaAperta.getStorico(), paginaAperta);
-        operazioniModifica.add(inserimento);
-    }
 
     public void caricaModifichePagina(String testo, Boolean proposta)
     {
@@ -402,11 +362,6 @@ public class Controller {
         return l.cercaPaginaDB(titolo);
     }
 
-    public Pagina searchPageById(int id)
-    {
-        PaginaDAO l = new PaginaImplementazionePostgresDAO();
-        return l.getPaginaByIdDB(id);
-    }
 
     public void creaAnteprime()
     {
@@ -464,15 +419,6 @@ public class Controller {
         l.approvaPropostaDB(proposta, utilizzatore, risposta);
     }
 
-    public ArrayList<Operazione> getProposteUtenteUP(Pagina pagina, Utente utente)
-    {
-        ArrayList<Operazione> listaProposte;
-
-        OperazioneDAO l= new OperazioneImplementazionePostgresDAO();
-        listaProposte = l.getProposteUP_DB(pagina, utente);
-
-        return listaProposte;
-    }
 
     public int getNumOccurences(String line, char occurence)
     {

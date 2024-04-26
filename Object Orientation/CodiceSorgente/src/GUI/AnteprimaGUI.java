@@ -3,6 +3,7 @@ package GUI;
 import Controller.Controller;
 
 import javax.swing.*;
+import javax.swing.border.MatteBorder;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,9 +19,14 @@ public class AnteprimaGUI {
 
     private JScrollPane scrollPane;
     private JLabel titleLabel;
-    private JLabel autoreLabel;
     private JButton backButton;
     private JButton paginaButton;
+
+
+    private JPanel titlePanel = new JPanel();
+    private JPanel centralPanel = new JPanel();
+    private JPanel bottomPanel = new JPanel();
+    private JLabel authorLabel = new JLabel();
 
     AnteprimaGUI(Controller controller, JFrame frameChiamante) {
         controllerPrincipale = controller;
@@ -33,48 +39,83 @@ public class AnteprimaGUI {
     }
 
     private void creationGUI() {
+        titlePanel.setLayout(null);
+        titlePanel.setBackground(new Color(139, 183, 240));
+        titlePanel.setBounds(0,0, 500, 50);
+        MatteBorder borderTitle = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(72,122,181));
+        titlePanel.setBorder(borderTitle);
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Anteprima: " + controllerPrincipale.paginaAperta.getTitolo());
-        frame.setSize(500, 500);
-        frame.setLayout(null);
-        frame.setLocationRelativeTo(null);
+        titleLabel = new JLabel(controllerPrincipale.paginaAperta.getTitolo() + " (" + controllerPrincipale.paginaAperta.getTema().getNome() + ")");
+        titleLabel.setBounds(10, 10, 200, 25);
+        titleLabel.setFont(new Font("Arial", Font.PLAIN, 20));
 
+        centralPanel.setLayout(null);
+        centralPanel.setBackground(new Color(194, 232, 255));
+        centralPanel.setBounds(0, 50, 500, 420);
+        MatteBorder borderCentral = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(116,150,196));
+        centralPanel.setBorder(borderCentral);
 
         textArea = new JTextPane();
         textArea.setEditable(false);
+        textArea.setBounds(10, 50, 460, 350);
         textArea.setFont(new Font("Arial", Font.PLAIN, 20));
 
 
         scrollPane = new JScrollPane(textArea);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setBounds(10, 50, 460, 350);
+        scrollPane.setBounds(10, 10, 460, 350);
 
-        titleLabel = new JLabel(controllerPrincipale.paginaAperta.getTitolo());
-        titleLabel.setBounds(10, 10, 200, 25);
+        authorLabel.setBounds(10, 360, 300, 55);
+        authorLabel.setText("<html> Proposed by: " + controllerPrincipale.paginaAperta.getAutore().getUsername() +
+                "<br>Date: " + controllerPrincipale.paginaAperta.getDataCreazione().toString().split("\\.")[0] +  "</html>");
+        authorLabel.setFont(new Font("Monospaced", Font.PLAIN, 15));
 
-        autoreLabel = new JLabel("Proposta di " + controllerPrincipale.paginaAperta.getAutore().getUsername());
-        autoreLabel.setBounds(10, 25, 200, 25);
+        bottomPanel.setLayout(null);
+        bottomPanel.setBackground(new Color(139, 183, 240));
+        bottomPanel.setBounds(0,470, 500, 90);
 
         backButton = new JButton("Back");
-        backButton.setBounds(390, 10, 70, 25);
+        backButton.setBounds(10, 10, 70, 35);
+        backButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        backButton.setBackground(new Color(47,69,92));
+        backButton.setForeground(Color.white);
+        backButton.setFocusable(false);
 
         paginaButton = new JButton("Versione Attuale");
-        paginaButton.setBounds(330, 410, 135, 25);
+        paginaButton.setBounds(90, 10, 135, 35);
+        paginaButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        paginaButton.setBackground(new Color(47,69,92));
+        paginaButton.setForeground(Color.white);
+        paginaButton.setFocusable(false);
 
 
 
-        //frame.add(textArea);
-        frame.add(titleLabel);
-        frame.add(autoreLabel);
-        frame.add(scrollPane);
-        frame.add(backButton);
-        frame.add(paginaButton);
+        titlePanel.add(titleLabel);
+
+        centralPanel.add(scrollPane);
+        centralPanel.add(authorLabel);
+
+        bottomPanel.add(backButton);
+        bottomPanel.add(paginaButton);
 
 
+        frame.add(titlePanel);
+        frame.add(centralPanel);
+        frame.add(bottomPanel);
+
+        ImageIcon logo = new ImageIcon(this.getClass().getResource("/icon/wiki.png"));
+        frame.setTitle(controllerPrincipale.paginaAperta.getTitolo());
+        frame.setResizable(false);
+        frame.setIconImage(logo.getImage());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 560);
+        frame.setLayout(null);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-
+        frame.requestFocusInWindow();
     }
+
+
 
     private void functionButton() {
         backButton.addActionListener(new ActionListener() {

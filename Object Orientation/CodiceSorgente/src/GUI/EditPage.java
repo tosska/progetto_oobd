@@ -1,6 +1,9 @@
 package GUI;
 
 import Controller.Controller;
+import DAO.PaginaDAO;
+import DAO.UtenteDAO;
+import ImplementazionePostgresDAO.PaginaImplementazionePostgresDAO;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -168,6 +171,8 @@ public class EditPage {
                 // Tema tema = listaTemi.get(selectedIndex);  modificare tema
 
                 controllerPrincipale.caricaModifichePagina(textPane.getText(), false);
+
+                JOptionPane.showMessageDialog(null, "Modifica effettuata con successo.", "Avviso", JOptionPane.INFORMATION_MESSAGE);
 
 
                 frame.dispose();
