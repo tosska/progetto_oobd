@@ -1,6 +1,7 @@
 package Model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class Pagina {
 
@@ -10,7 +11,7 @@ public class Pagina {
     private Timestamp dataCreazione;
     private Utente autore;
     private Testo testoRiferito;
-    private Storico storico;
+    private ArrayList<Operazione> storico;
 
     public Pagina(String titolo, Utente autore, String testo, Tema tema) { //creazione di un oggetto Pagina mandando testo di tipo String
                                                                 // costruttore da chiamare quando viene creata una pagina;
@@ -18,13 +19,13 @@ public class Pagina {
         setDataCreazione();
         setAutore(autore);
         testoRiferito = new Testo(this);
-        storico = new Storico(this);
+        storico = new ArrayList<>();
         setTema(tema);
         setTestoString(testo);
     }
 
     public Pagina(int id, String titolo, Testo testo, Timestamp dataCreazione, Utente autore, Tema tema ) { //creazione di un oggetto Pagina mandando testo di tipo Testo
-                                                                                                // costruttore da chiamare quando viene recuperata una pagina dal DB
+        // costruttore da chiamare quando viene recuperata una pagina dal DB
         this.id = id;
         setTitolo(titolo);
         setTestoRiferito(testo);
@@ -32,9 +33,8 @@ public class Pagina {
         setAutore(autore);
         testoRiferito = testo;
         setTema(tema);
-        // storico = new Storico(this);
+        storico = new ArrayList<>();
 
-        System.out.println(autore.getUsername());
     }
 
     public String getTitolo() { return titolo; }
@@ -47,8 +47,6 @@ public class Pagina {
 
     public Testo getTestoRiferito() { return testoRiferito; }
     public void setTestoRiferito(Testo testoRiferito) { this.testoRiferito = testoRiferito; }
-    public Storico getStorico() { return storico; }
-    public void setStorico(Storico storico) { this.storico = storico; }
 
     public int getId() {return id;}
 
@@ -71,5 +69,13 @@ public class Pagina {
     public void setLunghezzaRiga(int n)
     {
         testoRiferito.setLunghezzaRiga(n);
+    }
+
+    public ArrayList<Operazione> getStorico() {
+        return storico;
+    }
+
+    public void setStorico(ArrayList<Operazione> storico) {
+        this.storico = storico;
     }
 }

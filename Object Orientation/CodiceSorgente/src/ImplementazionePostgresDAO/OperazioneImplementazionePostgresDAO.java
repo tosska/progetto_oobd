@@ -85,53 +85,6 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
                 operazioni.add(rs.getTimestamp(8)); //data
                 operazioni.add(rs.getInt(9)); //id pagina
 
-
-                /*
-                //recupero le informazioni sull'operazione
-                int idOperazione = rs.getInt("id_operazione");
-                PaginaDAO lPagina = new PaginaImplementazionePostgresDAO();
-                Pagina pagina = lPagina.getPaginaByIdDB(rs.getInt("id_pagina")); //preleviamo la pagina che fa riferimento la proposta
-                UtenteDAO lUtente= new UtenteImplementazionePostgresDAO();
-                Utente generico = lUtente.getUtenteDB(rs.getString("utente")); //preleviamo l'utente che ha proposto la modifica
-                Timestamp data = rs.getTimestamp("data");
-                Boolean proposta = rs.getBoolean("proposta");
-                Operazione operazione = null;
-
-                //recupero le informazioni sulla frase coinvolta nell'operazione
-                int riga = rs.getInt("riga");
-                int ordine = rs.getInt("ordine");
-                String contenuto = rs.getString("fraseCoinvolta");
-                Frase fraseCoinvolta = new Frase(riga, ordine, contenuto, pagina.getTestoRiferito());
-
-
-
-                if(rs.getString("tipo").equals("I")) {
-                    operazione = new Inserimento(proposta, fraseCoinvolta, data, generico, pagina.getStorico(), pagina);
-                    operazione.setId(idOperazione);
-
-                }
-                else if(rs.getString("tipo").equals("M"))
-                {
-                    Frase fraseModificata = new Frase(riga, ordine, rs.getString("fraseModificata"), pagina.getTestoRiferito());
-                    operazione = new Modifica(proposta, fraseCoinvolta, fraseModificata, data, generico, pagina.getStorico(), pagina);
-                    operazione.setId(idOperazione);
-
-                }
-                else if(rs.getString("tipo").equals("C"))
-                {
-                    operazione = new Cancellazione(proposta, fraseCoinvolta, data, generico, pagina.getStorico(), pagina);
-                    operazione.setId(idOperazione);
-                }
-
-                if(proposta){
-                    Approvazione approvazione = getApprovazioneDB(operazione);
-                    operazione.setApprovazione(approvazione);
-                }
-
-                operazioni.add(operazione);
-
-*/
-
             }
             rs.close();
             ps.close();
