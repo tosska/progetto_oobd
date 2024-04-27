@@ -27,17 +27,12 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             ResultSet rs = ps.executeQuery();
 
             rs.next();
-            UtenteDAO l = new UtenteImplementazionePostgresDAO();
 
-            String tema = getTemaDB(rs.getInt("tema"));    // vado a recuperare il tema
+            paginaInfo.set(0, rs.getString(2)); //titolo
+            paginaInfo.set(1, Integer.toString(rs.getInt(3))); //tema
+            paginaInfo.set(2, rs.getString(4)); //data
+            paginaInfo.set(3, rs.getString(5)); //username
 
-            paginaInfo.set(0, rs.getInt(1));
-            paginaInfo.set(1, rs.getString("Titolo"));
-            paginaInfo.set(2, rs.getString("DataCreazione"));
-            paginaInfo.set(3, rs.getString("userAutore"));
-            paginaInfo.set(4, tema);
-
-            pagina.setTestoRiferito(getTestoDB(pagina));
 
             rs.close();
             ps.close();
@@ -119,52 +114,20 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         return idPagina;
     }
 
-    @Override
-    public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi, Utente utilizzatore) {
-        for (Frase f: listaFrasi)
-        {
-            try {
-                System.out.println("Sono arrivato");
-                CallableStatement cs = connection.prepareCall("CALL inserisciFrase(?, ?, null, ?, ?)"); //forse è meglio chiamare il metodo inserisciFraseDB
-                cs.setInt(1, idPagina);
-                cs.setInt(2, f.getRiga());
-                cs.setString(3, f.getContenuto());
-                cs.setString(4, utilizzatore.getUsername());
-                cs.execute();
 
-                /*PreparedStatement addFrasePS = connection.prepareStatement("INSERT INTO frase VALUES"
-                        + "('"+f.getRiga()+"','"+1+"','"+idPagina+"', '"+f.getContenuto()+"', '"+false+"')");*/
-                //addFrasePS.executeUpdate();
-                // connection.close();
-            } catch (Exception e) {
-                System.out.println("Errore: " + e.getMessage());
-            }
-        }
+    public void getTestoDB(int idPagina, ArrayList<Integer> riga, ArrayList<Integer> ordine, ArrayList<String> contenuto, ArrayList<Boolean> collegamento) {
 
-    }
 
-    @Override
-    public Testo getTestoDB(Pagina p) {
-
-        Testo t = new Testo(p);
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM FRASE WHERE id_Pagina=" + p.getId() + " ORDER BY riga, ordine");
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM FRASE WHERE id_Pagina=" + idPagina + " ORDER BY riga, ordine");
             ResultSet rs = ps.executeQuery();
 
             while(rs.next())
             {
-                int riga = rs.getInt("riga");
-                int ordine = rs.getInt("ordine");
-                String contenuto = rs.getString("contenuto");
-
-
-                if(!rs.getBoolean("collegamento"))
-                    t.addListaFrasiCoda(new Frase(riga, ordine, contenuto, t));
-                else {
-                    int idCollegamento = getIdCollegamentoDB(p.getId(), riga, ordine);
-                    Pagina paginaCollegamento = getPaginaByIdDB(idCollegamento);
-                    t.addListaFrasiCoda(new Collegamento(riga, ordine, contenuto, t, paginaCollegamento));
-                }
+                riga.add(rs.getInt(1)); //riga
+                ordine.add(rs.getInt(2)); //ordine
+                contenuto.add(rs.getString(4)); //contenuto
+                collegamento.add(rs.getBoolean(5));
             }
             rs.close();
         }
@@ -174,7 +137,6 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         }
 
 
-        return t;
     }
 
     public int getIdCollegamentoDB(int id_pagina, int riga, int ordine)
@@ -199,20 +161,16 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         return idCollegamento;
     }
 
-    public ArrayList<Pagina> getPagineCreateDB(Utente utilizzatore) { //da migliorare chiamando getPaginaByID
-        ArrayList<Pagina> lista = new ArrayList<>();
+    public void getPagineCreateDB(String utente, ArrayList<Integer> id) {
+
 
         try {
-            PreparedStatement listaPS = connection.prepareStatement("SELECT * FROM PAGINA WHERE userAutore =" + "'" + utilizzatore.getUsername() + "'");
+            PreparedStatement listaPS = connection.prepareStatement("SELECT * FROM PAGINA WHERE userAutore =" + "'" + utente + "'");
             ResultSet rs = listaPS.executeQuery();
 
             while(rs.next())
             {
-                Tema tema = getTemaDB(rs.getInt("tema"));
-
-                Pagina p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("dataCreazione"), utilizzatore, tema);
-                p.setTestoRiferito(getTestoDB(p)); //mando l'id della pagina e l'oggetto pagina
-                lista.add(p);
+                id.add(rs.getInt(1));
             }
 
             rs.close();
@@ -220,8 +178,6 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        return lista;
 
     }
 
@@ -234,10 +190,11 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             rs.next();//da capire se è possibile fare meglio
             UtenteDAO l = new UtenteImplementazionePostgresDAO();
 
-            Tema tema = getTemaDB(rs.getInt("tema"));
+            pagina.set(0, rs.getString(2)); //titolo
+            pagina.set(1, Integer.toString(rs.getInt(3))); //tema
+            pagina.set(2, rs.getString(4)); //data
+            pagina.set(3, rs.getString(5)); //username
 
-            p = new Pagina(rs.getInt(1), rs.getString("Titolo"), null, rs.getTimestamp("DataCreazione"), l.getUtenteDB(rs.getString("userAutore")), tema);
-            p.setTestoRiferito(getTestoDB(p));
             rs.close();
             ps.close();
         }
@@ -246,19 +203,19 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             System.out.println("Errore: " + e.getMessage());
         }
 
-        return p;
+
     }
 
     public String getTemaDB(int idTema)
     {
-        String nome;
+        String nome = null;
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM TEMA WHERE idTema = " + "'" + idTema + "'");
             ResultSet rs = ps.executeQuery();
             rs.next();
 
-            nome = rs.getInt("idTema"), rs.getString("nome");
+            nome = rs.getString("nome");
 
             rs.close();
             ps.close();
@@ -271,45 +228,27 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         return nome;
     }
 
-    public Storico getStoricoDB(Pagina pagina)
+    public void getStoricoDB(int idPagina, ArrayList<Object> operazioni)
     {
-        Storico s = new Storico(pagina);
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM storicopagine WHERE id_pagina=" + pagina.getId());
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM storicopagine WHERE id_pagina=" + idPagina);
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next())
-            {
-                UtenteDAO l = new UtenteImplementazionePostgresDAO();
-                Utente utente = l.getUtenteDB(rs.getString("utente"));
+            while(rs.next()) {
 
-                int riga = rs.getInt("riga");
-                int ordine = rs.getInt("ordine");
-                String contenuto = rs.getString("fraseCoinvolta");
-                Frase fraseCoinvolta = new Frase(riga, ordine, contenuto, pagina.getTestoRiferito());
-                Boolean proposta = rs.getBoolean("proposta");
-                Timestamp data = rs.getTimestamp("data");
-
-
-                if(rs.getString("tipo").equals("I")) {
-
-                    Inserimento inserimento = new Inserimento(proposta, fraseCoinvolta, data, utente, s, pagina);
-                    s.addOperazione(inserimento);
-                }
-                else if(rs.getString("tipo").equals("M"))
-                {
-                    Frase fraseModificata = new Frase(riga, ordine, rs.getString("fraseModificata"), pagina.getTestoRiferito());
-                    Modifica modifica = new Modifica(proposta, fraseCoinvolta, fraseModificata, data, utente, s, pagina);
-                    s.addOperazione(modifica);
-
-                }
-                else if(rs.getString("tipo").equals("C"))
-                {
-                    Cancellazione cancellazione = new Cancellazione(proposta, fraseCoinvolta, data, utente, s, pagina);
-                    s.addOperazione(cancellazione);
-                }
+                operazioni.add(rs.getInt(1)); //id
+                operazioni.add(rs.getString(2)); //tipo
+                operazioni.add(rs.getBoolean(3)); //proposta
+                operazioni.add(rs.getInt(4)); //riga
+                operazioni.add(rs.getInt(5)); //ordine
+                operazioni.add(rs.getString(6)); //frase coinvolta
+                operazioni.add(rs.getString(7)); //frase modificata
+                operazioni.add(rs.getTimestamp(8)); //data
+                operazioni.add(rs.getInt(9)); //id pagina
+                operazioni.add(rs.getString(10)); //utente
             }
+
 
             rs.close();
             ps.close();
@@ -319,49 +258,21 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             System.out.println("Errore: " + e.getMessage());
         }
 
-        return s;
+
     }
 
-    public void editPageDB(Pagina pagina, ArrayList<Operazione> listaOperazioni)
-    {
-        try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE PAGINA SET titolo=" + "'" + pagina.getTitolo() + "'" + "WHERE id_pagina= " + pagina.getId());
-            ps.executeUpdate();
 
-            editTextDB(pagina, listaOperazioni);
-        }
-        catch (Exception e)
-        {
-            System.out.println("Errore: " + e.getMessage());
-        }
-    }
 
-    public void editTextDB(Pagina pagina, ArrayList<Operazione> listaOperazioni)
+    public void addFraseDB(int idPagina, int riga, int ordine, String contenuto, String utente)
     {
-        for(Operazione op : listaOperazioni)
-        {
-            if(op instanceof Inserimento)
-                addFraseDB(pagina, (Inserimento) op);
-            else if (op instanceof Modifica) {
-                editFraseDB(pagina, (Modifica) op);
-            }
-            else if (op instanceof Cancellazione) {
-                removeFraseDB(pagina, (Cancellazione) op);
-            }
-        }
-    }
-
-    public void addFraseDB(Pagina pagina, Inserimento inserimento)
-    {
-        Frase fraseCoinvolta = inserimento.getFraseCoinvolta();
         try {
 
             CallableStatement cs = connection.prepareCall("CALL inserisciFrase(?, ?, ?, ?, ?)");
-            cs.setInt(1, pagina.getId());
-            cs.setInt(2, fraseCoinvolta.getRiga());
-            cs.setInt(3, fraseCoinvolta.getOrdine());
-            cs.setString(4, fraseCoinvolta.getContenuto());
-            cs.setString(5, inserimento.getUtente().getUsername());
+            cs.setInt(1, idPagina);
+            cs.setInt(2, riga);
+            cs.setInt(3, ordine);
+            cs.setString(4, contenuto);
+            cs.setString(5, utente);
             cs.execute();
 
             cs.close();
@@ -371,16 +282,16 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             System.out.println("Errore: " + e.getMessage());
         }
     }
-    public void removeFraseDB(Pagina pagina, Cancellazione cancellazione)
+    public void removeFraseDB(int idPagina, int riga, int ordine, String utente)
     {
-        Frase fraseCoinvolta = cancellazione.getFraseCoinvolta();
+
         try {
 
             CallableStatement cs = connection.prepareCall("CALL rimuoviFrase(?, ?, ?, ?)");
-            cs.setInt(1, pagina.getId());
-            cs.setInt(2, fraseCoinvolta.getRiga());
-            cs.setInt(3, fraseCoinvolta.getOrdine());
-            cs.setString(4, cancellazione.getUtente().getUsername());
+            cs.setInt(1, idPagina);
+            cs.setInt(2, riga);
+            cs.setInt(3, ordine);
+            cs.setString(4, utente);
             cs.execute();
 
             cs.close();
@@ -391,18 +302,17 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             System.out.println("Errore: " + e.getMessage());
         }
     }
-    public void editFraseDB(Pagina pagina, Modifica modifica)
+    public void editFraseDB(int idPagina, int riga, int ordine, String contenuto, String utente)
     {
-        Frase fraseModificata = modifica.getFraseModificata();
 
         try {
 
             CallableStatement cs = connection.prepareCall("CALL modificaFrase(?, ?, ?, ?, ?)");
-            cs.setInt(1, pagina.getId());
-            cs.setInt(2, fraseModificata.getRiga());
-            cs.setInt(3, fraseModificata.getOrdine());
-            cs.setString(4, fraseModificata.getContenuto());
-            cs.setString(5, modifica.getUtente().getUsername());
+            cs.setInt(1, idPagina);
+            cs.setInt(2, riga);
+            cs.setInt(3, ordine);
+            cs.setString(4, contenuto);
+            cs.setString(5, utente);
             cs.execute();
 
         }
@@ -412,17 +322,17 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         }
     }
 
-    public void insertLinkDB(Pagina pagina, int riga, int ordine, Pagina paginaCollegamento, Utente utente)
+    public void insertLinkDB(int idPagina, int riga, int ordine, int idPaginaCollegata, String utente)
     {
 
         try {
 
             CallableStatement cs = connection.prepareCall("CALL inserisciCollegamento(?, ?, ?, ?, ?)");
-            cs.setInt(1, pagina.getId());
+            cs.setInt(1, idPagina);
             cs.setInt(2, riga);
             cs.setInt(3, ordine);
-            cs.setInt(4, paginaCollegamento.getId());
-            cs.setString(5, utente.getUsername());
+            cs.setInt(4, idPaginaCollegata);
+            cs.setString(5, utente);
             cs.execute();
 
         }
@@ -432,15 +342,15 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         }
     }
 
-    public void removeLinkDB(Pagina pagina, int riga, int ordine, Utente utente)
+    public void removeLinkDB(int idPagina, int riga, int ordine, String utente)
     {
         try {
 
             CallableStatement cs = connection.prepareCall("CALL rimuoviCollegamento(?, ?, ?, ?)");
-            cs.setInt(1, pagina.getId());
+            cs.setInt(1, idPagina);
             cs.setInt(2, riga);
             cs.setInt(3, ordine);
-            cs.setString(4, utente.getUsername());
+            cs.setString(4, utente);
             cs.execute();
 
         }
@@ -450,6 +360,7 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         }
     }
 
+    /*
 
     public Approvazione getApprovazioneDB(int id_operazione, Operazione operazione)
     {
@@ -474,7 +385,7 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         return approvazione;
     }
 
-
+*/
 
 
 
