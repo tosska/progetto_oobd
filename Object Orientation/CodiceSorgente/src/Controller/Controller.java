@@ -30,6 +30,7 @@ public class Controller {
     public Controller()
     {
         ListaTemi = generaListaTemi();
+        pagineCreate = new ArrayList<>();
     }
 
     public boolean checkAutore()
@@ -43,15 +44,24 @@ public class Controller {
     public void caricaPagineCreate()
     {
         ArrayList<Integer> id = new ArrayList<>();
-            
+        ArrayList<String> titolo = new ArrayList<>();
+        ArrayList<Integer> tema = new ArrayList<>();
+        ArrayList<Timestamp> dataCreazione = new ArrayList<>(); 
+        ArrayList<String> autore = new ArrayList<>();
+
+        PaginaDAO l = new PaginaImplementazionePostgresDAO();
+        l.getPagineCreateDB(utilizzatore.getUsername(), id, titolo, tema, dataCreazione, autore);
+
         for(int i=0; i<id.size(); i++){
-
-            Pagina pagina = new Pagina(id.get(i), titolo.get(i), )
-            pagineCreate.add();
+            
+            Tema t = getTemaDB(tema.get(i));
+            Utente utente = getUtenteDB(autore.get(i));
+            Pagina pagina = new Pagina(id.get(i), titolo.get(i), null, dataCreazione.get(i), utente, t);
+            pagina.setTestoRiferito(new Testo(pagina));
+            setTestoFromDB(pagina);
+            pagineCreate.add(pagina);
         }
-
-
-        pagineCreate = l.getPagineCreateDB(utilizzatore);
+        
         stampaPagineCreate();
     }
 
@@ -66,13 +76,50 @@ public class Controller {
 
     public void caricaStoricoOperazioniUtente()
     {
-        ArrayList<Object> operazioni = new ArrayList<>();
+        ArrayList<Object> operazioniAstratte = new ArrayList<>();
+        ArrayList<Operazione> operazioni = new ArrayList<>();
 
         OperazioneDAO l= new OperazioneImplementazionePostgresDAO();
-        l.getOperazioniDB(utilizzatore.getUsername(),1, operazioni);
+        l.getOperazioniDB(utilizzatore.getUsername(),1, operazioniAstratte);
 
-        for(int i=0; i<operazioni.size(); i=i+9)
+        for(int i=0; i<operazioniAstratte.size(); i=i+9)
         {
+            int id = (int) operazioniAstratte.get(0); //id
+            String tipo = (String) operazioniAstratte.get(1);
+            boolean proposta = (boolean) operazioniAstratte.get(2); //proposta
+            int riga = (int) operazioniAstratte.get(3);//riga
+            int ordine = (int) operazioniAstratte.get(4); //ordine
+            String fc = (String) operazioniAstratte.get(5); //frase coinvolta
+            String fm = (String) operazioniAstratte.get(6); //frase modificata
+            Timestamp data = (Timestamp) operazioniAstratte.get(7);//data
+            int idPagina = (int) operazioniAstratte.get(8);  //id pagina
+
+            Pagina pagina = getPaginaByIdDB(idPagina);
+            Frase fraseCoinvolta = new Frase(riga, ordine, fc, pagina.getTestoRiferito());
+
+            if(tipo.equals("I")) {
+
+                Inserimento inserimento = new Inserimento(id, proposta, fraseCoinvolta, data, utilizzatore, null, pagina);
+                operazioni.add(inserimento);
+            }
+            else if(tipo.equals("M"))
+            {
+                Frase fraseModificata = new Frase(riga, ordine, fm, pagina.getTestoRiferito());
+                Modifica modifica = new Modifica(id, proposta, fraseCoinvolta, fraseModificata, data, utilizzatore, null, pagina);
+                operazioni.add(modifica);
+
+            }
+            else if(tipo.equals("C"))
+            {
+                Cancellazione cancellazione = new Cancellazione(id, proposta, fraseCoinvolta, data, utilizzatore, null, pagina);
+                operazioni.add(cancellazione);
+            }
+
+            if(proposta){
+
+                l.getApprovazioneDB(id, );
+            }
+
             //recupero le informazioni sull'operazione
             /*
             int idOperazione = rs.getInt("id_operazione");
@@ -118,6 +165,10 @@ public class Controller {
             operazioni.add(operazione);
             */
         }
+    }
+
+    public Approvazione getApprovazioneDB(int idOperazione){
+
     }
 
     public void caricaStoricoDaPagina(Pagina pagina)
@@ -308,16 +359,20 @@ public class Controller {
         ArrayList<String> paginaInfo = new ArrayList<>();
         PaginaDAO l = new PaginaImplementazionePostgresDAO();
         UtenteDAO ul = new UtenteImplementazionePostgresDAO();
+        Pagina pagina = null;
+
         l.getPaginaByIdDB(id, paginaInfo);
+        if(!paginaInfo.isEmpty()) {
 
-        String titolo = paginaInfo.get(0);
-        Tema tema = getTemaDB(Integer.parseInt(paginaInfo.get(1)));
-        Timestamp dataCreazione = Timestamp.valueOf(paginaInfo.get(2));
-        Testo testo=null;
-        Utente utente = getUtenteDB(paginaInfo.get(3));
+            String titolo = paginaInfo.get(0);
+            Tema tema = getTemaDB(Integer.parseInt(paginaInfo.get(1)));
+            Timestamp dataCreazione = Timestamp.valueOf(paginaInfo.get(2));
+            Utente utente = getUtenteDB(paginaInfo.get(3));
 
-        Pagina pagina = new Pagina(id, titolo, testo, dataCreazione, utente, tema);
-        setTestoFromDB(pagina);
+            pagina = new Pagina(id, titolo, null, dataCreazione, utente, tema);
+            pagina.setTestoRiferito(new Testo(pagina));
+            setTestoFromDB(pagina);
+        }
 
         return pagina;
     }
@@ -330,7 +385,6 @@ public class Controller {
         PaginaDAO l = new PaginaImplementazionePostgresDAO();
 
         l.getTestoDB(pagina.getId(), riga, ordine, contenuto, collegamento);
-
 
         ArrayList<Frase> tmp = new ArrayList<>();
 
@@ -540,7 +594,7 @@ public class Controller {
         ArrayList<String> utenteInfo = new ArrayList<>();
         l.getUtenteDB(username, utenteInfo);
 
-        Utente utente = new Utente(username, utenteInfo.get(0), utenteInfo.get(1), utenteInfo.get(2));
+        Utente utente = new Utente(username, utenteInfo.get(0), utenteInfo.get(1), Timestamp.valueOf(utenteInfo.get(2)));
         return utente;
     }
 
@@ -555,12 +609,28 @@ public class Controller {
             System.out.println(p.getTitolo());
     }
 
-    public Pagina cercaPagina(String titolo)
+    public Pagina cercaPagina(String titolo) //gestire quando non si trova la pagina
     {
+        ArrayList<String> paginaInfo = new ArrayList<>();
         PaginaDAO l = new PaginaImplementazionePostgresDAO();
-        return l.cercaPaginaDB(titolo);
+        l.cercaPaginaDB(titolo, paginaInfo);
+
+        Tema tema = getTemaDB(Integer.parseInt(paginaInfo.get(1)));
+        Utente autore = getUtenteDB(paginaInfo.get(3));
+
+        Pagina pagina = new Pagina(Integer.parseInt(paginaInfo.get(0)), titolo, null, Timestamp.valueOf(paginaInfo.get(2)), autore, tema);
+        pagina.setTestoRiferito(new Testo(pagina)); //da valutare con lorenzo
+        setTestoFromDB(pagina);
+
+        return pagina;
+
     }
 
+    public void searchAndOpenPage(String title)
+    {
+        Pagina pagina = cercaPagina(title);
+        paginaAperta = pagina;
+    }
 
     public void creaAnteprime()
     {
@@ -632,16 +702,17 @@ public class Controller {
         return num;
     }
 
-    public void insertLink(Pagina pagina, int riga, int ordine, Pagina paginaLink, Utente utente)
+    public void insertLink(int riga, int ordine, String titolo)
     {
         PaginaDAO l= new PaginaImplementazionePostgresDAO();
-        l.insertLinkDB(pagina, riga, ordine, paginaLink, utente);
+        Pagina paginaCollegamento = cercaPagina(titolo);
+        l.insertLinkDB(paginaAperta.getId(), riga, ordine, paginaCollegamento.getId(), utilizzatore.getUsername());
     }
 
-    public void removeLink(Pagina pagina, int riga, int ordine, Utente utente)  {
+    public void removeLink(int riga, int ordine)  {
 
         PaginaDAO l= new PaginaImplementazionePostgresDAO();
-        l.removeLinkDB(pagina, riga, ordine, utente);
+        l.removeLinkDB(paginaAperta.getId(), riga, ordine, utilizzatore.getUsername());
     }
 
     public void selezionaFrase(int posizione, boolean anteprima)

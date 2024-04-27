@@ -17,6 +17,6 @@ public interface OperazioneDAO {
 
     public void removeActiveProposalDB(Utente utente, Pagina pagina);
 
-    public Approvazione getApprovazioneDB(Operazione operazione);
+    public void getApprovazioneDB(int idOperazione, ArrayList<Object> approvazione);
 
 }

@@ -13,7 +13,7 @@ public abstract class Operazione { //fare interfaccia?
     private Storico storico;
     private Pagina pagina;
 
-    public Operazione(Boolean proposta, Frase fraseCoinvolta, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
+    public Operazione(int id, Boolean proposta, Frase fraseCoinvolta, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
         setProposta(proposta);
         setFraseCoinvolta(fraseCoinvolta);
         setData(data);

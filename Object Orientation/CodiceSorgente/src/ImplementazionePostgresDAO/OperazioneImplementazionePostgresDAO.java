@@ -24,7 +24,7 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
 
     public ArrayList<Operazione> getProposteDaApprovareDB(ArrayList<Pagina> pagineUtilizzatore, Utente utilizzatore)
     {
-
+/*
         ArrayList<Operazione> proposte = new ArrayList<>();
 
         try {
@@ -96,11 +96,13 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
         }
 
         return proposte;
-
+*/
+        return null;
     }
 
     public void getOperazioniDB(String username, int t, ArrayList<Object> operazioni)
     {
+
         String comandoSql = "SELECT O.* FROM OPERAZIONE O WHERE utente = " + "'" + username + "'";
         String comandoSql2 = "AND proposta=" ;
         int index=0;
@@ -113,8 +115,6 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
             comandoSql2 += "true";
 
         comandoSql += comandoSql2;
-
-
 
         try {
             PreparedStatement ps = connection.prepareStatement(comandoSql);
@@ -177,7 +177,7 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
 
                 operazioni.add(operazione);
 
-            */
+*/
 
             }
             rs.close();
@@ -190,15 +190,12 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
 
     }
 
-    public Approvazione getApprovazioneDB(Operazione operazione)
+    public void getApprovazioneDB(int idOperazione, ArrayList<Object> approvazione)
     {
-        if(!operazione.getProposta())
-            return null;
 
-        String comandoSql = "SELECT * FROM APPROVAZIONE WHERE id_operazione=" + operazione.getId();
-        Approvazione approvazione;
-
+        String comandoSql = "SELECT * FROM APPROVAZIONE WHERE id_operazione=" + idOperazione;
         PreparedStatement ps = null;
+
         try {
             ps = connection.prepareStatement(comandoSql);
             ResultSet rs = ps.executeQuery();
@@ -210,7 +207,11 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
             else
                 risposta = rs.getBoolean("risposta");
 
-            approvazione= new Approvazione(rs.getTimestamp("data"), risposta, operazione, operazione.getUtente());
+            approvazione.add(rs.getString("autore"));
+            approvazione.add(rs.getString("data"));
+            approvazione.add(risposta);
+
+
 
             ps.close();
             rs.close();
@@ -220,7 +221,9 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
             throw new RuntimeException(e);
         }
 
-        return approvazione;
+
+
+
     }
 
 

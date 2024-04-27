@@ -18,7 +18,9 @@ public interface PaginaDAO {
     public void getTestoDB(int idPagina, ArrayList<Integer> riga, ArrayList<Integer> ordine, ArrayList<String> contenuto, ArrayList<Boolean> collegamento);
 
 
-    public void getPagineCreateDB(String utente, ArrayList<Integer> id);
+    public void getPagineCreateDB(String utente, ArrayList<Integer> id,
+                                  ArrayList<String> titolo, ArrayList<Integer> tema,
+                                  ArrayList<Timestamp> dataCreazione, ArrayList<String> autore);
 
     public void getPaginaByIdDB(int idPagina, ArrayList<String> paginaInfo);
 

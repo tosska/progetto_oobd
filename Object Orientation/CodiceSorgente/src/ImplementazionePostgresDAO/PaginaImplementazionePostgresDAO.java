@@ -28,10 +28,10 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
 
             rs.next();
 
-            paginaInfo.set(0, rs.getString(2)); //titolo
-            paginaInfo.set(1, Integer.toString(rs.getInt(3))); //tema
-            paginaInfo.set(2, rs.getString(4)); //data
-            paginaInfo.set(3, rs.getString(5)); //username
+            paginaInfo.add(rs.getString(2)); //titolo
+            paginaInfo.add(Integer.toString(rs.getInt(3))); //tema
+            paginaInfo.add( rs.getString(4)); //data
+            paginaInfo.add(rs.getString(5)); //username
 
 
             rs.close();
@@ -74,12 +74,11 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM tema");
 
-            int i = 0;
+
             // Aggiunta dei temi al menu a tendina
             while (resultSet.next()) {
-                listaIdTemi.set(i, resultSet.getInt("idTema"));
-                listaNomiTemi.set(i, resultSet.getString("nome"));
-                i++;
+                listaIdTemi.add(resultSet.getInt("idTema"));
+                listaNomiTemi.add(resultSet.getString("nome"));
             }
 
             resultSet.close();
@@ -161,7 +160,9 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         return idCollegamento;
     }
 
-    public void getPagineCreateDB(String utente, ArrayList<Integer> id) {
+    public void getPagineCreateDB(String utente, ArrayList<Integer> id,
+                                  ArrayList<String> titolo, ArrayList<Integer> tema,
+                                  ArrayList<Timestamp> dataCreazione, ArrayList<String> autore) {
 
 
         try {
@@ -171,6 +172,10 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             while(rs.next())
             {
                 id.add(rs.getInt(1));
+                titolo.add(rs.getString(2));
+                tema.add(rs.getInt(3));
+                dataCreazione.add(rs.getTimestamp(4));
+                autore.add(rs.getString(5));
             }
 
             rs.close();
@@ -188,12 +193,11 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM PAGINA WHERE titolo=" + "'" + titolo + "'");
             ResultSet rs = ps.executeQuery();
             rs.next();//da capire se è possibile fare meglio
-            UtenteDAO l = new UtenteImplementazionePostgresDAO();
 
-            pagina.set(0, rs.getString(2)); //titolo
-            pagina.set(1, Integer.toString(rs.getInt(3))); //tema
-            pagina.set(2, rs.getString(4)); //data
-            pagina.set(3, rs.getString(5)); //username
+            pagina.add(Integer.toString(rs.getInt(1))); //id
+            pagina.add(Integer.toString(rs.getInt(3))); //tema
+            pagina.add(rs.getString(4)); //data
+            pagina.add(rs.getString(5)); //autore
 
             rs.close();
             ps.close();
