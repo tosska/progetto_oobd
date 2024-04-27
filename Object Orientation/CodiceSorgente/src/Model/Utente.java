@@ -28,6 +28,14 @@ public class Utente {
     public void setPassword(String password) { this.password = password; }
     public Timestamp getDataIscrizione() { return dataIscrizione; }
 
+    public ArrayList<Operazione> getOperazioniEffettuate() {
+        return operazioniEffettuate;
+    }
+
+    public void setOperazioniEffettuate(ArrayList<Operazione> operazioniEffettuate) {
+        this.operazioniEffettuate = operazioniEffettuate;
+    }
+
     //da capire se cancellare o modificare
     /*public void creaPagina(String titolo, String data, Testo testo, Storico storico) {
         ListaPagineCreate.add(new Pagina(titolo, data, this));
