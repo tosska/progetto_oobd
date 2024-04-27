@@ -5,8 +5,8 @@ import java.sql.Timestamp;
 public class Inserimento extends Operazione {
 
 
-    public Inserimento(Boolean proposta, Frase fraseInserita, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
-        super(proposta, fraseInserita, data, utente, storico, pagina);
+    public Inserimento(int id, Boolean proposta, Frase fraseInserita, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
+        super(id, proposta, fraseInserita, data, utente, storico, pagina);
 
     }
 

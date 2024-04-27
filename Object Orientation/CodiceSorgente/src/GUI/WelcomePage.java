@@ -180,7 +180,7 @@ public class WelcomePage {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    controllerPrincipale.paginaAperta = controllerPrincipale.cercaPagina(searchField.getText());
+                    controllerPrincipale.searchAndOpenPage(searchField.getText());
                     PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
                     frame.setVisible(false);
                 }

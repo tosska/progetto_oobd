@@ -7,28 +7,28 @@ public interface PaginaDAO {
     public void addPaginaDB(String titolo, Timestamp data, String autore, int idTema);
     public void addTemaDB(String tema);
     public void raccogliTemi(ArrayList<Integer> listaIdTemi, ArrayList<String> listaNomiTemi);
-    public void addTextDB(int idPagina, ArrayList<Frase> listaFrasi, Utente utilizzatore);
 
-    public void addFraseDB(Pagina pagina, Inserimento inserimento);
-    public void removeFraseDB(Pagina pagina, Cancellazione cancellazione);
-    public void editFraseDB(Pagina pagina, Modifica modifica);
+    public void addFraseDB(int idPagina, int riga, int ordine, String contenuto, String utente);
+    public void removeFraseDB(int idPagina, int riga, int ordine, String utente);
+    public void editFraseDB(int idPagina, int riga, int ordine, String contenuto, String utente);
 
     public int recuperaIdPagina();
-    public void cercaPaginaDB(String titolo);
-    public Storico getStoricoDB(Pagina p);
-    public Testo getTestoDB(Pagina p);
+    public void cercaPaginaDB(String titolo, ArrayList<String> pagina);
+    public void getStoricoDB(int idPagina, ArrayList<Object> operazioni);
+    public void getTestoDB(int idPagina, ArrayList<Integer> riga, ArrayList<Integer> ordine, ArrayList<String> contenuto, ArrayList<Boolean> collegamento);
 
-    public void editPageDB(Pagina pagina, ArrayList<Operazione> listaOperazioni);
 
-    public void editTextDB(Pagina pagina, ArrayList<Operazione> listaOperazioni);
-
-    public ArrayList<Pagina> getPagineCreateDB(Utente utilizzatore);
-
-    //public ArrayList<Operazione> getProposteDaApprovareDB(Utente utilizzatore);
+    public void getPagineCreateDB(String utente, ArrayList<Integer> id,
+                                  ArrayList<String> titolo, ArrayList<Integer> tema,
+                                  ArrayList<Timestamp> dataCreazione, ArrayList<String> autore);
 
     public void getPaginaByIdDB(int idPagina, ArrayList<String> paginaInfo);
 
-    public void insertLinkDB(Pagina pagina, int riga, int ordine, Pagina paginaCollegamento, Utente utente);
+    public void insertLinkDB(int idPagina, int riga, int ordine, int idPaginaCollegata, String utente);
 
-    public void removeLinkDB(Pagina pagina, int riga, int ordine, Utente utente);
+    public void removeLinkDB(int idPagina, int riga, int ordine, String utente);
+
+    public String getTemaDB(int idTema);
+
+    public int getIdCollegamentoDB(int id_pagina, int riga, int ordine);
 }

@@ -145,9 +145,9 @@ public class UtenteImplementazionePostgresDAO implements UtenteDAO {
 
             if(rs.next())
             {
-                utente.set(0, rs.getString("email"));
-                utente.set(1, rs.getString("password"));
-                utente.set(2, rs.getString("dataiscrizione"));
+                utente.add(rs.getString("email"));
+                utente.add(rs.getString("password"));
+                utente.add(rs.getString("dataiscrizione"));
             }
 
             connection.close();

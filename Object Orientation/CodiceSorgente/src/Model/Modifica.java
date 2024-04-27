@@ -5,8 +5,8 @@ import java.sql.Timestamp;
 public class Modifica extends Operazione {
     private Frase fraseModificata;
 
-    public Modifica(Boolean proposta, Frase fraseOriginale, Frase fraseModificata, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
-        super(proposta, fraseOriginale, data, utente, storico, pagina);
+    public Modifica(int id, Boolean proposta, Frase fraseOriginale, Frase fraseModificata, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
+        super(id, proposta, fraseOriginale, data, utente, storico, pagina);
 
         setFraseModificata(fraseModificata);
     }

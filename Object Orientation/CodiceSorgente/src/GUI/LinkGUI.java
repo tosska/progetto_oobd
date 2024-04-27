@@ -200,8 +200,7 @@ public class LinkGUI {
                 int riga = Integer.parseInt(selectedPhrase.getText().split(";")[0]);
                 int ordine = Integer.parseInt(selectedPhrase.getText().split(";")[1]);
 
-                controllerPrincipale.insertLink(controllerPrincipale.paginaAperta, riga, ordine,
-                        controllerPrincipale.cercaPagina(titolo), controllerPrincipale.utilizzatore);
+                controllerPrincipale.insertLink(riga, ordine, titolo);
 
                 JOptionPane.showMessageDialog(null, "Collegamento inserito", "Avviso", JOptionPane.INFORMATION_MESSAGE);
                 frame.dispose();
@@ -215,7 +214,7 @@ public class LinkGUI {
                 int riga = Integer.parseInt(selectedPhrase.getText().split(";")[0]);
                 int ordine = Integer.parseInt(selectedPhrase.getText().split(";")[1]);
 
-                controllerPrincipale.removeLink(controllerPrincipale.paginaAperta, riga, ordine, controllerPrincipale.utilizzatore);
+                controllerPrincipale.removeLink(riga, ordine);
 
                 JOptionPane.showMessageDialog(null, "Collegamento rimosso", "Avviso", JOptionPane.INFORMATION_MESSAGE);
                 frame.dispose();

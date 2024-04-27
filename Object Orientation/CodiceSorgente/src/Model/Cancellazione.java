@@ -5,8 +5,8 @@ import java.sql.Timestamp;
 public class Cancellazione extends Operazione {
 
 
-    public Cancellazione(Boolean proposta, Frase fraseEliminata, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
-        super(proposta, fraseEliminata, data, utente, storico, pagina);
+    public Cancellazione(int id, Boolean proposta, Frase fraseEliminata, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
+        super(id, proposta, fraseEliminata, data, utente, storico, pagina);
     }
 
     public String getTipo()
