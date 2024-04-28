@@ -4,10 +4,9 @@ import Controller.Controller;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -209,21 +208,7 @@ public class EditPage {
     {
         Style stile = textPane.addStyle("ColorStyle", null);
         Color c;
-
-        if(s.contains("##l")) {
-            StyleConstants.setUnderline(stile, true);
-            c = Color.orange;
-        }
-        else
-            c = Color.black;
-
-        if(s.contains("##i"))
-            c = Color.blue;
-        else if (s.contains("##m"))
-            c = Color.green;
-        else if (s.contains("##c"))
-            c = Color.red;
-
+        c = Color.black;
         StyleConstants.setForeground(stile, c);
         return stile;
     }
