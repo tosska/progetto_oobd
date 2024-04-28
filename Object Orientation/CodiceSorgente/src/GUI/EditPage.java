@@ -236,21 +236,7 @@ public class EditPage {
     {
         Style stile = textPane.addStyle("ColorStyle", null);
         Color c;
-
-        if(s.contains("##l")) {
-            StyleConstants.setUnderline(stile, true);
-            c = Color.orange;
-        }
-        else
-            c = Color.black;
-
-        if(s.contains("##i"))
-            c = Color.blue;
-        else if (s.contains("##m"))
-            c = Color.green;
-        else if (s.contains("##c"))
-            c = Color.red;
-
+        c = Color.black;
         StyleConstants.setForeground(stile, c);
         return stile;
     }
