@@ -207,7 +207,6 @@ public class Testo implements Cloneable{
         if(rigaSuccessiva==f.getRiga())
         {
             int ordineSuccessivo = listaFrasi.get(indiceSuccessivo).getOrdine();
-            int elementoIniziale = rigaSuccessiva;
 
             //posizioniamoci sulla prima frase che ha ordine maggiore di quello di inserimento
             while(ordineSuccessivo < f.getOrdine() && rigaSuccessiva == f.getRiga() && indiceSuccessivo<listaFrasi.size()-1)
@@ -217,7 +216,7 @@ public class Testo implements Cloneable{
                 rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
             }
 
-            if(indiceSuccessivo==listaFrasi.size())
+            if(indiceSuccessivo==listaFrasi.size() || (f.getOrdine()>ordineSuccessivo && indiceSuccessivo+1==listaFrasi.size()))
                 listaFrasi.add(f);
             else
             {
