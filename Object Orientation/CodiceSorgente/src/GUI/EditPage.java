@@ -180,29 +180,7 @@ public class EditPage {
             }
         });
 
-        textPane.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                try {
-                    // Quando viene inserito del testo, cambia il suo colore in nero
-                    textPane.getDocument().setCharacterAttributes(e.getOffset(), e.getLength(), style, false);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
 
-        }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-
-            }
-        });
 
 
         centralPanel.add(scrollPane);

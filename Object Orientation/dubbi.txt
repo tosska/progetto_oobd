@@ -1,5 +1,0 @@
-dubbi da risolvere
-
-- Storico nel costruttore delle operazioni, va messo? oppure la associazione va messa opzionale?
-
-
