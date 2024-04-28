@@ -16,9 +16,5 @@ public class Inserimento extends Operazione {
         return "Inserimento";
     }
 
-    @Override
-    public void stampa() //debug
-    {
-        System.out.println("Inserimento " + getProposta() + " " + super.getFraseCoinvolta().getRiga() +" "+ getData() + " " + getUtente().getUsername() +" " + super.getFraseCoinvolta().getContenuto());
-    }
+
 }

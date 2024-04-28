@@ -2,7 +2,7 @@ package Model;
 
 import java.sql.Timestamp;
 
-public abstract class Operazione { //fare interfaccia?
+public abstract class Operazione {
     private int id;
     private Boolean proposta;
     private Frase fraseCoinvolta;
@@ -42,7 +42,6 @@ public abstract class Operazione { //fare interfaccia?
         this.approvazione = approvazione;
     }
 
-    public abstract void stampa();
 
     public Frase getFraseCoinvolta() {
         return fraseCoinvolta;

@@ -7,7 +7,7 @@ public class Pagina {
 
     private int id;
     private String titolo;
-    private Tema tema; //da implementare sia da codice che da UML
+    private Tema tema;
     private Timestamp dataCreazione;
     private Utente autore;
     private Testo testoRiferito;
@@ -50,7 +50,7 @@ public class Pagina {
 
     public int getId() {return id;}
 
-    public String getTestoString() //da cancellare?
+    public String getTestoString()
     {
         return testoRiferito.getTestoString();
     }

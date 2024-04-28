@@ -14,9 +14,5 @@ public class Cancellazione extends Operazione {
         return "Cancellazione";
     }
 
-    @Override
-    public void stampa() //debug
-    {
-        System.out.println("Cancellazione: " + getProposta() + " " + super.getFraseCoinvolta().getContenuto() +" "+ getData() + " " + getUtente().getUsername());
-    }
+
 }

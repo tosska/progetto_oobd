@@ -182,7 +182,7 @@ public class Testo implements Cloneable{
         listaFrasi.add(f);
     }
 
-    //modificare forse indicando parametri di riga ordine e contenuto
+
     public void inserisciFrase(Frase f, Boolean anteprima)
     {
         if(anteprima)
@@ -247,7 +247,7 @@ public class Testo implements Cloneable{
         }
     }
 
-    //modificare forse indicando parametri di riga ordine e contenuto
+
     public void modificaFrase(Frase fraseModificata, boolean anteprima)
     {
         int posizione = getIndiceFrase(fraseModificata.getRiga(), fraseModificata.getOrdine());
@@ -262,7 +262,7 @@ public class Testo implements Cloneable{
         listaFrasi.set(posizione, fraseModificata);
     }
 
-    //modificare forse indicando parametri di riga ordine e contenuto
+
     public void cancellaFrase(Frase f, boolean anteprima)
     {
         int posizione = getIndiceFrase(f.getRiga(), f.getOrdine());
@@ -305,7 +305,7 @@ public class Testo implements Cloneable{
         return null;
     }
 
-//controllo se una stringa ha solo caratteri speciali come " " o "\n"
+    //controllo se una stringa ha solo caratteri speciali come " " o "\n"
     private boolean isStringaVuota(String s)
     {
         s = s.replace("\n", "");

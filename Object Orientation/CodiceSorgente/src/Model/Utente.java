@@ -59,10 +59,6 @@ public class Utente {
         this.autore = autore;
     }
 
-    //da capire se cancellare o modificare
-    /*public void creaPagina(String titolo, String data, Testo testo, Storico storico) {
-        ListaPagineCreate.add(new Pagina(titolo, data, this));
-    }*/
 
 
 }
