@@ -15,7 +15,7 @@ In questo README è presente una breve descrizione dei vari files riguardanti la
 
 3️⃣ Progettazione della soluzione
 
-4️⃣ Features e Controlli implementati
+4️⃣ Manuale dell'utente
 
 - File .png del Class Diagram del Dominio del Problema
 - File .png del Class Diagram del Dominio della Soluzione
