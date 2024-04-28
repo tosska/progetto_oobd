@@ -106,18 +106,17 @@ public class OperazioneImplementazionePostgresDAO implements OperazioneDAO {
             ps = connection.prepareStatement(comandoSql);
             ResultSet rs = ps.executeQuery();
 
-            rs.next();
-            Boolean risposta;
-            if(rs.getObject("risposta")==null)
-                risposta=null;
-            else
-                risposta = rs.getBoolean("risposta");
+            if(rs.next()){
+                Boolean risposta;
+                if(rs.getObject("risposta")==null)
+                    risposta=null;
+                else
+                    risposta = rs.getBoolean("risposta");
 
-            approvazione.add(rs.getString("autore"));
-            approvazione.add(rs.getString("data"));
-            approvazione.add(risposta);
-
-
+                approvazione.add(rs.getString("autore"));
+                approvazione.add(rs.getTimestamp("data"));
+                approvazione.add(risposta);
+            }
 
             ps.close();
             rs.close();

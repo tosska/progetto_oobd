@@ -129,6 +129,7 @@ public class AnteprimaGUI {
         paginaButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                controllerPrincipale.paginaPrecedente = controllerPrincipale.paginaAperta;
                 controllerPrincipale.paginaAperta = controllerPrincipale.getPaginaUtilizzatore(controllerPrincipale.paginaAperta.getId());
                 PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
                 frame.setVisible(false);

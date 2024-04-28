@@ -180,9 +180,14 @@ public class WelcomePage {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    controllerPrincipale.searchAndOpenPage(searchField.getText());
-                    PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
-                    frame.setVisible(false);
+                    try {
+                        controllerPrincipale.searchAndOpenPage(searchField.getText());
+                        PageGUI pageGUI = new PageGUI(controllerPrincipale, frame);
+                        frame.setVisible(false);
+                    }
+                    catch (RuntimeException er) {
+                        JOptionPane.showMessageDialog(null, er.getMessage(), "Errore", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }
             }
         });

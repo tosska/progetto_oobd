@@ -6,19 +6,17 @@ public abstract class Operazione { //fare interfaccia?
     private int id;
     private Boolean proposta;
     private Frase fraseCoinvolta;
-    private Frase fraseModificata;
     private Timestamp data;
     private Utente utente;
     private Approvazione approvazione;
-    private Storico storico;
     private Pagina pagina;
 
-    public Operazione(int id, Boolean proposta, Frase fraseCoinvolta, Timestamp data, Utente utente, Storico storico, Pagina pagina) {
+    public Operazione(int id, Boolean proposta, Frase fraseCoinvolta, Timestamp data, Utente utente,  Pagina pagina) {
+        setId(id);
         setProposta(proposta);
         setFraseCoinvolta(fraseCoinvolta);
         setData(data);
         setUtente(utente);
-        setStorico(storico);
         setPagina(pagina);
     }
 
@@ -36,8 +34,6 @@ public abstract class Operazione { //fare interfaccia?
     public void setData(Timestamp data) { this.data = data; }
     public Utente getUtente() { return utente; }
     public void setUtente(Utente utente) { this.utente = utente; }
-    public Storico getStorico() { return storico; }
-    public void setStorico(Storico storico) { this.storico = storico; }
     public Pagina getPagina(){return pagina;}
     public void setPagina(Pagina pagina) {this.pagina = pagina;}
 
@@ -46,10 +42,7 @@ public abstract class Operazione { //fare interfaccia?
         this.approvazione = approvazione;
     }
 
-    public void stampa()
-    {
-        //da capire se operazione farla classe o interfaccia
-    }
+    public abstract void stampa();
 
     public Frase getFraseCoinvolta() {
         return fraseCoinvolta;
@@ -59,9 +52,15 @@ public abstract class Operazione { //fare interfaccia?
         this.fraseCoinvolta = fraseCoinvolta;
     }
 
+    public Frase getFraseModificata(){
+        return null;
+    }
+
     public abstract String getTipo();
 
     public Approvazione getApprovazione() {
         return approvazione;
     }
+
+
 }

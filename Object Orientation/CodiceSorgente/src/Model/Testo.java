@@ -6,9 +6,8 @@ import java.util.ArrayList;
 public class Testo implements Cloneable{
     private ArrayList<Frase> listaFrasi;
     private Pagina paginaRiferita;
-    private int lunghezzaRiga; //da capire se cancellare o meno
+    private int lunghezzaRiga;
 
-    private String font; //da valutare l'idea
 
     public Testo(Pagina paginaRiferita) {
 
@@ -218,7 +217,7 @@ public class Testo implements Cloneable{
                 rigaSuccessiva = listaFrasi.get(indiceSuccessivo).getRiga();
             }
 
-            if(indiceSuccessivo==listaFrasi.size()-1)
+            if(indiceSuccessivo==listaFrasi.size())
                 listaFrasi.add(f);
             else
             {

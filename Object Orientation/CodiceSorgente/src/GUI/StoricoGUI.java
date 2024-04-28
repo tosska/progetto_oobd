@@ -68,21 +68,21 @@ public class StoricoGUI {
         tabellaStorico.setEnabled(false); // Rende la tabella non modificabile
 
 
-        for (int i = 0; i < controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().size(); i++)
+        for (int i = 0; i < controllerPrincipale.paginaAperta.getStorico().size(); i++)
         {
-            String tipo = "";
-            String fraseModificata = "";
+            String tipo = controllerPrincipale.paginaAperta.getStorico().get(i).getTipo();
+            String fraseModificata="";
+            if(tipo.equals("Modifica")) {
+                fraseModificata = controllerPrincipale.paginaAperta.getStorico().get(i).getFraseModificata().getContenuto();
+            }
 
-
-            tipo = controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getTipo();
-
-            storico.addRow(new Object[]{tipo, controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getProposta(),
-                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getFraseCoinvolta().getRiga(),
-                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getFraseCoinvolta().getOrdine(),
-                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getFraseCoinvolta().getContenuto(),
+            storico.addRow(new Object[]{tipo, controllerPrincipale.paginaAperta.getStorico().get(i).getProposta(),
+                    controllerPrincipale.paginaAperta.getStorico().get(i).getFraseCoinvolta().getRiga(),
+                    controllerPrincipale.paginaAperta.getStorico().get(i).getFraseCoinvolta().getOrdine(),
+                    controllerPrincipale.paginaAperta.getStorico().get(i).getFraseCoinvolta().getContenuto(),
                     fraseModificata,
-                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getUtente().getUsername(),
-                    controllerPrincipale.paginaAperta.getStorico().getListaOperazioni().get(i).getData()});
+                    controllerPrincipale.paginaAperta.getStorico().get(i).getUtente().getUsername(),
+                    controllerPrincipale.paginaAperta.getStorico().get(i).getData()});
         }
 
 

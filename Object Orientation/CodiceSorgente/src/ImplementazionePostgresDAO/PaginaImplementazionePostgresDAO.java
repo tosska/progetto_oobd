@@ -150,7 +150,7 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
 
             rs.close();
             ps.close();
-            return idCollegamento;
+
         }
         catch (Exception e) //fare exception not found
         {
@@ -179,6 +179,7 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             }
 
             rs.close();
+            listaPS.close();
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -192,12 +193,15 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT * FROM PAGINA WHERE titolo=" + "'" + titolo + "'");
             ResultSet rs = ps.executeQuery();
-            rs.next();//da capire se è possibile fare meglio
 
-            pagina.add(Integer.toString(rs.getInt(1))); //id
-            pagina.add(Integer.toString(rs.getInt(3))); //tema
-            pagina.add(rs.getString(4)); //data
-            pagina.add(rs.getString(5)); //autore
+            if(rs.next())
+            {
+                pagina.add(Integer.toString(rs.getInt(1))); //id
+                pagina.add(Integer.toString(rs.getInt(3))); //tema
+                pagina.add(rs.getString(4)); //data
+                pagina.add(rs.getString(5)); //autore
+            }
+
 
             rs.close();
             ps.close();
@@ -319,6 +323,8 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             cs.setString(5, utente);
             cs.execute();
 
+            cs.close();
+
         }
         catch (Exception e)
         {
@@ -339,6 +345,8 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             cs.setString(5, utente);
             cs.execute();
 
+            cs.close();
+
         }
         catch (Exception e)
         {
@@ -356,6 +364,8 @@ public class PaginaImplementazionePostgresDAO implements PaginaDAO {
             cs.setInt(3, ordine);
             cs.setString(4, utente);
             cs.execute();
+
+            cs.close();
 
         }
         catch (Exception e)

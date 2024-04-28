@@ -145,7 +145,8 @@ public class LoginPage {
                     if (controllerPrincipale.verificaPassword(userID, password)) {
                         frame.dispose();    // la schermata di login non ci serve più (va bene?)
 
-                        caricamentiDatabaseLogin(userID);
+                        controllerPrincipale.impostaUtilizzatore(userID);
+                        controllerPrincipale.caricaElementiDatabase();
 
                         // elimino il contenuto dei text field così se l'utente decide di fare un logout questi saranno già vuoti
                         usernameField.setText("");

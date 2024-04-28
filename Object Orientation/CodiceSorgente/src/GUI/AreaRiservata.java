@@ -140,13 +140,13 @@ public class AreaRiservata {
 
                 cardLayout.show(centralPanel, "operazioniPanel");
 
-                for (int i = 0; i < controller.storicoOperazioniUtente.size(); i++)
+                for (int i = 0; i < controller.utilizzatore.getOperazioniEffettuate().size(); i++)
                 {
-                    String username = controller.storicoOperazioniUtente.get(i).getUtente().getUsername();
-                    String tipo = controller.storicoOperazioniUtente.get(i).getTipo();
-                    Boolean proposta = controller.storicoOperazioniUtente.get(i).getProposta();
-                    String pagina = controller.storicoOperazioniUtente.get(i).getPagina().getTitolo();
-                    Timestamp data = controller.storicoOperazioniUtente.get(i).getData();
+                    String username = controller.utilizzatore.getOperazioniEffettuate().get(i).getUtente().getUsername();
+                    String tipo = controller.utilizzatore.getOperazioniEffettuate().get(i).getTipo();
+                    Boolean proposta = controller.utilizzatore.getOperazioniEffettuate().get(i).getProposta();
+                    String pagina = controller.utilizzatore.getOperazioniEffettuate().get(i).getPagina().getTitolo();
+                    Timestamp data = controller.utilizzatore.getOperazioniEffettuate().get(i).getData();
 
                     operazioni.addRow(new Object[]{username, tipo, proposta, pagina, data});
 
@@ -192,7 +192,7 @@ public class AreaRiservata {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                if(!controller.pagineCreate.isEmpty())
+                if(!controller.utilizzatore.getListaPagineCreate().isEmpty())
                 {
                     // Creazione del modello di tabella vuoto
                     DefaultTableModel pagineCreate = new DefaultTableModel();
@@ -206,11 +206,11 @@ public class AreaRiservata {
 
                     cardLayout.show(centralPanel, "storicoPanel");
 
-                    for (int i = 0; i < controller.pagineCreate.size(); i++)
+                    for (int i = 0; i < controller.utilizzatore.getListaPagineCreate().size(); i++)
                     {
-                        String pagina = controller.pagineCreate.get(i).getTitolo();
-                        String tema = controller.pagineCreate.get(i).getTema().getNome();
-                        Timestamp data = controller.pagineCreate.get(i).getDataCreazione();
+                        String pagina = controller.utilizzatore.getListaPagineCreate().get(i).getTitolo();
+                        String tema = controller.utilizzatore.getListaPagineCreate().get(i).getTema().getNome();
+                        Timestamp data = controller.utilizzatore.getListaPagineCreate().get(i).getDataCreazione();
 
                         pagineCreate.addRow(new Object[]{pagina, tema, data});
                     }
@@ -227,7 +227,7 @@ public class AreaRiservata {
                             if (column == 3) {
                                 frame.setVisible(false);
 
-                                controller.paginaAperta = controller.pagineCreate.get(row);
+                                controller.paginaAperta = controller.utilizzatore.getListaPagineCreate().get(row);
                                 controller.caricaStoricoDaPagina(controller.paginaAperta);
 
                                 StoricoGUI storicoGUI = new StoricoGUI(frame, controller);
@@ -578,8 +578,9 @@ public class AreaRiservata {
         ImageIcon anteprimaImagine = new ImageIcon(this.getClass().getResource("/icon/anteprima.png"));
         ImageIcon approvaImagine = new ImageIcon(this.getClass().getResource("/icon/approva.png"));
         ImageIcon rifiutaImagine = new ImageIcon(this.getClass().getResource("/icon/rifiuta.png"));
-        JLabel vuotoLabel = new JLabel("Non vi sono proposte da approvare");
-
+        JLabel vuotoLabel = new JLabel("Non vi sono proposte da approvare.");
+        vuotoLabel.setBounds(10, 10, 130, 30);
+        vuotoLabel.setFont(new Font("Arial", Font.BOLD, 16));
 
         proposteLabel.addMouseListener(new MouseAdapter()  {
             @Override
@@ -588,7 +589,7 @@ public class AreaRiservata {
 
                 controller.caricaProposteDaApprovare();
 
-                if(!controller.proposteDaApprovare.isEmpty())
+                if(!controller.utilizzatore.getProposteDaApprovare().isEmpty())
                 {
                     // Creazione del modello di tabella vuoto
                     DefaultTableModel proposte = new DefaultTableModel();
@@ -629,11 +630,11 @@ public class AreaRiservata {
                             // pacchetto di proposte approvate
                             if (column == 4) {
 
-                                for (int i = 0; i < controller.proposteDaApprovare.size(); i++) {
+                                for (int i = 0; i < controller.utilizzatore.getProposteDaApprovare().size(); i++) {
 
-                                    if (controller.proposteDaApprovare.get(i).getPagina().getId() == controller.anteprime.get(row).getId()
-                                            && controller.anteprime.get(row).getAutore().getUsername().equals(controller.proposteDaApprovare.get(i).getUtente().getUsername())) {
-                                        controller.approvaProposta(controller.proposteDaApprovare.get(i), true);
+                                    if (controller.utilizzatore.getProposteDaApprovare().get(i).getOperazione().getPagina().getId() == controller.anteprime.get(row).getId()
+                                            && controller.anteprime.get(row).getAutore().getUsername().equals(controller.utilizzatore.getProposteDaApprovare().get(i).getOperazione().getUtente().getUsername())) {
+                                        controller.approvaProposta(controller.utilizzatore.getProposteDaApprovare().get(i).getOperazione(), true);
                                     }
 
                                 }
@@ -647,11 +648,11 @@ public class AreaRiservata {
 
                             //pacchetto di proposte rifiutate
                             if (column == 5) {
-                                for (int i = 0; i < controller.proposteDaApprovare.size(); i++) {
+                                for (int i = 0; i < controller.utilizzatore.getProposteDaApprovare().size(); i++) {
 
-                                    if (controller.proposteDaApprovare.get(i).getPagina().getId() == controller.anteprime.get(row).getId()
-                                            && controller.anteprime.get(row).getAutore().getUsername().equals(controller.proposteDaApprovare.get(i).getUtente().getUsername())) {
-                                        controller.approvaProposta(controller.proposteDaApprovare.get(i), false);
+                                    if (controller.utilizzatore.getProposteDaApprovare().get(i).getOperazione().getPagina().getId() == controller.anteprime.get(row).getId()
+                                            && controller.anteprime.get(row).getAutore().getUsername().equals(controller.utilizzatore.getProposteDaApprovare().get(i).getOperazione().getUtente().getUsername())) {
+                                        controller.approvaProposta(controller.utilizzatore.getProposteDaApprovare().get(i).getOperazione(), false);
                                     }
 
                                 }
@@ -729,7 +730,7 @@ public class AreaRiservata {
                 }
                 else
                 {
-                    propostePanel.add(vuotoLabel);
+                    propostePanel.add(vuotoLabel, BorderLayout.NORTH);
                 }
             }
 

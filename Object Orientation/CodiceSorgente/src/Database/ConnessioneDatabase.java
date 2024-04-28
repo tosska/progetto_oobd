@@ -3,6 +3,7 @@ package Database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.concurrent.Executors;
 
 public class ConnessioneDatabase {
 
@@ -17,6 +18,7 @@ public class ConnessioneDatabase {
         try {
             Class.forName(driver);
             connection = DriverManager.getConnection(url, nome, password);
+            connection.setNetworkTimeout(Executors.newFixedThreadPool(1), 10000);
         } catch (ClassNotFoundException ex) {
             System.out.println("Database connection creation failed: " + ex.getMessage());
             ex.printStackTrace();

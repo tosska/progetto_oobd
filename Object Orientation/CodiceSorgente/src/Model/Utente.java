@@ -11,8 +11,7 @@ public class Utente {
     private Boolean autore; // indica se si tratta di un autore o no
     private ArrayList<Operazione> operazioniEffettuate;
     private ArrayList<Pagina> ListaPagineCreate;
-    private ArrayList<Approvazione> notifiche;
-
+    private ArrayList<Approvazione> proposteDaApprovare;
     public Utente (String user, String mail, String pass, Timestamp data) {
         setUsername(user);
         setEmail(mail);
@@ -34,6 +33,30 @@ public class Utente {
 
     public void setOperazioniEffettuate(ArrayList<Operazione> operazioniEffettuate) {
         this.operazioniEffettuate = operazioniEffettuate;
+    }
+
+    public ArrayList<Approvazione> getProposteDaApprovare() {
+        return proposteDaApprovare;
+    }
+
+    public void setProposteDaApprovare(ArrayList<Approvazione> proposteDaApprovare) {
+        this.proposteDaApprovare = proposteDaApprovare;
+    }
+
+    public ArrayList<Pagina> getListaPagineCreate() {
+        return ListaPagineCreate;
+    }
+
+    public void setListaPagineCreate(ArrayList<Pagina> listaPagineCreate) {
+        ListaPagineCreate = listaPagineCreate;
+    }
+
+    public Boolean getAutore() {
+        return autore;
+    }
+
+    public void setAutore(Boolean autore) {
+        this.autore = autore;
     }
 
     //da capire se cancellare o modificare

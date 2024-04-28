@@ -142,6 +142,7 @@ public class LinkGUI {
         removeLink.setBackground(new Color(47,69,92));
         removeLink.setForeground(Color.white);
         removeLink.setFocusable(false);
+        removeLink.setEnabled(false);
 
         insertLink = new JButton("Insert");
         insertLink.setBounds(220, 10, 120, 35);
@@ -149,6 +150,7 @@ public class LinkGUI {
         insertLink.setBackground(new Color(47,69,92));
         insertLink.setForeground(Color.white);
         insertLink.setFocusable(false);
+        insertLink.setEnabled(false);
 
         selectedPhrase = new JLabel();
         selectedPhrase.setBounds(15, 15, 70, 25);
@@ -200,9 +202,20 @@ public class LinkGUI {
                 int riga = Integer.parseInt(selectedPhrase.getText().split(";")[0]);
                 int ordine = Integer.parseInt(selectedPhrase.getText().split(";")[1]);
 
-                controllerPrincipale.insertLink(riga, ordine, titolo);
+                try {
+                    if(!titolo.equals(controllerPrincipale.paginaAperta.getTitolo())) {
+                        controllerPrincipale.insertLink(riga, ordine, titolo);
+                        JOptionPane.showMessageDialog(null, "Collegamento inserito", "Avviso", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                    else
+                        JOptionPane.showMessageDialog(null, "Impossibile collegare una frase alla\nstessa pagina su cui è presente", "Errore", JOptionPane.INFORMATION_MESSAGE);
 
-                JOptionPane.showMessageDialog(null, "Collegamento inserito", "Avviso", JOptionPane.INFORMATION_MESSAGE);
+                }
+                catch (RuntimeException er) {
+                    JOptionPane.showMessageDialog(null, er.getMessage(), "Errore", JOptionPane.INFORMATION_MESSAGE);
+                }
+
+
                 frame.dispose();
                 frameChiamante.setVisible(true);
             }
