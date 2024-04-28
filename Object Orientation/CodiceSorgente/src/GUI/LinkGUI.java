@@ -102,7 +102,7 @@ public class LinkGUI {
         titlePanel.setBorder(borderTitle);
 
         titleLabel = new JLabel(controllerPrincipale.paginaAperta.getTitolo() + " (" + controllerPrincipale.paginaAperta.getTema().getNome() + ")");
-        titleLabel.setBounds(10, 10, 200, 25);
+        titleLabel.setBounds(10, 10, 350, 25);
         titleLabel.setFont(new Font("Arial", Font.PLAIN, 20));
 
         centralPanel.setLayout(null);

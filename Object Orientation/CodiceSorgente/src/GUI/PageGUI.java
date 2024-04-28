@@ -8,6 +8,9 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import static javax.swing.text.StyleConstants.setForeground;
+import static javax.swing.text.StyleConstants.setUnderline;
+
 public class PageGUI {
     private JFrame frame = new JFrame();
     private JFrame frameChiamante;
@@ -41,8 +44,8 @@ public class PageGUI {
     private void stampaTesto() {
         Document doc = textPane.getDocument();
         Style collegamento = textPane.addStyle("ColorStyle", null);
-        StyleConstants.setUnderline(collegamento, true);
-        StyleConstants.setForeground(collegamento, Color.BLUE);
+        setUnderline(collegamento, true);
+        setForeground(collegamento, Color.BLUE);
         Style attuale;
 
         for(String f : controllerPrincipale.getFrasiPaginaAperta())
@@ -97,7 +100,6 @@ public class PageGUI {
         textPane.setEditable(false);
         textPane.setBounds(10, 50, 460, 350);
         textPane.setFont(new Font("Arial", Font.PLAIN, 20));
-
 
 
         scrollPane = new JScrollPane(textPane);

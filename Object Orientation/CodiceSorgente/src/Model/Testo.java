@@ -13,7 +13,7 @@ public class Testo implements Cloneable{
 
         setPaginaRiferita(paginaRiferita);
         listaFrasi = new ArrayList<>();
-        lunghezzaRiga = 50;
+        lunghezzaRiga = 48;
     }
 
     public Pagina getPaginaRiferita() { return paginaRiferita; }
@@ -321,7 +321,6 @@ public class Testo implements Cloneable{
         testo = testo + "\n"; // da valutare se la soluzione migliore
         String[] splitLine = testo.split("\\n");
         String textFormatted="";
-        String aCapo;
         int posizioneNewLine ;
 
         for(String line : splitLine)
@@ -345,11 +344,6 @@ public class Testo implements Cloneable{
 
         System.out.println("Sono il testo formattato: " + textFormatted);
         return textFormatted;
-    }
-
-    public void aggiorna()
-    {
-        this.setTestoString(this.getTestoString());
     }
 
 
@@ -389,17 +383,5 @@ public class Testo implements Cloneable{
         this.lunghezzaRiga = lunghezzaRiga;
     }
 
-    public Testo getTestoSelezionabile()
-    {
-        Testo t = clonaTesto();
 
-        for(int i=0; i<t.listaFrasi.size(); i++)
-        {
-            Frase f = t.listaFrasi.get(i);
-            f.setContenuto("\u21921;2\u2192" + f.getContenuto());
-            t.listaFrasi.set(i, f);
-        }
-
-        return t;
-    }
 }

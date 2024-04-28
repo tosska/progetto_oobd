@@ -4,6 +4,8 @@ import Controller.Controller;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Style;
@@ -80,8 +82,8 @@ public class EditPage {
         textPane = new JTextPane();
 
         textPane.setFont(new Font("Arial", Font.PLAIN, 20));
-        //textPane.setEditable(false);
         textPane.setBounds(10, 50, 460, 350);
+
 
         scrollPane = new JScrollPane(textPane);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -137,6 +139,7 @@ public class EditPage {
         chooseTheme.setBounds(480, 10, 100, 25);
         chooseTheme.setFont(new Font("Roboto", Font.BOLD, 13));
         chooseTheme.setForeground(new Color(47,69,92));
+        dropdownMenu.setEnabled(false);
 
 
 
@@ -174,6 +177,30 @@ public class EditPage {
 
                 frame.dispose();
                 frameChiamante.setVisible(true);
+            }
+        });
+
+        textPane.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                try {
+                    // Quando viene inserito del testo, cambia il suo colore in nero
+                    textPane.getDocument().setCharacterAttributes(e.getOffset(), e.getLength(), style, false);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+        }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
             }
         });
 
